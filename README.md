@@ -23,5 +23,8 @@ yarn run build:watch
 
 # in another window:
 jupyter-repo2docker -v "$PWD/src:/home/$USER/" .
-
 ```
+
+We depend on the JupyterLab core using [git subtree](https://manpages.debian.org/testing/git-man/git-subtree.1.en.html) so that TypeScript can read the sources to see the most recent type definitions.
+
+This is instead of adding this as a package inside JupyterLab, which is a bit messy.

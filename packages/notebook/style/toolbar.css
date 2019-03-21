@@ -1,0 +1,35 @@
+/*-----------------------------------------------------------------------------
+| Copyright (c) Jupyter Development Team.
+| Distributed under the terms of the Modified BSD License.
+|----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+| Variables
+|----------------------------------------------------------------------------*/
+
+/*-----------------------------------------------------------------------------
+
+/*-----------------------------------------------------------------------------
+| Styles
+|----------------------------------------------------------------------------*/
+
+.jp-NotebookPanel-toolbar {
+  padding: 2px;
+}
+
+.jp-Toolbar-item.jp-Notebook-toolbarCellType .jp-select-wrapper.jp-mod-focused {
+  border: none;
+  box-shadow: none;
+}
+
+.jp-Notebook-toolbarCellTypeDropdown select {
+  height: 24px;
+  font-size: var(--jp-ui-font-size1);
+  line-height: 14px;
+  border-radius: 0;
+  display: block;
+}
+
+.jp-Notebook-toolbarCellTypeDropdown span {
+  top: 5px !important;
+}

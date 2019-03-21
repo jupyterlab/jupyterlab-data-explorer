@@ -1,4 +1,17 @@
 {
-    "private": true,
-    "workspaces": ["dataregistry", "dataregistry-extension"]
-  }
+  "private": true,
+  "workspaces": [
+    "dataregistry",
+    "dataregistry-extension",
+    "jupyterlab/packages/application",
+    "jupyterlab/packages/apputils",
+    "jupyterlab/packages/coreutils",
+    "jupyterlab/packages/dataregistry",
+    "jupyterlab/packages/docmanager",
+    "jupyterlab/packages/docregistry",
+    "jupyterlab/packages/filebrowser",
+    "jupyterlab/packages/rendermime-interfaces",
+    "jupyterlab/packages/notebook",
+    "jupyterlab/packages/rendermime"
+  ]
+}

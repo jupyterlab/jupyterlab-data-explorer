@@ -1,20 +1,24 @@
 {
-  "extends": "../../tsconfigbase",
   "compilerOptions": {
     "outDir": "lib",
     "rootDir": "src",
     "jsx": "react",
     "skipLibCheck": true,
     "strict": true,
-    "types": ["node"]
+    "types": ["node"],
+    "lib": ["dom", "es2015", "esnext.asynciterable"],
+    "allowSyntheticDefaultImports": true,
+    "composite": true,
+    "declaration": true,
+    "noImplicitAny": true,
+    "noEmitOnError": true,
+    "noUnusedLocals": true,
+    "esModuleInterop": true,
+    "preserveWatchOutput": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "target": "es2015"
   },
-  "include": ["src/*"],
-  "references": [
-    {
-      "path": "../apputils"
-    },
-    {
-      "path": "../rendermime-interfaces"
-    }
-  ]
+  "include": ["src/*"]
 }

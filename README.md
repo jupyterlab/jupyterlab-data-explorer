@@ -12,12 +12,12 @@ We use [`repo2docker`](https://repo2docker.readthedocs.io/en/latest/usage.html) 
 
 ```bash
 python3 -m pip install jupyter-repo2docker
-jupyter-repo2docker .
-```
 
-To edit the code, you need to fetch the JavaScript dependencies:
+cd jupyterlab
+yarn
+yarn run build:src
+cd ..
 
-```bash
 yarn
 yarn run build:watch
 

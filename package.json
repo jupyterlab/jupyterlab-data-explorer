@@ -3,15 +3,10 @@
   "workspaces": [
     "dataregistry",
     "dataregistry-extension",
-    "jupyterlab/packages/application",
-    "jupyterlab/packages/apputils",
-    "jupyterlab/packages/coreutils",
-    "jupyterlab/packages/dataregistry",
-    "jupyterlab/packages/docmanager",
-    "jupyterlab/packages/docregistry",
-    "jupyterlab/packages/filebrowser",
-    "jupyterlab/packages/rendermime-interfaces",
-    "jupyterlab/packages/notebook",
-    "jupyterlab/packages/rendermime"
-  ]
+    "jupyterlab/packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build dataregistry dataregistry-extension",
+    "build:watch": "yarn run build --watch"
+  }
 }

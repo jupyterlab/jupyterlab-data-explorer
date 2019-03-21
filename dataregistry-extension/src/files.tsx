@@ -78,7 +78,6 @@ function activate(
   );
 
   // Register right click on file menu.
-  app.contextMenu.menu.
   app.contextMenu.addItem({
     command: open,
     selector: selectorNotDir,

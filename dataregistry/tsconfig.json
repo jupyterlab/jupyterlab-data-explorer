@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfigbase",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "jsx": "react",
+    "skipLibCheck": true,
+    "strict": true,
+    "types": ["node"]
+  },
+  "include": ["src/*"],
+  "references": [
+    {
+      "path": "../apputils"
+    },
+    {
+      "path": "../rendermime-interfaces"
+    }
+  ]
+}

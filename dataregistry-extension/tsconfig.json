@@ -1,0 +1,39 @@
+{
+  "extends": "../../tsconfigbase",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src",
+    "skipLibCheck": true,
+    "strict": true
+  },
+  "include": ["src/*"],
+  "references": [
+    {
+      "path": "../application"
+    },
+    {
+      "path": "../apputils"
+    },
+    {
+      "path": "../coreutils"
+    },
+    {
+      "path": "../dataregistry"
+    },
+    {
+      "path": "../docmanager"
+    },
+    {
+      "path": "../docregistry"
+    },
+    {
+      "path": "../filebrowser"
+    },
+    {
+      "path": "../notebook"
+    },
+    {
+      "path": "../rendermime"
+    }
+  ]
+}

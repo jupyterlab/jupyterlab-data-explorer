@@ -22,7 +22,10 @@ yarn
 yarn run build:watch
 
 # in another window:
-jupyter-repo2docker -v "$PWD/src:/home/$USER/" .
+jupyter-repo2docker \
+    -v "$PWD/dataregistry-extension/src:/home/$USER/jupyterlab/packages/dataregistry-extension/src" \
+    -v "$PWD/dataregistry/src:/home/$USER/jupyterlab/packages/dataregistry/src" \
+    . --watch
 ```
 
 We depend on the JupyterLab core using [git subtree](https://manpages.debian.org/testing/git-man/git-subtree.1.en.html) so that TypeScript can read the sources to see the most recent type definitions.

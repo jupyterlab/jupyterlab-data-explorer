@@ -19,7 +19,8 @@ python3 -m pip install jupyter-repo2docker
 jupyter-repo2docker \
     -v "$PWD/dataregistry-extension/src:/home/$USER/jupyterlab/packages/dataregistry-extension/src" \
     -v "$PWD/dataregistry/src:/home/$USER/jupyterlab/packages/dataregistry/src" \
-    . --watch
+    --publish 8888:8888 \
+    . _ _ --watch
 ```
 
 As you update the TypeScript source, it should rebuild so that when you reload you see the changes.
@@ -39,4 +40,4 @@ yarn run build:watch
 
 We depend on the JupyterLab core using [git subtree](https://manpages.debian.org/testing/git-man/git-subtree.1.en.html) so that TypeScript can read the sources to see the most recent type definitions.
 
-This is instead of adding this as a package inside JupyterLab, which is a bit messy.
+This is instead of adding this as a package inside JupyterLab, which is a bit messy. This is done for you transparently in the `binder/postBuild` file. 

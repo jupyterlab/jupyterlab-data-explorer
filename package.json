@@ -1,0 +1,12 @@
+{
+  "private": true,
+  "workspaces": [
+    "dataregistry",
+    "dataregistry-extension",
+    "jupyterlab/packages/*"
+  ],
+  "scripts": {
+    "build": "tsc --build dataregistry dataregistry-extension",
+    "build:watch": "yarn run build --watch"
+  }
+}

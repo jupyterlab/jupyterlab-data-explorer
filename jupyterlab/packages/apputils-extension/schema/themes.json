@@ -1,0 +1,15 @@
+{
+  "title": "Theme",
+  "jupyter.lab.setting-icon-label": "Theme Manager",
+  "description": "Theme manager settings.",
+  "additionalProperties": false,
+  "properties": {
+    "theme": {
+      "type": "string",
+      "title": "Selected Theme",
+      "description": "Application-level visual styling theme",
+      "default": "JupyterLab Light"
+    }
+  },
+  "type": "object"
+}

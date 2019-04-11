@@ -1,7 +1,8 @@
-import { widgetDataType } from '@jupyterlab/dataregistry';
+import { widgetDataType, IDataRegistry } from '@jupyterlab/dataregistry';
 import { DataGrid } from '@phosphor/datagrid';
-import { DSVModel } from './model';
+import { DSVModel } from '@jupyterlab/csvviewer';
 import { DataTypeNoArgs } from '@jupyterlab/dataregistry/lib/datatype';
+import { JupyterFrontEndPlugin, JupyterFrontEnd } from '@jupyterlab/application';
 
 export const CSVDataType = new DataTypeNoArgs<string>('text/csv');
 
@@ -26,3 +27,19 @@ export const CSVConverter = CSVDataType.createSingleTypedConverter(
     }
   ]
 );
+
+const id = '@jupyterlab/dataregistry-extension:csv-viewer';
+
+export default {
+  activate,
+  id,
+  requires: [IDataRegistry],
+  autoStart: true
+} as JupyterFrontEndPlugin<void>;
+
+function activate(
+  app: JupyterFrontEnd,
+  dataRegistry: IDataRegistry,
+): void {
+  dataRegistry.converters.register(CSVConverter);
+}

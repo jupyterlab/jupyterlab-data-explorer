@@ -3,29 +3,31 @@
 | Distributed under the terms of the Modified BSD License.
 |----------------------------------------------------------------------------*/
 
-import { JupyterFrontEndPlugin } from '@jupyterlab/application';
-import converterRegistryPlugin from './converters';
-import dataRegistryPlugin from './dataregistry';
-import datasetsPlugin from './datasets';
-import dataExplorerPlugin from './explorer';
-import filesPlugin from './files';
-import snippetsPlugin from './snippets';
-import widgetPlugin from './widgets';
-import URLPlugin from './urls';
-import renderMimePlugin from './rendermime';
-import activePlugin from './active';
-import filePlugin from './file';
+import { JupyterFrontEndPlugin } from "@jupyterlab/application";
+import activePlugin from "./active";
+import converterRegistryPlugin from "./converters";
+import csvViewerPlugin from "./csvviewer";
+import dataRegistryPlugin from "./dataregistry";
+import datasetsPlugin from "./datasets";
+import dataExplorerPlugin from "./explorer";
+import filePlugin from "./file";
+import filesPlugin from "./files";
+import renderMimePlugin from "./rendermime";
+import snippetsPlugin from "./snippets";
+import URLPlugin from "./urls";
+import widgetPlugin from "./widgets";
 
 export default [
-  dataRegistryPlugin,
+  activePlugin,
   converterRegistryPlugin,
+  csvViewerPlugin,
   dataExplorerPlugin,
+  dataRegistryPlugin,
   datasetsPlugin,
+  filePlugin,
   filesPlugin,
-  widgetPlugin,
+  renderMimePlugin,
   snippetsPlugin,
   URLPlugin,
-  renderMimePlugin,
-  activePlugin,
-  filePlugin
+  widgetPlugin
 ] as JupyterFrontEndPlugin<any>[];

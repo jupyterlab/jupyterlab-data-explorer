@@ -19,6 +19,7 @@ python3 -m pip install jupyter-repo2docker
 jupyter-repo2docker \
     -v "$PWD/dataregistry-extension/src:/home/$USER/jupyterlab/packages/dataregistry-extension/src" \
     -v "$PWD/dataregistry/src:/home/$USER/jupyterlab/packages/dataregistry/src" \
+    -v "$PWD/dataregistry/notebooks:/home/$USER/notebooks" \
     --publish 8888:8888 \
     . _ _ --watch
 ```

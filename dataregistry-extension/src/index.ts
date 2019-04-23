@@ -16,6 +16,7 @@ import renderMimePlugin from "./rendermime";
 import snippetsPlugin from "./snippets";
 import URLPlugin from "./urls";
 import widgetPlugin from "./widgets";
+import tableDataPlugin from './tableData'
 
 export default [
   activePlugin,
@@ -29,5 +30,6 @@ export default [
   renderMimePlugin,
   snippetsPlugin,
   URLPlugin,
-  widgetPlugin
+  widgetPlugin,
+  tableDataPlugin
 ] as JupyterFrontEndPlugin<any>[];

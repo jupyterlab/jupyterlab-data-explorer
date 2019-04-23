@@ -13,12 +13,20 @@ import {
   singleConverter,
   MimeType_
 } from './converters';
+import { Dataset } from './datasets';
 
 export const INVALID = Symbol('INVALID');
 
 export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
   abstract createMimeType(typeData: T): MimeType_;
+
+  /**
+   * Creates a new dataset of this type.
+   */
+  createDataset(url: URL, data: U, typeData: T): Dataset<U> {
+    return new Dataset(this.createMimeType(typeData), url, data);
+  }
 
   /**
    * Creates a converter with a source of this data type.

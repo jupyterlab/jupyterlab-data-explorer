@@ -18,7 +18,7 @@ import { ISignal, Signal } from '@phosphor/signaling';
  * to be utilities to convert between this formats.
  */
 export class Dataset<T> {
-  constructor(mimetype: string, url: URL, data: T) {
+  constructor(mimetype: string, url: URL_, data: T) {
     this.mimeType = mimetype;
     this.url = url;
     this.data = data;
@@ -30,16 +30,16 @@ export class Dataset<T> {
   readonly mimeType: string;
 
   /**
-   * A persistent URL that points to the dataset.
+   * A persistent URL_ that points to the dataset.
    *
    * #### Notes
    * This can be used by other extensions and services to maintain
    * persistent pointers to datasets across sessions. It is also used interally
    * to understand that new datasets produced by conversions refer to the same
-   * dataset. The term "URL" is prefered over "URI" by the WHATWG:
+   * dataset. The term "URL_" is prefered over "URI" by the WHATWG:
    * https://url.spec.whatwg.org/#goals
    */
-  readonly url: URL;
+  readonly url: URL_;
 
   /***
    * The data of the dataset.
@@ -111,9 +111,9 @@ export class DatasetRegistry {
   }
 
   /**
-   * Filters the datasets to this with a certain URL.
+   * Filters the datasets to this with a certain URL_.
    */
-  filterByURL(url: URL): Set<Dataset<any>> {
+  filterByURL_(url: URL_): Set<Dataset<any>> {
     return new Set(
       [...this._datasets].filter(
         dataset => dataset.url.toString() === url.toString()
@@ -121,8 +121,8 @@ export class DatasetRegistry {
     );
   }
 
-  mimeTypesForURL(url: URL): Set<string> {
-    return new Set([...this.filterByURL(url)].map(dataset => dataset.mimeType));
+  mimeTypesForURL_(url: URL_): Set<string> {
+    return new Set([...this.filterByURL_(url)].map(dataset => dataset.mimeType));
   }
 
   /**
@@ -145,9 +145,9 @@ export class DatasetRegistry {
   }
 
   /**
-   * Return a set of all dataset URLs.
+   * Return a set of all dataset URL_s.
    */
-  get URLs(): Set<URL> {
+  get URL_s(): Set<URL_> {
     return new Set([...this._datasets].map(d => d.url));
   }
 

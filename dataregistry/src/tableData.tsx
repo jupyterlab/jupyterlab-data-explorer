@@ -48,7 +48,7 @@ class RendererDataset extends ReactWidget implements IRenderMime.IRenderer {
   }
   async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
     this._register(
-      TableDataType.createDataset(new URL("tmp:///"), (model.data[
+      TableDataType.createDataset(new URL_("tmp:///"), (model.data[
         TableDataType.mimeType
       ] as unknown) as TableData)
     );

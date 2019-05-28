@@ -42,7 +42,7 @@ class RendererDataset extends ReactWidget implements IRenderMime.IRenderer {
   register() {
     this._register(
       this._data!.datasets.map(
-        ({ mimeType, url, data }) => new Dataset(mimeType, new URL(url), data)
+        ({ mimeType, url, data }) => new Dataset(mimeType, new URL_(url), data)
       )
     );
   }

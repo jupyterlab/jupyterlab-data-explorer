@@ -1,6 +1,7 @@
 {
   "private": true,
   "workspaces": [
+    "dataregistry-core",
     "dataregistry",
     "dataregistry-extension",
     "jupyterlab/packages/*"

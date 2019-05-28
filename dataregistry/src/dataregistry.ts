@@ -23,7 +23,7 @@ export class DataRegistry {
     this.data = config.data;
   }
 
-  registerURL(url: URL): IDisposable | null {
+  registerURL_(url: URL_): IDisposable | null {
     const dataset = resolveDataSet(url);
     if (this.data.contains(dataset)) {
       return null;
@@ -32,11 +32,11 @@ export class DataRegistry {
   }
 
   /**
-   * Returns whether a URL, if registered, will have any conversions.
+   * Returns whether a URL_, if registered, will have any conversions.
    *
-   * Basically checks if the we will be able to resolve the mimetype just from the URL.
+   * Basically checks if the we will be able to resolve the mimetype just from the URL_.
    */
-  hasConversions(url: URL): boolean {
+  hasConversions(url: URL_): boolean {
     return (
       this.converters.listTargetMimeTypes(url, [resolveDataType.mimeType])
         .size > 1
@@ -44,21 +44,21 @@ export class DataRegistry {
   }
 
   /**
-   * Returns all mimetypes a URL that is already registered
+   * Returns all mimetypes a URL_ that is already registered
    * can be converted to.
    */
-  possibleMimeTypesForURL(url: URL): Set<string> {
+  possibleMimeTypesForURL_(url: URL_): Set<string> {
     return this.converters.listTargetMimeTypes(
       url,
-      this.data.mimeTypesForURL(url)
+      this.data.mimeTypesForURL_(url)
     );
   }
   /**
-   * Returns the viewer labels for a given URL.
+   * Returns the viewer labels for a given URL_.
    */
-  viewersForURL(url: URL): Set<string> {
+  viewersForURL_(url: URL_): Set<string> {
     const res = new Set<string>();
-    for (const mimeType of this.possibleMimeTypesForURL(url)) {
+    for (const mimeType of this.possibleMimeTypesForURL_(url)) {
       const label = viewerDataType.parseMimeType(mimeType);
       if (label !== INVALID) {
         res.add(label);
@@ -68,10 +68,10 @@ export class DataRegistry {
   }
 
   /**
-   * View a dataset with a certain URL with the viewer with a certain label.
+   * View a dataset with a certain URL_ with the viewer with a certain label.
    */
-  async viewURL(url: URL, label: string): Promise<void> {
-    const viewer: Dataset<() => Promise<void>> = await this.convertByURL(
+  async viewURL_(url: URL_, label: string): Promise<void> {
+    const viewer: Dataset<() => Promise<void>> = await this.convertByURL_(
       url,
       viewerDataType.createMimeType(label)
     );
@@ -80,17 +80,17 @@ export class DataRegistry {
 
   /**
    * Returns a dataset of the the target mime type converted from existing
-   * data types with the same URL.
+   * data types with the same URL_.
    *
    * Any datasets that are created will be added to the registery.
    */
-  async convertByURL(
-    url: URL,
+  async convertByURL_(
+    url: URL_,
     targetMimeType: MimeType_
   ): Promise<Dataset<any>> {
     let finalDataSet: Dataset<any>;
     for await (const dataset of this.converters.convert(
-      this.data.filterByURL(url),
+      this.data.filterByURL_(url),
       targetMimeType
     )) {
       finalDataSet = dataset;

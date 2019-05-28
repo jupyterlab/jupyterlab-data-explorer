@@ -5,7 +5,7 @@
 import { viewerDataType, View } from './viewers';
 import { Converter } from './converters';
 import { FilePath, fileDataType } from './files';
-import { URLDataType } from './urls';
+import { URL_DataType } from './urls';
 
 import { relative, dirname } from 'path';
 import { DataTypeStringArg } from './datatype';
@@ -48,24 +48,24 @@ export function fileSnippetConverter({
   );
 }
 
-export interface IURLSnippetConverter {
+export interface IURL_SnippetConverter {
   mimeType: string;
-  createSnippet: (url: string | URL) => string;
+  createSnippet: (url: string | URL_) => string;
   label: string;
 }
 
-export function URLSnippetConverter({
+export function URL_SnippetConverter({
   mimeType,
   createSnippet,
   label
-}: IURLSnippetConverter): Converter<URL | string, Snippet> {
-  return URLDataType.createSingleTypedConverter(
+}: IURL_SnippetConverter): Converter<URL_ | string, Snippet> {
+  return URL_DataType.createSingleTypedConverter(
     snippedDataType,
     (innerMimeType: string) => {
       if (innerMimeType !== mimeType) {
         return null;
       }
-      return [label, async (url: string | URL) => () => createSnippet(url)];
+      return [label, async (url: string | URL_) => () => createSnippet(url)];
     }
   );
 }

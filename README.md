@@ -6,6 +6,13 @@
 
 We are currently building a data registry for JupyterLab [#5548](https://github.com/jupyterlab/jupyterlab/issues/5548). The idea is to show users datasets that have been registered and allow users to view those datasets, by relying on a series of data converters.
 
+
+## Design
+
+
+
+
+
 ## Development
 
 This relies on features in an unreleased version of JupyterLab, so you you have to run it linked against that version of JupyterLab.
@@ -17,6 +24,7 @@ and build it locally:
 python3 -m pip install jupyter-repo2docker
 
 jupyter-repo2docker \
+    -v "$PWD/dataregistry-core/src:/home/$USER/jupyterlab/packages/dataregistry-core/src" \
     -v "$PWD/dataregistry-extension/src:/home/$USER/jupyterlab/packages/dataregistry-extension/src" \
     -v "$PWD/dataregistry/src:/home/$USER/jupyterlab/packages/dataregistry/src" \
     -v "$PWD/dataregistry/notebooks:/home/$USER/notebooks" \

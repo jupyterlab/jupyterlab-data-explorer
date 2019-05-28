@@ -11,7 +11,7 @@ import {
   IConverterRegistry,
   snippetViewerConverter,
   fileSnippetConverter,
-  URLSnippetConverter
+  URL_SnippetConverter
 } from '@jupyterlab/dataregistry';
 import { INotebookTracker } from '@jupyterlab/notebook';
 
@@ -46,10 +46,10 @@ function activate(
     })
   );
   converters.register(
-    URLSnippetConverter({
+    URL_SnippetConverter({
       mimeType: 'text/csv',
       label: 'Snippet',
-      createSnippet: (url: string | URL) =>
+      createSnippet: (url: string | URL_) =>
         `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(
           url.toString()
         )})\ndf`

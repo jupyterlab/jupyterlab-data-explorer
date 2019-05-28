@@ -14,7 +14,7 @@ import filePlugin from "./file";
 import filesPlugin from "./files";
 import renderMimePlugin from "./rendermime";
 import snippetsPlugin from "./snippets";
-import URLPlugin from "./urls";
+import URL_Plugin from "./urls";
 import widgetPlugin from "./widgets";
 import tableDataPlugin from './tableData'
 
@@ -29,7 +29,7 @@ export default [
   filesPlugin,
   renderMimePlugin,
   snippetsPlugin,
-  URLPlugin,
+  URL_Plugin,
   widgetPlugin,
   tableDataPlugin
 ] as JupyterFrontEndPlugin<any>[];

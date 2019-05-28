@@ -1,10 +1,10 @@
 /**
  * Start with files as unkown mimetype
  *
- * Then convert to known filetype, with URL on it.
+ * Then convert to known filetype, with URL_ on it.
  */
 import { Converter } from './converters';
-import { URLDataType } from './urls';
+import { URL_DataType } from './urls';
 import { DataTypeStringArg } from './datatype';
 import { resolveMimetypeDataType } from './resolvers';
 
@@ -13,8 +13,8 @@ export const fileDataType = new DataTypeStringArg<FilePath>(
   'application/x.jupyter.file',
   'mimeType'
 );
-export function createFileURL(path: string): URL {
-  const url = new URL('file:');
+export function createFileURL_(path: string): URL_ {
+  const url = new URL_('file:');
   url.pathname = path;
   return url;
 }
@@ -25,7 +25,7 @@ export function createFileURL(path: string): URL {
 export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedConverter(
   fileDataType,
   (innerMimeType, url) => {
-    const path = parseFileURL(url);
+    const path = parseFileURL_(url);
     if (path === null) {
       return null;
     }
@@ -34,22 +34,22 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
 );
 
 /**
- * Creates a converter from file paths to their download URLs
+ * Creates a converter from file paths to their download URL_s
  */
-export function fileURLConverter(
-  getDownloadURL: (path: FilePath) => Promise<URL>
-): Converter<FilePath, URL | string> {
-  return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
+export function fileURL_Converter(
+  getDownloadURL_: (path: FilePath) => Promise<URL_>
+): Converter<FilePath, URL_ | string> {
+  return fileDataType.createSingleTypedConverter(URL_DataType, mimeType => [
     mimeType,
-    getDownloadURL
+    getDownloadURL_
   ]);
 }
 
 /**
- * Returns the path of a file URL, or null if it is not one.
+ * Returns the path of a file URL_, or null if it is not one.
  * @param url
  */
-function parseFileURL(url: URL): null | FilePath {
+function parseFileURL_(url: URL_): null | FilePath {
   if (url.protocol !== 'file:') {
     return null;
   }

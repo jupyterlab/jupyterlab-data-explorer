@@ -71,7 +71,7 @@ class DataRegistryFileFactory extends ABCWidgetFactory<
         }" not supported in dataregistry.yml file`;
       }
       for (const { url } of file.datasets) {
-        this.dataRegistry.registerURL(new URL(url));
+        this.dataRegistry.registerURL_(new URL_(url));
       }
     });
 

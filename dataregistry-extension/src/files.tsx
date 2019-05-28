@@ -8,14 +8,14 @@ import {
 } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
 import {
-  createFileURL,
-  fileURLConverter,
+  createFileURL_,
+  fileURL_Converter,
   IActiveDataset,
   IDataRegistry,
   IDataExplorer,
   resolveExtensionConverter,
   resolveFileConverter,
-  URLDataType,
+  URL_DataType,
   widgetDataType
 } from '@jupyterlab/dataregistry';
 import { DirListing, IFileBrowserFactory } from '@jupyterlab/filebrowser';
@@ -55,21 +55,21 @@ function activate(
     resolveExtensionConverter('.png', 'image/png')
   );
   dataRegistry.converters.register(
-    URLDataType.createSingleTypedConverter(widgetDataType, mimeType => {
+    URL_DataType.createSingleTypedConverter(widgetDataType, mimeType => {
       if (mimeType !== 'image/png') {
         return null;
       }
       return [
         'Image',
-        async (url: URL | string) => async () =>
+        async (url: URL_ | string) => async () =>
           ReactWidget.create(<img src={url.toString()} />)
       ];
     })
   );
   dataRegistry.converters.register(
-    fileURLConverter(
+    fileURL_Converter(
       async (path: string) =>
-        new URL(
+        new URL_(
           await fileBrowserFactory.defaultBrowser.model.manager.services.contents.getDownloadUrl(
             path
           )
@@ -85,9 +85,9 @@ function activate(
   });
 
   /**
-   * Returns the URL of the first selected file, as a `file:///{path}`.
+   * Returns the URL_ of the first selected file, as a `file:///{path}`.
    */
-  function getURL(): URL | null {
+  function getURL_(): URL_ | null {
     const widget = fileBrowserFactory.tracker.currentWidget;
     if (!widget) {
       return null;
@@ -96,21 +96,21 @@ function activate(
     if (!model) {
       return null;
     }
-    return createFileURL(model.path);
+    return createFileURL_(model.path);
   }
 
   app.commands.addCommand(open, {
     execute: async () => {
-      const url = getURL();
+      const url = getURL_();
       if (url === null || !dataRegistry.hasConversions(url)) {
         return;
       }
-      dataRegistry.registerURL(url);
+      dataRegistry.registerURL_(url);
       app.shell.activateById(dataExplorer.id);
       active.active = url;
     },
     isEnabled: () => {
-      const url = getURL();
+      const url = getURL_();
       return url !== null && dataRegistry.hasConversions(url);
     },
     label: 'Register Dataset',
@@ -123,10 +123,10 @@ function activate(
     for (const widget of layout.widgets) {
       // And the panel layout has a `DirListing` as a child
       if (widget instanceof DirListing) {
-        // Then listen to update request messages and change the active URL.
+        // Then listen to update request messages and change the active URL_.
         MessageLoop.installMessageHook(widget, (sender, message) => {
           if (message === Widget.Msg.UpdateRequest) {
-            active.active = getURL();
+            active.active = getURL_();
           }
 
           // Invoke other handlers

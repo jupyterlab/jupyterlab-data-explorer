@@ -10,10 +10,10 @@ import {
   Convert,
   Converts,
   SingleConvert,
-  singleConverter,
-  MimeType_
+  singleConverter
 } from './converters';
-import { Dataset } from './datasets';
+import { MimeType_, Dataset, URL_ } from './datasets';
+import { Observable } from 'rxjs';
 
 export const INVALID = Symbol('INVALID');
 
@@ -21,11 +21,19 @@ export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
   abstract createMimeType(typeData: T): MimeType_;
 
+
   /**
-   * Creates a new dataset of this type.
+   * Filer dataset for mimetypes of this type.
    */
-  createDataset(url: URL_, data: U, typeData: T): Dataset<U> {
-    return new Dataset(this.createMimeType(typeData), url, data);
+  filterDatasets(dataset: Dataset): Map<T, Observable<U>> {
+    const res = new Map<T, Observable<U>>();
+    for (const [mimeType, [, data$]] of dataset) {
+      const typeData = this.parseMimeType(mimeType);
+      if (typeData !== INVALID) {
+        res.set(typeData, data$ as Observable<any>);
+      }
+    }
+    return res;
   }
 
   /**

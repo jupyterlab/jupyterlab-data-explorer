@@ -10,14 +10,14 @@ export const resolveMimetypeDataType = new DataTypeStringArg<null>(
   'mimetype'
 );
 
-export function resolveDataSet(url: URL): Dataset<null> {
+export function resolveDataSet(url: URL_): Dataset<null> {
   return new Dataset(resolveDataType.createMimeType(), url, null);
 }
 
 /**
- * Returns a set of possible mimetype for a URL.
+ * Returns a set of possible mimetype for a URL_.
  */
-export type Resolver = (url: URL) => Set<MimeType_>;
+export type Resolver = (url: URL_) => Set<MimeType_>;
 
 export function resolveConverter<T>(resolver: Resolver): Converter<null, null> {
   return resolveDataType.createTypedConverter(
@@ -39,7 +39,7 @@ export function resolveExtensionConverter(
   extension: string,
   mimeType: string
 ): Converter<null, null> {
-  return resolveConverter((url: URL) => {
+  return resolveConverter((url: URL_) => {
     if (url.pathname.endsWith(extension)) {
       return new Set([mimeType]);
     }

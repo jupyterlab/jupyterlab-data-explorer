@@ -49,10 +49,10 @@ function activate(
 
   app.commands.addCommand(commandID, {
     execute: async args => {
-      const url = new URL(args.url as string);
-      const disposable = dataRegistry.registerURL(url);
+      const url = new URL_(args.url as string);
+      const disposable = dataRegistry.registerURL_(url);
       try {
-        await dataRegistry.viewURL(url, args.label as string);
+        await dataRegistry.viewURL_(url, args.label as string);
       } catch (e) {
         console.warn(`Could not load dataset ${url}`, e);
         if (disposable) {

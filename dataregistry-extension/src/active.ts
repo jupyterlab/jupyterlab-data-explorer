@@ -11,8 +11,8 @@ import {
 import {
   IActiveDataset,
   ActiveDataset,
-  createFileURL,
-  hasURL
+  createFileURL_,
+  hasURL_
 } from '@jupyterlab/dataregistry';
 import { DocumentWidget } from '@jupyterlab/docregistry';
 import { Widget } from '@phosphor/widgets';
@@ -33,19 +33,19 @@ function activate(app: JupyterFrontEnd, labShell: ILabShell): IActiveDataset {
 
   // Track active documents open.
   labShell.currentChanged.connect((sender, args) => {
-    active.active = getURL(args.newValue);
+    active.active = getURL_(args.newValue);
   });
   return active;
 }
 
-function getURL(widget: Widget | null): URL | null {
+function getURL_(widget: Widget | null): URL_ | null {
   if (widget === null) {
     return null;
   }
   if (isDocumentWidget(widget)) {
-    return createFileURL(widget.context.session.path);
+    return createFileURL_(widget.context.session.path);
   }
-  if (hasURL(widget)) {
+  if (hasURL_(widget)) {
     return widget.url;
   }
   return null;

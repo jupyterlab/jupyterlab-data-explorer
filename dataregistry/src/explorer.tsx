@@ -83,7 +83,7 @@ function DatasetCompononent({
   dataRegistry,
   active
 }: {
-  url: URL;
+  url: URL_;
   dataRegistry: IDataRegistry;
   active: IActiveDataset;
 }) {
@@ -91,11 +91,11 @@ function DatasetCompononent({
   if (active.active !== null && active.active.toString() === url.toString()) {
     classNames.push(activeDatasetClassName);
   }
-  const viewers = [...dataRegistry.viewersForURL(url)];
+  const viewers = [...dataRegistry.viewersForURL_(url)];
   console.log('Dataset', {
     url,
-    mimeType: dataRegistry.data.mimeTypesForURL(url),
-    possible: dataRegistry.possibleMimeTypesForURL(url)
+    mimeType: dataRegistry.data.mimeTypesForURL_(url),
+    possible: dataRegistry.possibleMimeTypesForURL_(url)
   });
   viewers.sort();
   return (
@@ -120,7 +120,7 @@ function DatasetCompononent({
         {viewers.map((label: string) => (
           <Button
             key={label}
-            onClick={() => dataRegistry.viewURL(url, label)}
+            onClick={() => dataRegistry.viewURL_(url, label)}
             text={label}
           />
         ))}
@@ -178,8 +178,8 @@ class DataExplorer extends React.Component<
     search: ''
   };
 
-  urls(): Array<URL> {
-    return [...this.props.dataRegistry.data.URLs].filter(
+  urls(): Array<URL_> {
+    return [...this.props.dataRegistry.data.URL_s].filter(
       url => url.toString().indexOf(this.state.search) !== -1
     );
   }
@@ -204,7 +204,7 @@ class DataExplorer extends React.Component<
             {() => (
               <UseSignal signal={this.props.active.signal}>
                 {() =>
-                  this.urls().map((url: URL) => (
+                  this.urls().map((url: URL_) => (
                     <DatasetCompononent
                       key={url.toString()}
                       url={url}

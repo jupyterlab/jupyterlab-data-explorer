@@ -9,8 +9,8 @@ import {
 } from '@jupyterlab/application';
 import {
   IConverterRegistry,
-  URLStringConverter,
-  resolverURLConverter
+  URL_StringConverter,
+  resolverURL_Converter
 } from '@jupyterlab/dataregistry';
 
 export default {
@@ -21,6 +21,6 @@ export default {
 } as JupyterFrontEndPlugin<void>;
 
 function activate(app: JupyterFrontEnd, converters: IConverterRegistry) {
-  converters.register(URLStringConverter);
-  converters.register(resolverURLConverter);
+  converters.register(URL_StringConverter);
+  converters.register(resolverURL_Converter);
 }

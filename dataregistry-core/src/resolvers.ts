@@ -1,4 +1,9 @@
-import { MimeType_, URL_, Datasets$ } from "./datasets";
+import {
+  MimeType_,
+  URL_,
+  Datasets,
+  createDatasets
+} from "./datasets";
 import { Converter, Convert } from "./converters";
 import { DataTypeNoArgs, DataTypeStringArg } from "./datatypes";
 import { identity, of } from "rxjs";
@@ -17,23 +22,12 @@ export const resolveMimetypeDataType = new DataTypeStringArg<null>(
   "application/x.jupyter.resolve",
   "mimetype"
 );
-/**
- * Plan:
- * 
- * * Add merge datasets command
- * * Have a converter from `/` path ending to folder mimetype
- * * Have a file -> folder to nested converter, that maps path to grab directory every x seconds
- * * Add nested and converted converter mimetype
- * * Registry, finish this.
- */
-function createResolveDataset(...urls: Array<URL_>): Datasets$ {
-  const dataset$: Dataset$ = of(
-    new Map([
-      [resolveDataType.createMimeType(), [0, of(url)] as [Cost, Data$]]
-    ])
-  );
-  this.datasets.set(url, dataset$);
 
+/**
+ * Given some list of URLs, returns datasets that contain them.
+ */
+export function createResolveDataset(url: URL_): Datasets {
+  return createDatasets(url, resolveDataType.createMimeType(), of(url));
 }
 
 /**

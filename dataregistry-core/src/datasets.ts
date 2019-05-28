@@ -36,6 +36,7 @@
 
 import { Observable, BehaviorSubject } from "rxjs";
 import { mergeMap } from "rxjs/operators";
+import { mergeMaps } from "./utils";
 
 /**
  * Unique ID. We use a string here instead of the builtin URL class because
@@ -57,7 +58,26 @@ export type Dataset = Map<MimeType_, DataValue>;
 export type Datasets = Map<URL_, Dataset>;
 export type Datasets$ = Observable<Datasets>;
 
-
+/**
+ * Merges datasets, choosing the data with lower cost if there are conflicts.
+ */
 export function mergeDataset(...datasets: Array<Dataset>): Dataset {
+  const merged: Dataset = new Map();
+  for (const dataset of datasets) {
+    for (const [mimeType, newValue] of dataset) {
+      const oldValue = merged.get(mimeType);
+      if (!oldValue || newValue[0] < oldValue[0]) {
+        merged.set(mimeType, newValue);
+      }
+    }
+  }
+  return merged;
+}
 
+export function mergeDatasets(...datasets: Array<Datasets>): Datasets {
+  return mergeMaps(mergeDataset, ...datasets);
+}
+
+export function createDatasets(url: URL_, mimeType: MimeType_, data: Data$) {
+  return new Map([[url, new Map([[mimeType, [0, data] as [Cost, Data$]]])]]);
 }

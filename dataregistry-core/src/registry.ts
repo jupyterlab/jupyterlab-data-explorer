@@ -1,81 +1,43 @@
-import { Observable, of, Subscriber, from } from "rxjs";
+import { Datasets$, Datasets, mergeDatasets } from "./datasets";
 import {
-  Datasets$,
-  url,
-  MimeType_,
-  Data,
-  Datasets,
-  URL_,
-  Cost,
-  Dataset$,
-  Data$
-} from "./datasets";
-import { Converter } from "./converters";
-import { resolveDataType } from "./resolvers";
+  Converter,
+  applyConverter$,
+  combineManyConverters
+} from "./converters";
+import { ObservableSet } from "./utils";
+import { map } from "rxjs/operators";
 
 export class Registry {
   public readonly datasets$: Datasets$;
 
-  private subscriber!: Subscriber<Datasets>;
-  private datasets: Datasets = new Map();
+  private _converters: ObservableSet<Converter<any, any>> = new ObservableSet();
+  private _datasets: ObservableSet<Datasets> = new ObservableSet();
 
   constructor() {
-    this.datasets$ = new Observable(subscriber => {
-      this.subscriber = subscriber;
-      this.newDatasets();
-    });
+    this.datasets$ = applyConverter$(
+      this._datasets.observable.pipe(
+        map(datasets => mergeDatasets(...datasets))
+      ),
+      this._converters.observable.pipe(
+        map(converters => combineManyConverters(...converters))
+      )
+    );
   }
   /**
    * Adds a new dataseset.
    *
    * If it has already been registered, throws an error.
    */
-  // addDataset(url: URL_, mimeType: MimeType_, data: Observable<Data>): void {
-  //   const newDatasets = new Map(this.datasets);
-  //   if (newDatasets.has(url)) {
-
-  //   } else {
-  //     newDatasets.set(url, from(new Map([[mimeType, ]])))
-  //   }
-  // }
-
+  addDatasets(datasets: Datasets): () => void {
+    this._datasets.add(datasets);
+    return () => this._datasets.remove(datasets);
+  }
 
   /**
    * Adds a new converter.
    */
-  addConverter(converter: Converter<any, any>): {
-
+  addConverter(converter: Converter<any, any>): () => void {
+    this._converters.add(converter);
+    return () => this._converters.remove(converter);
   }
-
-  addURL(url: URL_): () => void {
-    if (this.datasets.has(url)) {
-      return () => this.disposeURL(url);
-    }
-    // Create new dataset
-    this.datasets = new Map(this.datasets);
-    const dataset$: Dataset$ = of(
-      new Map([
-        [resolveDataType.createMimeType(), [0, of(url)] as [Cost, Data$]]
-      ])
-    );
-    this.datasets.set(url, dataset$);
-
-    this.newDatasets();
-    return () => this.disposeURL(url);
-  }
-
-  private newDatasets(): void {
-    this.subscriber.next(this.datasets);
-  }
-
-  private disposeURL(url: URL_): void {
-    if (!this.datasets.has(url)) {
-      return;
-    }
-    // Create new dataset
-    this.datasets = new Map(this.datasets);
-    this.datasets.delete(url);
-    this.newDatasets();
-  }
-
 }

@@ -102,25 +102,15 @@ export function applyConverter$(
   );
 }
 
-/**
- * Combine two converters by merging their resulting maps for a given url,
- * choosing the conversion with the lower cost.
- */
-function combineConverters<T, U>(
-  x: Converter<T, U>,
-  y: Converter<T, U>
-): Converter<T, U> {
-  return (mimeType: MimeType_, url: URL_) => {
-    return mergeMaps(x(mimeType, url), y(mimeType, url), (xData, yData) =>
-      xData[0] < yData[0] ? yData : xData
-    );
-  };
-}
-
 export function combineManyConverters<T, V>(
   ...converters: Array<Converter<T, V>>
 ): Converter<T, V> {
-  return converters.reduce(combineConverters, () => new Map());
+  return (mimeType: MimeType_, url: URL_) => {
+    return mergeMaps(
+      (xData, yData) => (xData[0] < yData[0] ? yData : xData),
+      ...converters.map(c => c(mimeType, url))
+    );
+  };
 }
 
 export type SingleConvert<T, V> = null | [MimeType_, Convert<T, V>];

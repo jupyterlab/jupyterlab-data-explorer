@@ -1,12 +1,7 @@
-import {
-  MimeType_,
-  URL_,
-  Datasets,
-  createDatasets
-} from "./datasets";
+import { MimeType_, URL_, Datasets, createDatasets } from "./datasets";
 import { Converter, Convert } from "./converters";
 import { DataTypeNoArgs, DataTypeStringArg } from "./datatypes";
-import { identity, of } from "rxjs";
+import { identity, BehaviorSubject } from "rxjs";
 
 /**
  * Datasets without a known mimetype start as just a resolve mimetype and no data.
@@ -27,7 +22,11 @@ export const resolveMimetypeDataType = new DataTypeStringArg<null>(
  * Given some list of URLs, returns datasets that contain them.
  */
 export function createResolveDataset(url: URL_): Datasets {
-  return createDatasets(url, resolveDataType.createMimeType(), of(url));
+  return createDatasets(
+    url,
+    resolveDataType.createMimeType(),
+    new BehaviorSubject(null)
+  );
 }
 
 /**

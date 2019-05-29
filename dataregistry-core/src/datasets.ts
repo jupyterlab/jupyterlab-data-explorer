@@ -34,8 +34,7 @@
  * the data itself can all change over time.
  */
 
-import { Observable, BehaviorSubject } from "rxjs";
-import { mergeMap } from "rxjs/operators";
+import { Observable } from "rxjs";
 import { mergeMaps } from "./utils";
 
 /**
@@ -80,4 +79,29 @@ export function mergeDatasets(...datasets: Array<Datasets>): Datasets {
 
 export function createDatasets(url: URL_, mimeType: MimeType_, data: Data$) {
   return new Map([[url, new Map([[mimeType, [0, data] as [Cost, Data$]]])]]);
+}
+
+export function getURLs(datasets: Datasets): Set<URL_> {
+  return new Set(datasets.keys());
+}
+
+export function getMimeTypes(datasets: Datasets, url: URL_): Set<MimeType_> {
+  const dataset = datasets.get(url);
+  return new Set(dataset && [...dataset.keys()]);
+}
+
+export function getData$(
+  datasets: Datasets,
+  url: URL_,
+  mimeType: MimeType_
+): Data$ | null {
+  const dataset = datasets.get(url);
+  if (!dataset) {
+    return null;
+  }
+  const dataValue = dataset.get(mimeType);
+  if (!dataValue) {
+    return null;
+  }
+  return dataValue[1];
 }

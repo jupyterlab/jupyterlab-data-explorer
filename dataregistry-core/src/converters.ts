@@ -1,4 +1,4 @@
-import { Observable, zip } from "rxjs";
+import { Observable, combineLatest } from "rxjs";
 import { scan, shareReplay } from "rxjs/operators";
 import {
   Cost,
@@ -10,6 +10,7 @@ import {
   URL_
 } from "./datasets";
 import { mapValues, mergeMaps } from "./utils";
+import { tag } from "rxjs-spy/operators/tag";
 
 export type Convert<T, V> = [Cost, (data: Observable<T>) => Observable<V>];
 export type Converts<T, V> = Map<MimeType_, Convert<T, V>>;
@@ -92,13 +93,16 @@ export function applyConverter$(
   datasets$: Datasets$,
   converter$: Observable<Converter<any, any>>
 ): Datasets$ {
-  return zip(datasets$, converter$).pipe(
+  return combineLatest(datasets$, converter$).pipe(
+    tag("applyConverter$/zipped"),
     // Take latest output and merge with most recent
     scan(
       (acc: Datasets, [datasets, converter]) =>
         applyConverterDatasets(acc, datasets, converter),
       new Map()
-    )
+    ),
+    shareReplay({ bufferSize: 1, refCount: true }),
+    tag("applyConverter$/scanned")
   );
 }
 

@@ -5,23 +5,39 @@ import {
   combineManyConverters
 } from "./converters";
 import { ObservableSet } from "./utils";
-import { map } from "rxjs/operators";
+import { map, shareReplay } from "rxjs/operators";
+import { tag } from "rxjs-spy/operators/tag";
+import { Observable } from "rxjs";
+import { createNestedConverter } from ".";
 
 export class Registry {
   public readonly datasets$: Datasets$;
 
-  private _converters: ObservableSet<Converter<any, any>> = new ObservableSet();
-  private _datasets: ObservableSet<Datasets> = new ObservableSet();
+  private readonly _converters: ObservableSet<
+    Converter<any, any>
+  > = new ObservableSet();
+  private readonly _datasets: ObservableSet<Datasets> = new ObservableSet();
+  private readonly _converter$: Observable<Converter<any, any>>;
+  private readonly _datasets$: Datasets$;
 
   constructor() {
-    this.datasets$ = applyConverter$(
-      this._datasets.observable.pipe(
-        map(datasets => mergeDatasets(...datasets))
-      ),
-      this._converters.observable.pipe(
-        map(converters => combineManyConverters(...converters))
-      )
+    this._converter$ = this._converters.observable.pipe(
+      tag("Registry/converters"),
+      map(converters => combineManyConverters(...converters)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      tag("Registry/datasets-combined")
     );
+    this._datasets$ = this._datasets.observable.pipe(
+      tag("Registry/datasets"),
+      map(datasets => mergeDatasets(...datasets)),
+      shareReplay({ bufferSize: 1, refCount: true }),
+      tag("Registry/datasets-merged")
+    );
+    this.datasets$ = applyConverter$(this._datasets$, this._converter$).pipe(
+      tag("Registry/datasets$")
+    );
+
+    this.addConverter(createNestedConverter(this._converter$));
   }
   /**
    * Adds a new dataseset.

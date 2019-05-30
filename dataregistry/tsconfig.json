@@ -20,5 +20,10 @@
     "resolveJsonModule": true,
     "target": "es2015"
   },
-  "include": ["src/*"]
+  "include": ["src/*"],
+  "references": [
+    {
+      "path": "../dataregistry-core"
+    }
+  ]
 }

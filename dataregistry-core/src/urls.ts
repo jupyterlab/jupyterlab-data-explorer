@@ -29,7 +29,7 @@ export const resolverURLConverter = resolveMimetypeDataType.createSingleTypedCon
   }
 );
 
-export const URL_StringConverter = URLDataType.createSingleConverter<string>(
+export const URLStringConverter = URLDataType.createSingleConverter<string>(
   mimeType => [
     mimeType,
     [

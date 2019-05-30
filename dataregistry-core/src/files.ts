@@ -7,7 +7,7 @@ import { Converter } from "./converters";
 import { URLDataType } from "./urls";
 import { DataTypeStringArg } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { of, from } from "rxjs";
+import { from, BehaviorSubject } from "rxjs";
 import { URL_ } from "./datasets";
 import { switchMap } from "rxjs/operators";
 
@@ -32,19 +32,21 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
     if (url.protocol !== "file:") {
       return null;
     }
-    return [innerMimeType, [1, () => of(url.pathname)]];
+    return [innerMimeType, [1, () => new BehaviorSubject(url.pathname)]];
   }
 );
 
 /**
  * Creates a converter from file paths to their download URL_s
  */
-export function fileConverter(
+export function fileURLConverter(
   getDownloadURL: (path: FilePath) => Promise<URL_>
-): Converter<FilePath, URL_ | string> {
-  return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
-    mimeType,
-    [1, switchMap((path) => from(getDownloadURL(path)))]
-  ]);
+): Converter<FilePath, URL_> {
+  return fileDataType.createSingleTypedConverter(
+    URLDataType,
+    (mimeType, url) => [
+      mimeType,
+      [1, switchMap(path => from(getDownloadURL(path)))]
+    ]
+  );
 }
-

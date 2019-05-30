@@ -7,33 +7,30 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILabShell
-} from '@jupyterlab/application';
-import {
-  IActiveDataset,
-  ActiveDataset,
-  createFileURL_,
-  hasURL_
-} from '@jupyterlab/dataregistry';
-import { DocumentWidget } from '@jupyterlab/docregistry';
-import { Widget } from '@phosphor/widgets';
+} from "@jupyterlab/application";
+import { IActiveDataset, hasURL_ } from "@jupyterlab/dataregistry";
+import { DocumentWidget } from "@jupyterlab/docregistry";
+import { Widget } from "@phosphor/widgets";
+import { BehaviorSubject } from "rxjs";
+import { URL_ } from "@jupyterlab/dataregistry-core";
 
 /**
  * The active dataset extension.
  */
 export default {
   activate,
-  id: '@jupyterlab/dataregistry-extension:active-dataset',
+  id: "@jupyterlab/dataregistry-extension:active-dataset",
   requires: [ILabShell],
   provides: IActiveDataset,
   autoStart: true
 } as JupyterFrontEndPlugin<IActiveDataset>;
 
 function activate(app: JupyterFrontEnd, labShell: ILabShell): IActiveDataset {
-  const active = new ActiveDataset();
+  const active = new BehaviorSubject<URL_ | null>(null);
 
   // Track active documents open.
   labShell.currentChanged.connect((sender, args) => {
-    active.active = getURL_(args.newValue);
+    active.next(getURL_(args.newValue));
   });
   return active;
 }
@@ -43,7 +40,7 @@ function getURL_(widget: Widget | null): URL_ | null {
     return null;
   }
   if (isDocumentWidget(widget)) {
-    return createFileURL_(widget.context.session.path);
+    return new URL(`file://${widget.context.session.path}`).toString();
   }
   if (hasURL_(widget)) {
     return widget.url;

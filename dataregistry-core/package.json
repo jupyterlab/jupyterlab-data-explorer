@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-core",
-  "version": "0.0.0",
+  "version": "0.7.1",
   "description": "A plugin that makes datasets first class entities in JupyterLab",
   "homepage": "https://github.com/jupyterlab/jupyterlab",
   "bugs": {

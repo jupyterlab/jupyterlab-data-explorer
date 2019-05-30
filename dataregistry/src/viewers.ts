@@ -1,4 +1,4 @@
-import { DataTypeStringArg } from './datatype';
+import { DataTypeStringArg } from "@jupyterlab/dataregistry-core";
 
 /**
  * A function that is called to view the data in some way.
@@ -6,6 +6,6 @@ import { DataTypeStringArg } from './datatype';
 export type View = () => Promise<void>;
 
 export const viewerDataType = new DataTypeStringArg<View>(
-  'application/x.jupyter.viewer',
-  'label'
+  "application/x.jupyter.viewer",
+  "label"
 );

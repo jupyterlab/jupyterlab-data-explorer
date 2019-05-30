@@ -8,7 +8,9 @@
 
 export * from "./converters";
 export * from "./datasets";
+export * from "./datatypes";
 export * from "./files";
+export * from "./folders";
 export * from "./nested";
 export * from "./registry";
 export * from "./resolvers";

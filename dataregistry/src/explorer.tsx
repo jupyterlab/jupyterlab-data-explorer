@@ -3,32 +3,40 @@
 | Distributed under the terms of the Modified BSD License.
 |----------------------------------------------------------------------------*/
 
-import { ReactWidget, UseSignal } from '@jupyterlab/apputils';
-import { Token } from '@phosphor/coreutils';
-import * as React from 'react';
-import { IDataRegistry } from './dataregistry';
-import { IActiveDataset } from './active';
-import { Widget } from '@phosphor/widgets';
-import { style, classes } from 'typestyle';
-import { Classes } from '@blueprintjs/core';
+import { Classes } from "@blueprintjs/core";
+import { ReactWidget } from "@jupyterlab/apputils";
+import {
+  Dataset,
+  Datasets,
+  Datasets$,
+  URL_
+} from "@jupyterlab/dataregistry-core";
+import { Token } from "@phosphor/coreutils";
+import { Widget } from "@phosphor/widgets";
+import * as React from "react";
+import { classes, style } from "typestyle";
+import { IActiveDataset } from "./active";
+import { IDataRegistry } from "./dataregistry";
+import { UseObservable } from "./utils";
+import { viewerDataType } from "./viewers";
 
 const buttonClassName = style({
-  color: '#2196F3',
+  color: "#2196F3",
   borderRadius: 2,
-  background: '#FFFFFF',
+  background: "#FFFFFF",
   fontSize: 10,
   borderWidth: 0,
   marginRight: 12, // 2 + 10 spacer between
-  padding: '2px 4px',
+  padding: "2px 4px",
   $nest: {
-    '&:active': {
-      background: '#BDBDBD'
+    "&:active": {
+      background: "#BDBDBD"
     },
-    '&:active:hover': {
-      background: '#BDBDBD'
+    "&:active:hover": {
+      background: "#BDBDBD"
     },
-    '&:hover': {
-      background: '#E0E0E0'
+    "&:hover": {
+      background: "#E0E0E0"
     }
   }
 });
@@ -42,89 +50,116 @@ function Button({ onClick, text }: { onClick: () => void; text: string }) {
 }
 
 const datasetClassName = style({
-  borderBottom: '1px solid #E0E0E0',
-  color: '#333333',
+  borderBottom: "1px solid #E0E0E0",
+  color: "#333333",
   padding: 4,
   paddingRight: 12,
   paddingLeft: 12,
   borderLeftWidth: 8,
-  borderLeftColor: 'white',
-  borderLeftStyle: 'solid',
+  borderLeftColor: "white",
+  borderLeftStyle: "solid",
   $nest: {
-    '&:hover': {
-      borderLeftColor: '#E0E0E0'
+    "&:hover": {
+      borderLeftColor: "#E0E0E0"
     },
-    '&:active': {
-      borderLeftColor: '#BDBDBD'
+    "&:active": {
+      borderLeftColor: "#BDBDBD"
     },
-    '&:active:hover': {
-      borderLeftColor: '#BDBDBD'
+    "&:active:hover": {
+      borderLeftColor: "#BDBDBD"
     }
   }
 });
 
 const activeDatasetClassName = style({
-  borderLeftColor: 'var(--jp-brand-color1)',
+  borderLeftColor: "var(--jp-brand-color1)",
   $nest: {
-    '&:hover': {
-      borderLeftColor: 'var(--jp-brand-color1)'
+    "&:hover": {
+      borderLeftColor: "var(--jp-brand-color1)"
     },
-    '&:active': {
-      borderLeftColor: 'var(--jp-brand-color1)'
+    "&:active": {
+      borderLeftColor: "var(--jp-brand-color1)"
     },
-    '&:active:hover': {
-      borderLeftColor: 'var(--jp-brand-color1)'
+    "&:active:hover": {
+      borderLeftColor: "var(--jp-brand-color1)"
     }
   }
 });
 
 function DatasetCompononent({
   url,
-  dataRegistry,
-  active
+  active$,
+  dataset
 }: {
   url: URL_;
-  dataRegistry: IDataRegistry;
-  active: IActiveDataset;
+  dataset: Dataset;
+  active$: IActiveDataset;
 }) {
-  const classNames = [datasetClassName];
-  if (active.active !== null && active.active.toString() === url.toString()) {
-    classNames.push(activeDatasetClassName);
-  }
-  const viewers = [...dataRegistry.viewersForURL_(url)];
-  console.log('Dataset', {
-    url,
-    mimeType: dataRegistry.data.mimeTypesForURL_(url),
-    possible: dataRegistry.possibleMimeTypesForURL_(url)
-  });
-  viewers.sort();
+  const viewers = viewerDataType.filterDataset(dataset);
+  // Sort viewers by label
+  viewers.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   return (
-    <div
-      className={classes(...classNames)}
-      onClick={() => (active.active = url)}
-    >
-      <h3
-        style={{
-          fontSize: 12,
-          fontWeight: 'unset',
-          margin: 'unset',
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          direction: 'rtl',
-          textAlign: 'left'
-        }}
-      >
-        {url.toString()}
-      </h3>
-      <span>
-        {viewers.map((label: string) => (
-          <Button
-            key={label}
-            onClick={() => dataRegistry.viewURL_(url, label)}
-            text={label}
-          />
-        ))}
-      </span>
+    <UseObservable observable={active$} initial={null}>
+      {active => {
+        const classNames = [datasetClassName];
+        if (active === url) {
+          classNames.push(activeDatasetClassName);
+        }
+        return (
+          <div
+            className={classes(...classNames)}
+            onClick={() => active$.next(url)}
+          >
+            <h3
+              style={{
+                fontSize: 12,
+                fontWeight: "unset",
+                margin: "unset",
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                direction: "rtl",
+                textAlign: "left"
+              }}
+            >
+              {url.toString()}
+            </h3>
+            <span>
+              {viewers.map(([label, view$]) => (
+                <UseObservable observable={view$} initial={() => {}}>
+                  {view => (
+                    <Button key={label} onClick={() => view()} text={label} />
+                  )}
+                </UseObservable>
+              ))}
+            </span>
+          </div>
+        );
+      }}
+    </UseObservable>
+  );
+}
+
+function DatasetsComponent({
+  active,
+  datasets$
+}: {
+  active: IActiveDataset;
+  datasets$: Datasets$;
+}) {
+  return (
+    <div style={{ flex: 1, overflow: "auto" }}>
+      <UseObservable observable={datasets$} initial={new Map() as Datasets}>
+        {datasets =>
+          [...datasets].map(([url, dataset]) => (
+            <DatasetCompononent
+              key={url}
+              url={url}
+              dataset={dataset}
+              active$={active}
+            />
+          ))
+        }
+      </UseObservable>
     </div>
   );
 }
@@ -144,14 +179,14 @@ function Heading({
         paddingLeft: 12,
         paddingRight: 12,
         fontSize: 14,
-        letterSpacing: '0.1em',
-        margin: 'unset',
-        color: '#333333',
-        display: 'flex',
-        justifyContent: 'space-between',
+        letterSpacing: "0.1em",
+        margin: "unset",
+        color: "#333333",
+        display: "flex",
+        justifyContent: "space-between",
         borderBottom:
-          'var(--jp-border-width) solid var(--jp-toolbar-border-color)',
-        boxShadow: 'var(--jp-toolbar-box-shadow)'
+          "var(--jp-border-width) solid var(--jp-toolbar-border-color)",
+        boxShadow: "var(--jp-toolbar-box-shadow)"
       }}
     >
       Datasets
@@ -175,48 +210,29 @@ class DataExplorer extends React.Component<
   { search: string }
 > {
   state: { search: string } = {
-    search: ''
+    search: ""
   };
 
-  urls(): Array<URL_> {
-    return [...this.props.dataRegistry.data.URL_s].filter(
-      url => url.toString().indexOf(this.state.search) !== -1
-    );
-  }
   render() {
     return (
       <div
         style={{
-          background: '#FFFFFF',
-          color: '#000000',
-          fontFamily: 'Helvetica',
-          height: '100%',
-          display: 'flex',
-          flexDirection: 'column'
+          background: "#FFFFFF",
+          color: "#000000",
+          fontFamily: "Helvetica",
+          height: "100%",
+          display: "flex",
+          flexDirection: "column"
         }}
       >
         <Heading
           search={this.state.search}
           onSearch={(search: string) => this.setState({ search })}
         />
-        <div style={{ flex: 1, overflow: 'auto' }}>
-          <UseSignal signal={this.props.dataRegistry.data.datasetsChanged}>
-            {() => (
-              <UseSignal signal={this.props.active.signal}>
-                {() =>
-                  this.urls().map((url: URL_) => (
-                    <DatasetCompononent
-                      key={url.toString()}
-                      url={url}
-                      dataRegistry={this.props.dataRegistry}
-                      active={this.props.active}
-                    />
-                  ))
-                }
-              </UseSignal>
-            )}
-          </UseSignal>
-        </div>
+        <DatasetsComponent
+          datasets$={this.props.dataRegistry.datasets$}
+          active={this.props.active}
+        />
       </div>
     );
   }
@@ -226,17 +242,17 @@ export function createDataExplorer(
   dataRegistry: IDataRegistry,
   active: IActiveDataset
 ): IDataExplorer {
-  const widget = ReactWidget.create(
+  const widget = ReactWidget.create((
     <DataExplorer dataRegistry={dataRegistry} active={active} />
-  );
-  widget.id = '@jupyterlab-dataRegistry/explorer';
-  widget.title.iconClass = 'jp-SpreadsheetIcon  jp-SideBar-tabIcon';
-  widget.title.caption = 'Data Explorer';
+  ) as any);
+  widget.id = "@jupyterlab-dataRegistry/explorer";
+  widget.title.iconClass = "jp-SpreadsheetIcon  jp-SideBar-tabIcon";
+  widget.title.caption = "Data Explorer";
   return widget;
 }
 /* tslint:disable */
 export const IDataExplorer = new Token<IDataExplorer>(
-  '@jupyterlab/dataRegistry:IDataExplorer'
+  "@jupyterlab/dataRegistry:IDataExplorer"
 );
 
 export interface IDataExplorer extends Widget {}

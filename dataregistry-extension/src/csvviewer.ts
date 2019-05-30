@@ -1,15 +1,18 @@
-import { widgetDataType, IDataRegistry } from '@jupyterlab/dataregistry';
-import { DataGrid } from '@phosphor/datagrid';
-import { DSVModel } from '@jupyterlab/csvviewer';
-import { DataTypeNoArgs } from '@jupyterlab/dataregistry/lib/datatype';
-import { JupyterFrontEndPlugin, JupyterFrontEnd } from '@jupyterlab/application';
+import { widgetDataType, IDataRegistry } from "@jupyterlab/dataregistry";
+import { DataGrid } from "@phosphor/datagrid";
+import { DSVModel } from "@jupyterlab/csvviewer";
+import { DataTypeNoArgs } from "@jupyterlab/dataregistry/lib/datatype";
+import {
+  JupyterFrontEndPlugin,
+  JupyterFrontEnd
+} from "@jupyterlab/application";
 
-export const CSVDataType = new DataTypeNoArgs<string>('text/csv');
+export const CSVDataType = new DataTypeNoArgs<string>("text/csv");
 
 export const CSVConverter = CSVDataType.createSingleTypedConverter(
   widgetDataType,
   () => [
-    'Grid',
+    "Grid",
     async (data: string) => async () => {
       // Copies the default grid setup from `widget.ts`
       // It would be great to use `CSVViewer` itself,
@@ -21,14 +24,14 @@ export const CSVConverter = CSVDataType.createSingleTypedConverter(
         baseColumnHeaderSize: 36,
         baseRowHeaderSize: 64
       });
-      grid.headerVisibility = 'all';
-      grid.model = new DSVModel({ data, delimiter: ',' });
+      grid.headerVisibility = "all";
+      grid.model = new DSVModel({ data, delimiter: "," });
       return grid;
     }
   ]
 );
 
-const id = '@jupyterlab/dataregistry-extension:csv-viewer';
+const id = "@jupyterlab/dataregistry-extension:csv-viewer";
 
 export default {
   activate,
@@ -37,9 +40,6 @@ export default {
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 
-function activate(
-  app: JupyterFrontEnd,
-  dataRegistry: IDataRegistry,
-): void {
-  dataRegistry.converters.register(CSVConverter);
+function activate(app: JupyterFrontEnd, dataRegistry: IDataRegistry): void {
+  dataRegistry.addConverter(CSVConverter);
 }

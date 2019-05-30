@@ -1,8 +1,12 @@
-import { Converter } from './converters';
-import { Widget } from '@phosphor/widgets';
-import { MainAreaWidget } from '@jupyterlab/apputils';
-import { View, viewerDataType } from './viewers';
-import { DataTypeStringArg } from './datatype';
+import { MainAreaWidget } from "@jupyterlab/apputils";
+import {
+  Converter,
+  DataTypeStringArg,
+  URL_
+} from "@jupyterlab/dataregistry-core";
+import { Widget } from "@phosphor/widgets";
+import { map } from "rxjs/operators";
+import { View, viewerDataType } from "./viewers";
 
 /**
  * A function that creates a widget for the data.
@@ -10,8 +14,8 @@ import { DataTypeStringArg } from './datatype';
 export type WidgetCreator = () => Promise<Widget>;
 
 export const widgetDataType = new DataTypeStringArg<WidgetCreator>(
-  'application/x.jupyter.widget',
-  'label'
+  "application/x.jupyter.widget",
+  "label"
 );
 
 export function extractWidgetArgs(
@@ -29,7 +33,7 @@ export interface IHasURL_ {
 }
 
 export function hasURL_(t: any): t is IHasURL_ {
-  return 'url' in t;
+  return "url" in t;
 }
 
 class DataWidget extends MainAreaWidget implements IHasURL_ {
@@ -47,14 +51,17 @@ export type WrappedWidgetCreator = () => Promise<DataWidget>;
 
 export const wrappedWidgetDataType = new DataTypeStringArg<
   WrappedWidgetCreator
->('application/x.jupyter.wrapped-widget', 'label');
+>("application/x.jupyter.wrapped-widget", "label");
 
 export const wrapWidgetConverter = widgetDataType.createSingleTypedConverter(
   wrappedWidgetDataType,
   (label, url) => {
     return [
       label,
-      async creator => async () => new DataWidget(await creator(), url, label)
+      [
+        1,
+        map(creator => async () => new DataWidget(await creator(), url, label))
+      ]
     ];
   }
 );
@@ -64,6 +71,6 @@ export function widgetViewerConverter(
 ): Converter<WrappedWidgetCreator, View> {
   return wrappedWidgetDataType.createSingleTypedConverter(
     viewerDataType,
-    label => [label, async creator => async () => display(await creator())]
+    label => [label, [1, map(creator => async () => display(await creator()))]]
   );
 }

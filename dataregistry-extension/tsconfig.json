@@ -24,6 +24,9 @@
   "references": [
     {
       "path": "../dataregistry"
+    },
+    {
+      "path": "../dataregistry-core"
     }
   ]
 }

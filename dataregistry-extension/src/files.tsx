@@ -5,36 +5,40 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from '@jupyterlab/application';
-import { ReactWidget } from '@jupyterlab/apputils';
+} from "@jupyterlab/application";
+import { ReactWidget } from "@jupyterlab/apputils";
 import {
-  createFileURL_,
-  fileURL_Converter,
   IActiveDataset,
   IDataRegistry,
   IDataExplorer,
-  resolveExtensionConverter,
-  resolveFileConverter,
-  URL_DataType,
   widgetDataType
-} from '@jupyterlab/dataregistry';
-import { DirListing, IFileBrowserFactory } from '@jupyterlab/filebrowser';
-import { MessageLoop } from '@phosphor/messaging';
-import { PanelLayout, Widget } from '@phosphor/widgets';
-import * as React from 'react';
+} from "@jupyterlab/dataregistry";
+import { fileURLConverter } from "@jupyterlab/dataregistry-core";
+import { DirListing, IFileBrowserFactory } from "@jupyterlab/filebrowser";
+import { MessageLoop } from "@phosphor/messaging";
+import { PanelLayout, Widget } from "@phosphor/widgets";
+import * as React from "react";
+import {
+  resolveFileConverter,
+  resolveExtensionConverter,
+  URL_,
+  createFileURL_,
+  URLDataType
+} from "@jupyterlab/dataregistry-core";
+import { map } from "rxjs/operators";
 
 // Copied from filebrowser because it isn't exposed there
 // ./packages/filebrowser-extension/src/index.ts
 const selectorNotDir = '.jp-DirListing-item[data-isdir="false"]';
 
-const open = 'dataregistry:filebrowser-open';
+const open = "dataregistry:filebrowser-open";
 
 /**
  * Integrates the dataregistry into the doc registry.
  */
 export default {
   activate,
-  id: '@jupyterlab/dataregistry-extension:files',
+  id: "@jupyterlab/dataregistry-extension:files",
   requires: [IDataRegistry, IFileBrowserFactory, IDataExplorer, IActiveDataset],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
@@ -42,32 +46,30 @@ export default {
 function activate(
   app: JupyterFrontEnd,
   dataRegistry: IDataRegistry,
-  fileBrowserFactory: IFileBrowserFactory,
-  dataExplorer: IDataExplorer,
   active: IActiveDataset
 ) {
   // Add default converters
-  dataRegistry.converters.register(resolveFileConverter);
-  dataRegistry.converters.register(
-    resolveExtensionConverter('.csv', 'text/csv')
-  );
-  dataRegistry.converters.register(
-    resolveExtensionConverter('.png', 'image/png')
-  );
-  dataRegistry.converters.register(
-    URL_DataType.createSingleTypedConverter(widgetDataType, mimeType => {
-      if (mimeType !== 'image/png') {
+  dataRegistry.addConverter(resolveFileConverter);
+  dataRegistry.addConverter(resolveExtensionConverter(".csv", "text/csv"));
+  dataRegistry.addConverter(resolveExtensionConverter(".png", "image/png"));
+  dataRegistry.addConverter(
+    URLDataType.createSingleTypedConverter(widgetDataType, mimeType => {
+      if (mimeType !== "image/png") {
         return null;
       }
       return [
-        'Image',
-        async (url: URL_ | string) => async () =>
-          ReactWidget.create(<img src={url.toString()} />)
+        "Image",
+        [
+          1,
+          map((url: URL_) => async () =>
+            ReactWidget.create(<img src={url.toString()} />)
+          )
+        ]
       ];
     })
   );
-  dataRegistry.converters.register(
-    fileURL_Converter(
+  dataRegistry.addConverter(
+    fileURLConverter(
       async (path: string) =>
         new URL_(
           await fileBrowserFactory.defaultBrowser.model.manager.services.contents.getDownloadUrl(
@@ -113,8 +115,8 @@ function activate(
       const url = getURL_();
       return url !== null && dataRegistry.hasConversions(url);
     },
-    label: 'Register Dataset',
-    iconClass: 'jp-MaterialIcon jp-??'
+    label: "Register Dataset",
+    iconClass: "jp-MaterialIcon jp-??"
   });
 
   const layout = fileBrowserFactory.defaultBrowser.layout;

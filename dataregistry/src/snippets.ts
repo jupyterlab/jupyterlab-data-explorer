@@ -2,14 +2,18 @@
  * Support for exporting datasets as code snippets.
  */
 
-import { viewerDataType, View } from './viewers';
-import { Converter } from './converters';
-import { FilePath, fileDataType } from './files';
-import { URL_DataType } from './urls';
+import { viewerDataType, View } from "./viewers";
 
-import { relative, dirname } from 'path';
-import { DataTypeStringArg } from './datatype';
-
+import { relative, dirname } from "path";
+import {
+  DataTypeStringArg,
+  Converter,
+  FilePath,
+  fileDataType,
+  URL_,
+  URLDataType
+} from "@jupyterlab/dataregistry-core";
+import { map } from "rxjs/operators";
 type SnippetContext = {
   path: string;
 };
@@ -17,8 +21,8 @@ type SnippetContext = {
 type Snippet = (context: SnippetContext) => string;
 
 export const snippedDataType = new DataTypeStringArg<Snippet>(
-  'application/x.jupyter.snippet',
-  'label'
+  "application/x.jupyter.snippet",
+  "label"
 );
 
 export interface IFileSnippetConverterOptions {
@@ -40,9 +44,12 @@ export function fileSnippetConverter({
       }
       return [
         label,
-        async (dataPath: FilePath) => (context: SnippetContext) => {
-          return createSnippet(relative(dirname(context.path), dataPath));
-        }
+        [
+          1,
+          map(dataPath => (context: SnippetContext) =>
+            createSnippet(relative(dirname(context.path), dataPath))
+          )
+        ]
       ];
     }
   );
@@ -50,22 +57,22 @@ export function fileSnippetConverter({
 
 export interface IURL_SnippetConverter {
   mimeType: string;
-  createSnippet: (url: string | URL_) => string;
+  createSnippet: (url: URL_) => string;
   label: string;
 }
 
-export function URL_SnippetConverter({
+export function URLSnippetConverter({
   mimeType,
   createSnippet,
   label
-}: IURL_SnippetConverter): Converter<URL_ | string, Snippet> {
-  return URL_DataType.createSingleTypedConverter(
+}: IURL_SnippetConverter): Converter<URL_, Snippet> {
+  return URLDataType.createSingleTypedConverter(
     snippedDataType,
     (innerMimeType: string) => {
       if (innerMimeType !== mimeType) {
         return null;
       }
-      return [label, async (url: string | URL_) => () => createSnippet(url)];
+      return [label, [1, map((url: URL_) => () => createSnippet(url))]];
     }
   );
 }
@@ -77,7 +84,7 @@ export function snippetViewerConverter(
   return snippedDataType.createSingleTypedConverter(viewerDataType, label => {
     return [
       label,
-      async data => async () => await insert(data(await getContext()))
+      [1, map(data => async () => await insert(data(await getContext())))]
     ];
   });
 }

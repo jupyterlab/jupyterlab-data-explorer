@@ -1,13 +1,10 @@
-import { DataTypeNoArgs } from "./datatype";
-import * as React from "react";
-
-import NteractDataExplorer, { Props } from "@nteract/data-explorer";
-import { widgetDataType } from "./widgets";
 import { ReactWidget } from "@jupyterlab/apputils";
-import { Dataset } from ".";
-import { IRenderMime } from "@jupyterlab/rendermime-interfaces";
-
+import { DataTypeNoArgs } from "@jupyterlab/dataregistry-core";
+import NteractDataExplorer, { Props } from "@nteract/data-explorer";
+import * as React from "react";
 import "react-table/react-table.css";
+import { map } from "rxjs/operators";
+import { widgetDataType } from "./widgets";
 
 /**
  * Type for table data.
@@ -31,37 +28,11 @@ export const nteractDataExplorerConverter = TableDataType.createSingleTypedConve
   widgetDataType,
   () => [
     "nteract Data Explorer",
-    async (data: TableData) => async () => {
-      return ReactWidget.create(<NteractDataExplorer data={data} />);
-    }
+    [
+      1,
+      map(data => async () =>
+        ReactWidget.create(<NteractDataExplorer data={data} /> as any)
+      )
+    ]
   ]
 );
-
-type Register = (datasets: Dataset<any>) => Promise<void>;
-class RendererDataset extends ReactWidget implements IRenderMime.IRenderer {
-  constructor(private _register: Register) {
-    super();
-  }
-
-  render() {
-    return <div />;
-  }
-  async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
-    this._register(
-      TableDataType.createDataset(new URL_("tmp:///"), (model.data[
-        TableDataType.mimeType
-      ] as unknown) as TableData)
-    );
-  }
-}
-
-export function createTableDataFactory(
-  register: Register
-): IRenderMime.IRendererFactory {
-  return {
-    safe: true,
-    defaultRank: 1,
-    mimeTypes: [TableDataType.mimeType],
-    createRenderer: options => new RendererDataset(register)
-  };
-}

@@ -32,7 +32,6 @@
     "@jupyterlab/apputils": "^1.0.0-alpha.3",
     "@jupyterlab/coreutils": "^3.0.0-alpha.3",
     "@jupyterlab/dataregistry": "^0.7.1",
-    "@jupyterlab/dataregistry-core": "^0.7.1",
     "@jupyterlab/docmanager": "^1.0.0-alpha.3",
     "@jupyterlab/docregistry": "^1.0.0-alpha.3",
     "@jupyterlab/filebrowser": "^1.0.0-alpha.3",

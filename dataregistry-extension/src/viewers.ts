@@ -1,4 +1,4 @@
-import { DataTypeStringArg } from "@jupyterlab/dataregistry-core";
+import { DataTypeStringArg } from "@jupyterlab/dataregistry";
 
 /**
  * A function that is called to view the data in some way.

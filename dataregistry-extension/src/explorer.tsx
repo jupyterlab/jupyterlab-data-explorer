@@ -3,6 +3,24 @@
 | Distributed under the terms of the Modified BSD License.
 |----------------------------------------------------------------------------*/
 
+import {
+  JupyterFrontEnd,
+  JupyterFrontEndPlugin,
+  ILabShell,
+  ILayoutRestorer
+} from "@jupyterlab/application";
+import {
+  createDataExplorer,
+  IDataExplorer,
+  IDataRegistry,
+  IActiveDataset
+} from "@jupyterlab/dataregistry";
+
+/*-----------------------------------------------------------------------------
+| Copyright (c) Jupyter Development Team.
+| Distributed under the terms of the Modified BSD License.
+|----------------------------------------------------------------------------*/
+
 import { Classes } from "@blueprintjs/core";
 import { ReactWidget } from "@jupyterlab/apputils";
 import {
@@ -16,7 +34,7 @@ import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { classes, style } from "typestyle";
 import { IActiveDataset } from "./active";
-import { IDataRegistry } from "./dataregistry";
+import { IDataRegistry } from "./registry";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";
 
@@ -256,3 +274,28 @@ export const IDataExplorer = new Token<IDataExplorer>(
 );
 
 export interface IDataExplorer extends Widget {}
+
+const id = "@jupyterlab/dataregistry-extension:data-explorer";
+/**
+ * Adds a visual data explorer to the sidebar.
+ */
+export default {
+  activate,
+  id,
+  requires: [ILabShell, IDataRegistry, ILayoutRestorer, IActiveDataset],
+  provides: IDataExplorer,
+  autoStart: true
+} as JupyterFrontEndPlugin<IDataExplorer>;
+
+function activate(
+  app: JupyterFrontEnd,
+  labShell: ILabShell,
+  dataRegistry: IDataRegistry,
+  restorer: ILayoutRestorer,
+  active: IActiveDataset
+): IDataExplorer {
+  const widget = createDataExplorer();
+  restorer.add(widget, widget.id);
+  labShell.add(widget, "left");
+  return widget;
+}

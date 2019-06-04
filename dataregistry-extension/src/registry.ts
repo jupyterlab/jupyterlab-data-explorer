@@ -7,8 +7,11 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from "@jupyterlab/application";
-import { IDataRegistry } from "@jupyterlab/dataregistry";
-import { Registry } from "@jupyterlab/dataregistry-core";
+import { Token } from "@phosphor/coreutils";
+import { Registry } from "@jupyterlab/dataregistry";
+export const IDataRegistry = new Token<Registry>(
+  "@jupyterlab/dataregistry:IDataRegistry"
+);
 
 /**
  * The converter registry extension.
@@ -19,8 +22,8 @@ export default {
   requires: [],
   provides: IDataRegistry,
   autoStart: true
-} as JupyterFrontEndPlugin<IDataRegistry>;
+} as JupyterFrontEndPlugin<Registry>;
 
-function activate(app: JupyterFrontEnd): IDataRegistry {
+function activate(_app: JupyterFrontEnd): Registry {
   return new Registry();
 }

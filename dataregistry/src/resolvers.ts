@@ -1,4 +1,4 @@
-import { MimeType_, URL_, Datasets, Cost, Data$ } from "./datasets";
+import { MimeType_, URL_, Datasets, Cost, Data$, Dataset } from "./datasets";
 import { Converter, Convert } from "./converters";
 import { DataTypeNoArgs, DataTypeStringArg } from "./datatypes";
 import { identity, BehaviorSubject } from "rxjs";
@@ -23,15 +23,18 @@ export const resolveMimetypeDataType = new DataTypeStringArg<null>(
  */
 export function createResolveDataset(...urls: Array<URL_>): Datasets {
   return new Map(
-    urls.map(url => [
-      url,
-      new Map([
+    urls.map(
+      url =>
         [
-          resolveDataType.createMimeType(),
-          [0, new BehaviorSubject(null)] as [Cost, Data$]
-        ]
-      ])
-    ])
+          url,
+          new Map([
+            [
+              resolveDataType.createMimeType(),
+              [0, new BehaviorSubject(null)] as [Cost, Data$]
+            ]
+          ])
+        ] as [string, Dataset]
+    )
   );
 }
 

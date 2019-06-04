@@ -7,16 +7,16 @@ import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
 import converterRegistryPlugin from "./converters";
 import csvViewerPlugin from "./csvviewer";
-import dataRegistryPlugin from "./dataregistry";
+import dataRegistryPlugin from "./registry";
 import datasetsPlugin from "./datasets";
 import dataExplorerPlugin from "./explorer";
 import filePlugin from "./file";
 import filesPlugin from "./files";
 import renderMimePlugin from "./rendermime";
 import snippetsPlugin from "./snippets";
-import URL_Plugin from "./urls";
+import URLPlugin from "./urls";
 import widgetPlugin from "./widgets";
-import tableDataPlugin from './tableData'
+import tableDataPlugin from "./tableData";
 
 export default [
   activePlugin,
@@ -29,7 +29,7 @@ export default [
   filesPlugin,
   renderMimePlugin,
   snippetsPlugin,
-  URL_Plugin,
+  URLPlugin,
   widgetPlugin,
   tableDataPlugin
 ] as JupyterFrontEndPlugin<any>[];

@@ -8,11 +8,17 @@ import {
   JupyterFrontEndPlugin,
   ILabShell
 } from "@jupyterlab/application";
-import { IActiveDataset, hasURL_ } from "@jupyterlab/dataregistry";
 import { DocumentWidget } from "@jupyterlab/docregistry";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
-import { URL_ } from "@jupyterlab/dataregistry-core";
+import { URL_ } from "@jupyterlab/dataregistry";
+import { hasURL_ } from "./widgets";
+import { Token } from "@phosphor/coreutils";
+
+export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
+export const IActiveDataset = new Token<IActiveDataset>(
+  "@jupyterlab/dataregistry:IActiveDataset"
+);
 
 /**
  * The active dataset extension.

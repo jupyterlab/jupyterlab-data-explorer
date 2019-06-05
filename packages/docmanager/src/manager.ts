@@ -17,8 +17,6 @@ import { Contents, Kernel, ServiceManager } from '@jupyterlab/services';
 
 import { ArrayExt, find } from '@phosphor/algorithm';
 
-import { Token } from '@phosphor/coreutils';
-
 import { IDisposable } from '@phosphor/disposable';
 
 import { AttachedProperty } from '@phosphor/properties';
@@ -29,21 +27,9 @@ import { Widget } from '@phosphor/widgets';
 
 import { SaveHandler } from './savehandler';
 
+import { IDocumentManager } from './tokens';
+
 import { DocumentWidgetManager } from './widgetmanager';
-
-/* tslint:disable */
-/**
- * The document registry token.
- */
-export const IDocumentManager = new Token<IDocumentManager>(
-  '@jupyterlab/docmanager:IDocumentManager'
-);
-/* tslint:enable */
-
-/**
- * The interface for a document manager.
- */
-export interface IDocumentManager extends DocumentManager {}
 
 /**
  * The document manager.
@@ -55,7 +41,7 @@ export interface IDocumentManager extends DocumentManager {}
  * open, and a list of widgets for each context. The document manager is in
  * control of the proper closing and disposal of the widgets and contexts.
  */
-export class DocumentManager implements IDisposable {
+export class DocumentManager implements IDocumentManager {
   /**
    * Construct a new document manager.
    */
@@ -67,10 +53,7 @@ export class DocumentManager implements IDisposable {
     this._when = options.when || options.manager.ready;
 
     let widgetManager = new DocumentWidgetManager({ registry: this.registry });
-    widgetManager.activateRequested.connect(
-      this._onActivateRequested,
-      this
-    );
+    widgetManager.activateRequested.connect(this._onActivateRequested, this);
     this._widgetManager = widgetManager;
     this._setBusy = options.setBusy;
   }
@@ -151,7 +134,7 @@ export class DocumentManager implements IDisposable {
 
     // Close all the widgets for our contexts and dispose the widget manager.
     this._contexts.forEach(context => {
-      this._widgetManager.closeWidgets(context);
+      return this._widgetManager.closeWidgets(context);
     });
     this._widgetManager.dispose();
 
@@ -485,15 +468,12 @@ export class DocumentManager implements IDisposable {
       saveInterval: this.autosaveInterval
     });
     Private.saveHandlerProperty.set(context, handler);
-    context.ready.then(() => {
+    void context.ready.then(() => {
       if (this.autosave) {
         handler.start();
       }
     });
-    context.disposed.connect(
-      this._onContextDisposed,
-      this
-    );
+    context.disposed.connect(this._onContextDisposed, this);
     this._contexts.push(context);
     return context;
   }

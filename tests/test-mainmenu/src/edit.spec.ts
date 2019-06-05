@@ -9,7 +9,7 @@ import { Widget } from '@phosphor/widgets';
 
 import { InstanceTracker } from '@jupyterlab/apputils';
 
-import { EditMenu, IEditMenu } from '@jupyterlab/mainmenu/src';
+import { EditMenu, IEditMenu } from '@jupyterlab/mainmenu';
 
 import { delegateExecute } from './util';
 
@@ -32,7 +32,7 @@ describe('@jupyterlab/mainmenu', () => {
       wodget = new Wodget();
       menu = new EditMenu({ commands });
       tracker = new InstanceTracker<Wodget>({ namespace: 'wodget' });
-      tracker.add(wodget);
+      void tracker.add(wodget);
     });
 
     afterEach(() => {
@@ -62,9 +62,9 @@ describe('@jupyterlab/mainmenu', () => {
           }
         };
         menu.undoers.add(undoer);
-        delegateExecute(wodget, menu.undoers, 'undo');
+        void delegateExecute(wodget, menu.undoers, 'undo');
         expect(wodget.state).to.equal('undo');
-        delegateExecute(wodget, menu.undoers, 'redo');
+        void delegateExecute(wodget, menu.undoers, 'redo');
         expect(wodget.state).to.equal('redo');
       });
     });
@@ -84,25 +84,10 @@ describe('@jupyterlab/mainmenu', () => {
           }
         };
         menu.clearers.add(clearer);
-        delegateExecute(wodget, menu.clearers, 'clearCurrent');
+        void delegateExecute(wodget, menu.clearers, 'clearCurrent');
         expect(wodget.state).to.equal('clearCurrent');
-        delegateExecute(wodget, menu.clearers, 'clearAll');
+        void delegateExecute(wodget, menu.clearers, 'clearAll');
         expect(wodget.state).to.equal('clearAll');
-      });
-    });
-
-    describe('#findReplacers', () => {
-      it('should allow setting of an IFindReplacer', () => {
-        const finder: IEditMenu.IFindReplacer<Wodget> = {
-          tracker,
-          findAndReplace: widget => {
-            widget.state = 'findAndReplace';
-            return;
-          }
-        };
-        menu.findReplacers.add(finder);
-        delegateExecute(wodget, menu.findReplacers, 'findAndReplace');
-        expect(wodget.state).to.equal('findAndReplace');
       });
     });
   });

@@ -42,6 +42,7 @@ import { Message, MessageLoop } from '@phosphor/messaging';
 import { Widget } from '@phosphor/widgets';
 
 import { FileBrowserModel } from './model';
+import { ISignal, Signal } from '@phosphor/signaling';
 
 /**
  * The class name added to DirListing widget.
@@ -188,18 +189,9 @@ export class DirListing extends Widget {
     });
     this.addClass(DIR_LISTING_CLASS);
     this._model = options.model;
-    this._model.fileChanged.connect(
-      this._onFileChanged,
-      this
-    );
-    this._model.refreshed.connect(
-      this._onModelRefreshed,
-      this
-    );
-    this._model.pathChanged.connect(
-      this._onPathChanged,
-      this
-    );
+    this._model.fileChanged.connect(this._onFileChanged, this);
+    this._model.refreshed.connect(this._onModelRefreshed, this);
+    this._model.pathChanged.connect(this._onPathChanged, this);
     this._editNode = document.createElement('input');
     this._editNode.className = EDITOR_CLASS;
     this._manager = this._model.manager;
@@ -207,10 +199,7 @@ export class DirListing extends Widget {
 
     const headerNode = DOMUtils.findElement(this.node, HEADER_CLASS);
     this._renderer.populateHeaderNode(headerNode);
-    this._manager.activateRequested.connect(
-      this._onActivateRequested,
-      this
-    );
+    this._manager.activateRequested.connect(this._onActivateRequested, this);
   }
 
   /**
@@ -266,6 +255,13 @@ export class DirListing extends Widget {
    */
   get sortState(): DirListing.ISortState {
     return this._sortState;
+  }
+
+  /**
+   * A signal fired when an item is opened.
+   */
+  get onItemOpened(): ISignal<DirListing, Contents.IModel> {
+    return this._onItemOpened;
   }
 
   /**
@@ -359,7 +355,7 @@ export class DirListing extends Widget {
         return undefined;
       })
       .catch(error => {
-        showErrorMessage('Paste Error', error);
+        void showErrorMessage('Paste Error', error);
       });
   }
 
@@ -415,19 +411,19 @@ export class DirListing extends Widget {
         return undefined;
       })
       .catch(error => {
-        showErrorMessage('Duplicate file', error);
+        void showErrorMessage('Duplicate file', error);
       });
   }
 
   /**
    * Download the currently selected item(s).
    */
-  download(): void {
-    each(this.selectedItems(), item => {
-      if (item.type !== 'directory') {
-        this._model.download(item.path);
-      }
-    });
+  async download(): Promise<void> {
+    await Promise.all(
+      toArray(this.selectedItems())
+        .filter(item => item.type !== 'directory')
+        .map(item => this._model.download(item.path))
+    );
   }
 
   /**
@@ -452,7 +448,7 @@ export class DirListing extends Widget {
         return undefined;
       })
       .catch(error => {
-        showErrorMessage('Shutdown kernel', error);
+        void showErrorMessage('Shut down kernel', error);
       });
   }
 
@@ -790,6 +786,12 @@ export class DirListing extends Widget {
     this._prevPath = this._model.path;
   }
 
+  onResize(msg: Widget.ResizeMessage) {
+    const { width } =
+      msg.width === -1 ? this.node.getBoundingClientRect() : msg;
+    this.toggleClass('jp-DirListing-narrow', width < 250);
+  }
+
   /**
    * Handle the `'click'` event for the widget.
    */
@@ -910,6 +912,20 @@ export class DirListing extends Widget {
   }
 
   /**
+   * Handle the opening of an item.
+   */
+  private _handleOpen(item: Contents.IModel): void {
+    this._onItemOpened.emit(item);
+    if (item.type === 'directory') {
+      this._model
+        .cd(item.name)
+        .catch(error => showErrorMessage('Open directory', error));
+    } else {
+      let path = item.path;
+      this._manager.openOrReveal(path);
+    }
+  }
+  /**
    * Handle the `'keydown'` event for the widget.
    */
   private _evtKeydown(event: KeyboardEvent): void {
@@ -930,17 +946,8 @@ export class DirListing extends Widget {
           return;
         }
 
-        let model = this._model;
         let item = this._sortedItems[i];
-        if (item.type === 'directory') {
-          model
-            .cd(item.name)
-            .catch(error => showErrorMessage('Open directory', error));
-        } else {
-          let path = item.path;
-          this._manager.openOrReveal(path);
-        }
-
+        this._handleOpen(item);
         break;
       case 38: // Up arrow
         this.selectPrevious(event.shiftKey);
@@ -1001,16 +1008,8 @@ export class DirListing extends Widget {
       return;
     }
 
-    let model = this._model;
     let item = this._sortedItems[i];
-    if (item.type === 'directory') {
-      model
-        .cd(item.name)
-        .catch(error => showErrorMessage('Open directory', error));
-    } else {
-      let path = item.path;
-      this._manager.openOrReveal(path);
-    }
+    this._handleOpen(item);
   }
 
   /**
@@ -1023,7 +1022,7 @@ export class DirListing extends Widget {
     }
     event.preventDefault();
     for (let i = 0; i < files.length; i++) {
-      this._model.upload(files[i]);
+      void this._model.upload(files[i]);
     }
   }
 
@@ -1136,7 +1135,7 @@ export class DirListing extends Widget {
       }
     }
     Promise.all(promises).catch(error => {
-      showErrorMessage('Error while copying/moving files', error);
+      void showErrorMessage('Error while copying/moving files', error);
     });
   }
 
@@ -1197,7 +1196,7 @@ export class DirListing extends Widget {
         }
         if (otherPaths.length) {
           const firstWidgetPlaced = new PromiseDelegate<void>();
-          firstWidgetPlaced.promise.then(() => {
+          void firstWidgetPlaced.promise.then(() => {
             let prevWidget = widget;
             otherPaths.forEach(path => {
               const options: DocumentRegistry.IOpenOptions = {
@@ -1223,7 +1222,7 @@ export class DirListing extends Widget {
     document.removeEventListener('mousemove', this, true);
     document.removeEventListener('mouseup', this, true);
     clearTimeout(this._selectTimer);
-    this._drag.start(clientX, clientY).then(action => {
+    void this._drag.start(clientX, clientY).then(action => {
       this._drag = null;
       clearTimeout(this._selectTimer);
     });
@@ -1332,7 +1331,7 @@ export class DirListing extends Widget {
     for (let name of names) {
       let newPath = PathExt.join(basePath, name);
       let promise = this._model.manager.deleteFile(newPath).catch(err => {
-        showErrorMessage('Delete Failed', err);
+        void showErrorMessage('Delete Failed', err);
       });
       promises.push(promise);
     }
@@ -1360,7 +1359,7 @@ export class DirListing extends Widget {
         return original;
       }
       if (!isValidFileName(newName)) {
-        showErrorMessage(
+        void showErrorMessage(
           'Rename Error',
           Error(
             `"${newName}" is not a valid name for a file. ` +
@@ -1384,7 +1383,7 @@ export class DirListing extends Widget {
       return promise
         .catch(error => {
           if (error !== 'File not renamed') {
-            showErrorMessage('Rename Error', error);
+            void showErrorMessage('Rename Error', error);
           }
           this._inRename = false;
           return original;
@@ -1396,7 +1395,7 @@ export class DirListing extends Widget {
           }
           if (this._inRename) {
             // No need to catch because `newName` will always exit.
-            this.selectItemByName(newName);
+            void this.selectItemByName(newName);
           }
           this._inRename = false;
           return newName;
@@ -1466,10 +1465,10 @@ export class DirListing extends Widget {
       return;
     }
 
-    this.selectItemByName(name)
+    void this.selectItemByName(name)
       .then(() => {
         if (!this.isDisposed && newValue.type === 'directory') {
-          this._doRename();
+          return this._doRename();
         }
       })
       .catch(() => {
@@ -1499,6 +1498,7 @@ export class DirListing extends Widget {
     direction: 'ascending',
     key: 'name'
   };
+  private _onItemOpened = new Signal<DirListing, Contents.IModel>(this);
   private _drag: Drag | null = null;
   private _dragData: {
     pressX: number;

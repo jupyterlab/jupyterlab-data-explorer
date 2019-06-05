@@ -21,11 +21,6 @@ if [[ $GROUP == js ]]; then
     jlpm build:test
     FORCE_COLOR=1 jlpm coverage --loglevel success
 
-    # Run the services node example.
-    pushd packages/services/examples/node
-    python main.py
-    popd
-
     jlpm run clean
 fi
 
@@ -61,49 +56,66 @@ if [[ $GROUP == integrity ]]; then
     # Build the packages individually.
     jlpm run build:src
 
-    # Make sure the examples build
-    jlpm run build:examples
-
     # Make sure we have CSS that can be converted with postcss
     jlpm global add postcss-cli
 
     jlpm config set prefix ~/.yarn
     ~/.yarn/bin/postcss packages/**/style/*.css --dir /tmp
 
-    # Make sure we can successfully load the dev app.
-    python -m jupyterlab.browser_check --dev-mode
+    # run twine check on the python build assets.
+    # this must be done before altering any versions below.
+    python -m pip install -U twine wheel
+    python setup.py sdist
+    python setup.py bdist_wheel
+    twine check dist/*
 
-    # Make sure core mode works
-    jlpm run build:core
-    python -m jupyterlab.browser_check --core-mode
+    # Make sure we can bump the version
+    # This must be done at the end so as not to interfere
+    # with the other checks
+    git config --global user.email "you@example.com"
+    git config --global user.name "CI"
+    git stash
+    git checkout -b commit_${BUILD_SOURCEVERSION}
+    git clean -df
+    jlpm bumpversion minor --force
+    git commit -a -m "minor"
+    jlpm bumpversion major --force
+    git commit -a -m "major"
+    jlpm bumpversion release --force # switch to rc
+    git commit -a -m "release"
+    jlpm bumpversion build --force
+    git commit -a -m "build"
+    VERSION=$(python setup.py --version)
+    if [[ $VERSION != *rc1 ]]; then exit 1; fi
 
-    # Make sure we can run the built app.
-    jupyter labextension install ./jupyterlab/tests/mock_packages/extension
-    python -m jupyterlab.browser_check
-    jupyter labextension list
+    # make sure we can patch release
+    jlpm bumpversion release --force  # switch to final
+    git commit -a -m "release"
+    jlpm patch:release --force
+    git commit -a -m "patched"
+    jlpm patch:release console --force
+    git commit -a -m "patched single"
+    jlpm patch:release filebrowser notebook --force
+    git commit -a -m "patched multiple"
 
-    # Make sure the deprecated `selenium_check` command still works
-    python -m jupyterlab.selenium_check
+    # make sure we can bump major JS releases
+    jlpm bumpversion minor --force
+    jlpm bump:js:major console --force
+    jlpm bump:js:major console notebook --force
 
-    # Make sure we can non-dev install.
-    virtualenv -p $(which python3) test_install
-    ./test_install/bin/pip install -q ".[test]"  # this populates <sys_prefix>/share/jupyter/lab
-    ./test_install/bin/python -m jupyterlab.browser_check
-    # Make sure we can run the build
-    ./test_install/bin/jupyter lab build
-
-    # Make sure we can start and kill the lab server
-    ./test_install/bin/jupyter lab --no-browser &
-    TASK_PID=$!
-    # Make sure the task is running
-    ps -p $TASK_PID || exit 1
-    sleep 5
-    kill $TASK_PID
-    wait $TASK_PID
+    # Make sure that a prepublish would include the proper files.
+    jlpm run prepublish:check
 fi
 
 
-if [[ $GROUP == cli ]]; then
+if [[ $GROUP == usage ]]; then
+    # Build the examples.
+    jlpm run build:packages
+    jlpm run build:examples
+
+    # Test the examples
+    jlpm run test:examples
+
     # Test the cli apps.
     jupyter lab clean
     jupyter lab build
@@ -161,4 +173,50 @@ if [[ $GROUP == cli ]]; then
     python -m jupyterlab.browser_check --dev-mode
     rm -rf packages/foo
     jlpm run integrity
+
+    ## Test app directory support being a symlink
+    mkdir tmp
+    pushd tmp
+    mkdir real_app_dir
+    ln -s real_app_dir link_app_dir
+    # verify that app directory is not resolved
+    env JUPYTERLAB_DIR=./link_app_dir jupyter lab path | grep link_app_dir
+    popd
+
+    # Build the examples.
+    jlpm run build:examples
+
+    # Test the examples
+    jlpm run test:examples
+
+    # Make sure we can successfully load the dev app.
+    python -m jupyterlab.browser_check --dev-mode
+
+    # Make sure core mode works
+    jlpm run build:core
+    python -m jupyterlab.browser_check --core-mode
+
+    # Make sure we can run the built app.
+    jupyter labextension install ./jupyterlab/tests/mock_packages/extension
+    python -m jupyterlab.browser_check
+    jupyter labextension list
+
+    # Make sure the deprecated `selenium_check` command still works
+    python -m jupyterlab.selenium_check
+
+    # Make sure we can non-dev install.
+    virtualenv -p $(which python3) test_install
+    ./test_install/bin/pip install -q ".[test]"  # this populates <sys_prefix>/share/jupyter/lab
+    ./test_install/bin/python -m jupyterlab.browser_check
+    # Make sure we can run the build
+    ./test_install/bin/jupyter lab build
+
+    # Make sure we can start and kill the lab server
+    ./test_install/bin/jupyter lab --no-browser &
+    TASK_PID=$!
+    # Make sure the task is running
+    ps -p $TASK_PID || exit 1
+    sleep 5
+    kill $TASK_PID
+    wait $TASK_PID
 fi

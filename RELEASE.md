@@ -2,20 +2,27 @@
 
 This document guides a contributor through creating a release of JupyterLab.
 
-## Check installed tools
-
 Review `CONTRIBUTING.md`. Make sure all the tools needed to generate the
 built JavaScript files are properly installed.
 
 ## Creating a full release
 
-We publish the npm packages, a Python source package, and a Python universal binary wheel. We also publish a conda package on conda-forge (see below).
-See the Python docs on [package uploading](https://packaging.python.org/guides/tool-recommendations/)
-for twine setup instructions and for why twine is the recommended method.
+We publish the npm packages, a Python source package, and a Python universal
+binary wheel. We also publish a conda package on conda-forge (see below). See
+the Python docs on [package
+uploading](https://packaging.python.org/guides/tool-recommendations/) for twine
+setup instructions and for why twine is the recommended method.
 
 ## Getting a clean environment
 
-For convenience, here are commands for getting a completely clean repo. This makes sure that we don't have any extra tags or commits in our repo (especially since we will push our tags later in the process), and that we are on the master branch.
+For convenience, here are commands for getting a completely clean repo. This
+makes sure that we don't have any extra tags or commits in our repo (especially
+since we will push our tags later in the process), and that we are on the master
+branch.
+
+Note that right now, we pin tornado to version 5 because there are some
+incompatibilities with tornado 6. See
+https://github.com/jupyterlab/jupyterlab/issues/6131.
 
 ```bash
 cd release
@@ -23,47 +30,55 @@ conda deactivate
 conda remove --all -y -n jlabrelease
 rm -rf jupyterlab
 
-conda create -c conda-forge -y -n jlabrelease notebook nodejs twine
+conda create -c conda-forge -y -n jlabrelease notebook nodejs twine 'tornado<6'
 conda activate jlabrelease
 git clone git@github.com:jupyterlab/jupyterlab.git
 cd jupyterlab
 pip install -ve .
 ```
 
-### Publish the npm packages
+## How Python and NPM versions increment
 
-The command below ensures the latest dependencies and built files,
-then prompts you to select package versions. When one package has an
-effective major release, the packages that depend on it should also get a
-major release, to prevent consumers that are using the `^` semver
-requirement from getting a conflict. Note that we publish the
-JavaScript packages using the `next` tag until we are ready for the
-final release.
+Here is an example of how version numbers progress through a release process.
 
-```bash
-jlpm run publish:next
-```
+| Command                            | Python Version Change | NPM Version change                 |
+| ---------------------------------- | --------------------- | ---------------------------------- |
+| `jlpm bumpversion minor`           | x.y.z-> x.(y+1).0.a0  | All a.b.c -> a.(b+1).0-alpha.0     |
+| `jlpm bumpversion build`           | x.y.z.a0-> x.y.z.a1   | All a.b.c-alpha.0 -> a.b.c-alpha.1 |
+| `jlpm bumpversion release`         | x.y.z.a1-> x.y.z.rc0  | All a.b.c-alpha.1 -> a.b.c-rc.0    |
+| `jlpm bumpversion release`         | x.y.z.rc0-> x.y.z     | All a.b.c-rc0 -> a.b.c             |
+| `jlpm patch:release [...packages]` | x.y.z -> x.y.(z+1)    | Selected a.b.c -> a.b.(c+1)        |
 
-### Publish the Python package
+### JS major release(s)
 
-- Update `jupyterlab/_version.py` with an `rc` version
-- Prep the static assets for release:
+Command:
+`jlpm bump:js:major [...packages]`
 
-```bash
-jlpm run build:update
-```
+Results:
 
-- Commit and tag and push the tag
-- Create the Python release artifacts:
+- Python package is not affected.
+- JS dependencies are also bumped a major version.
+- Packages that have already had a major bump in this prerelease cycle are not affected.
+- All affected packages changed to match the current release type of the Python package (`alpha` or `rc`).
 
-```bash
-rm -rf dist build
-python setup.py sdist
-python setup.py bdist_wheel --universal
-twine upload dist/*
-```
+### Publishing Packages
 
-### Post prerelease checklist
+We use [bump2version](https://github.com/c4urself/bump2version) to manage the Python
+version, and we keep the JS versions and tags in sync with the release cycle.
+For a backwards-incompatible changes to JS packages, bump the major version number(s)
+using `jlpm run bump:js:major` with the package name(s). For a major release of
+JupyterLab itself, run `jlpm run bumpversion major`.
+
+- Run `jlpm run bumpversion build` to create a new `alpha` version.
+- Push the commits and tags as prompted.
+- Run `jlpm run publish:all` to publish the JS and Python packages.
+  Execute the suggested commands after doing a quick sanity check.
+  If there is a network error during JS publish, run `jlpm run publish:all --skip-build` to resume publish without requiring another
+  clean and build phase of the JS packages.
+- Run `jlpm run bumpversion release` to switch to an `rc` version.
+  (running `jlpm run bumpversion build` will then increment `rc` versions).
+
+### Post release candidate checklist
 
 - [ ] Modify and run `python scripts/milestone_check.py` to check the issues assigned to this milestone
 - [ ] Write [release highlights](https://github.com/jupyterlab/jupyterlab/blob/master/docs/source/getting_started/changelog.rst), starting with:
@@ -89,24 +104,23 @@ twine upload dist/*
   - [ ] [Notebook toolbar button](https://github.com/jupyterlab/jupyterlab/blob/master/docs/source/developer/notebook.rst#adding-a-button-to-the-toolbar)
 - [ ] Update the [xkcd tutorial](https://github.com/jupyterlab/jupyterlab/blob/master/RELEASE.md#updating-the-xkcd-tutorial)
 - [ ] At this point, there may have been some more commits merged. Run `python scripts/milestone_check.py` to check the issues assigned to this milestone one more time. Update changelog if necessary.
-- [ ] Publish the final (not prerelease) JavaScript packages using `jlpm run publish:next` at some point.
 
 Now do the actual final release:
 
-- [ ] Update `jupyterlab/_version.py` with a final version
-- [ ] Make a final Python release
+- [ ] Run `jlpm run bumpversion release` to switch to final release
+- [ ] Push the commit and tags to master
+- [ ] Run `jlpm run publish:all` to publish the packages
 - [ ] Create a branch for the release and push to GitHub
 - [ ] Merge the PRs on the other repos and set the default branch of the
       xckd repo
-- [ ] Update the `latest` npm tags by running `jlpm run update:dist-tags` and running the commands it prints out
 - [ ] Publish to [conda-forge](https://github.com/jupyterlab/jupyterlab/blob/master/RELEASE.md#publishing-to-conda-forge).
 
 After a few days (to allow for possible patch releases), set up development for
 the next release:
 
-- [ ] Update `jupyterlab/_version.py` with a `dev` version
-- [ ] Run `jlpm integrity` to update the `dev_mode` version
-- [ ] Commit and push the version update to master
+- [ ] Run `jlpm run bumpversion minor` to bump to alpha for the next alpha release
+- [ ] Put the commit and tags to master
+- [ ] Run `jlpm run publish:all` to publish the packages
 - [ ] Release the other repos as appropriate
 - [ ] Update version for [binder](https://github.com/jupyterlab/jupyterlab/blob/master/RELEASE.md#update-version-for-binder)
 
@@ -203,21 +217,16 @@ shasum -a 256 dist/*.tar.gz
 - Create a PR with the version bump
 - Update `recipe/meta.yaml` with the new version and md5 and reset the build number to 0.
 
-## Making a patch release JavaScript package(s)
+## Making a patch release
 
 - Backport the change to the previous release branch
-- Make a new PR against the previous branch
-- Run the following script, where the package is in `/packages/package-folder-name` (note that multiple packages can be given):
+- Run the following script, where the package is in `/packages/package-folder-name` (note that multiple packages can be given, or no packages for a Python-only patch release):
 
 ```bash
 jlpm run patch:release package-folder-name
 ```
 
-- Push the resulting commit and tag.
-- Create a new Python release on the previous branch
-- Cherry pick the patch commit to the master branch
-- Update the dev version of the master branch in `_version.py`
-- Update the `package.json` file in `dev_mode` with the new JupyterLab version in the `jupyterlab` metadata section.
+- Push the resulting commit and tag
 
 ## Update version for binder
 

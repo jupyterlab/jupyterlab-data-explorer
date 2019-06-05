@@ -7,7 +7,7 @@ import { CodeEditor, CodeEditorWrapper } from '@jupyterlab/codeeditor';
 
 import { ISettingRegistry } from '@jupyterlab/coreutils';
 
-import { RenderMimeRegistry } from '@jupyterlab/rendermime';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { CommandRegistry } from '@phosphor/commands';
 
@@ -84,10 +84,7 @@ export class RawEditor extends SplitPanel {
 
     user.addClass(USER_CLASS);
     user.editor.model.mimeType = 'text/javascript';
-    user.editor.model.value.changed.connect(
-      this._onTextChanged,
-      this
-    );
+    user.editor.model.value.changed.connect(this._onTextChanged, this);
 
     // Create and set up an inspector.
     this._inspector = createInspector(this, options.rendermime);
@@ -166,10 +163,7 @@ export class RawEditor extends SplitPanel {
 
     if (settings) {
       this._settings = settings;
-      this._settings.changed.connect(
-        this._onSettingsChanged,
-        this
-      );
+      this._settings.changed.connect(this._onSettingsChanged, this);
       this._onSettingsChanged();
     } else {
       this._settings = null;
@@ -394,7 +388,7 @@ export namespace RawEditor {
     /**
      * The optional MIME renderer to use for rendering debug messages.
      */
-    rendermime?: RenderMimeRegistry;
+    rendermime?: IRenderMimeRegistry;
   }
 }
 

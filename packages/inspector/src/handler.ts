@@ -3,9 +3,9 @@
 
 import { CodeEditor } from '@jupyterlab/codeeditor';
 
-import { IDataConnector, Text, ActivityMonitor } from '@jupyterlab/coreutils';
+import { IDataConnector, Text, Debouncer } from '@jupyterlab/coreutils';
 
-import { MimeModel, RenderMimeRegistry } from '@jupyterlab/rendermime';
+import { MimeModel, IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { ReadonlyJSONObject } from '@phosphor/coreutils';
 
@@ -13,7 +13,7 @@ import { IDisposable } from '@phosphor/disposable';
 
 import { ISignal, Signal } from '@phosphor/signaling';
 
-import { IInspector } from './inspector';
+import { IInspector } from './tokens';
 
 /**
  * An object that handles code inspection.
@@ -25,6 +25,7 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
   constructor(options: InspectionHandler.IOptions) {
     this._connector = options.connector;
     this._rendermime = options.rendermime;
+    this._debouncer = new Debouncer(this.onEditorChange.bind(this), 250);
   }
 
   /**
@@ -58,12 +59,9 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
     if (newValue === this._editor) {
       return;
     }
+    // Remove all of our listeners.
+    Signal.disconnectReceiver(this);
 
-    if (this._editor && !this._editor.isDisposed) {
-      this._monitors.forEach(monitor => {
-        monitor.activityStopped.disconnect(this.onEditorChange, this);
-      });
-    }
     let editor = (this._editor = newValue);
     if (editor) {
       // Clear the inspector in preparation for a new editor.
@@ -71,18 +69,8 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
       // Call onEditorChange to cover the case where the user changes
       // the active cell
       this.onEditorChange();
-      let signals: ISignal<any, any>[] = [
-        editor.model.selections.changed,
-        editor.model.value.changed
-      ];
-      this._monitors = signals.map(s => {
-        let m = new ActivityMonitor({ signal: s, timeout: 250 });
-        m.activityStopped.connect(
-          this.onEditorChange,
-          this
-        );
-        return m;
-      });
+      editor.model.selections.changed.connect(this._onChange, this);
+      editor.model.value.changed.connect(this._onChange, this);
     }
   }
 
@@ -147,7 +135,7 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
 
     const pending = ++this._pending;
 
-    this._connector
+    void this._connector
       .fetch({ offset, text })
       .then(reply => {
         // If handler has been disposed or a newer request is pending, bail.
@@ -163,7 +151,7 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
           const widget = this._rendermime.createRenderer(mimeType);
           const model = new MimeModel({ data });
 
-          widget.renderModel(model);
+          void widget.renderModel(model);
           update.content = widget;
         }
 
@@ -173,6 +161,13 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
         // Since almost all failures are benign, fail silently.
         this._inspected.emit(update);
       });
+  }
+
+  /**
+   * Handle changes to the editor state, debouncing.
+   */
+  private _onChange(): void {
+    this._debouncer.invoke();
   }
 
   private _cleared = new Signal<InspectionHandler, void>(this);
@@ -186,9 +181,9 @@ export class InspectionHandler implements IDisposable, IInspector.IInspectable {
   private _inspected = new Signal<this, IInspector.IInspectorUpdate>(this);
   private _isDisposed = false;
   private _pending = 0;
-  private _rendermime: RenderMimeRegistry;
+  private _rendermime: IRenderMimeRegistry;
   private _standby = true;
-  private _monitors: ActivityMonitor<any, any>[];
+  private _debouncer: Debouncer;
 }
 
 /**
@@ -212,7 +207,7 @@ export namespace InspectionHandler {
     /**
      * The mime renderer for the inspection handler.
      */
-    rendermime: RenderMimeRegistry;
+    rendermime: IRenderMimeRegistry;
   }
 
   /**

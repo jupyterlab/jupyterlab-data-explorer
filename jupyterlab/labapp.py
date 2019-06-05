@@ -6,6 +6,8 @@
 
 import json
 import os
+import os.path as osp
+from os.path import join as pjoin
 import sys
 
 from jupyter_core.application import JupyterApp, base_aliases
@@ -26,12 +28,9 @@ build_aliases = dict(base_aliases)
 build_aliases['app-dir'] = 'LabBuildApp.app_dir'
 build_aliases['name'] = 'LabBuildApp.name'
 build_aliases['version'] = 'LabBuildApp.version'
+build_aliases['dev-build'] = 'LabBuildApp.dev_build'
 
 build_flags = dict(flags)
-build_flags['dev'] = (
-    {'LabBuildApp': {'dev_build': True}},
-    "Build in Development mode"
-)
 
 version = __version__
 app_version = get_app_version()
@@ -63,8 +62,8 @@ class LabBuildApp(JupyterApp):
     dev_build = Bool(True, config=True,
         help="Whether to build in dev mode (defaults to dev mode)")
 
-    pre_clean = Bool(True, config=True,
-        help="Whether to clean before building (defaults to True)")
+    pre_clean = Bool(False, config=True,
+        help="Whether to clean before building (defaults to False)")
 
     def start(self):
         command = 'build:prod' if not self.dev_build else 'build'
@@ -143,9 +142,9 @@ class LabWorkspaceExportApp(JupyterApp):
         raw = (page_url if not self.extra_args
                else ujoin(config.workspaces_url, self.extra_args[0]))
         slug = slugify(raw, base_url)
-        workspace_path = os.path.join(directory, slug + WORKSPACE_EXTENSION)
+        workspace_path = pjoin(directory, slug + WORKSPACE_EXTENSION)
 
-        if os.path.exists(workspace_path):
+        if osp.exists(workspace_path):
             with open(workspace_path) as fid:
                 try:  # to load the workspace file.
                     print(fid.read())
@@ -190,22 +189,15 @@ class LabWorkspaceImportApp(JupyterApp):
             print('One argument is required for workspace import.')
             sys.exit(1)
 
-        file_name = self.extra_args[0]
-        file_path = os.path.abspath(file_name)
-
-        if not os.path.exists(file_path):
-            print('%s does not exist.' % file_name)
-            sys.exit(1)
-
         workspace = dict()
-        with open(file_path) as fid:
+        with self._smart_open() as fid:
             try:  # to load, parse, and validate the workspace file.
                 workspace = self._validate(fid, base_url, page_url, workspaces_url)
             except Exception as e:
-                print('%s is not a valid workspace:\n%s' % (file_name, e))
+                print('%s is not a valid workspace:\n%s' % (fid.name, e))
                 sys.exit(1)
 
-        if not os.path.exists(directory):
+        if not osp.exists(directory):
             try:
                 os.makedirs(directory)
             except Exception as e:
@@ -213,13 +205,27 @@ class LabWorkspaceImportApp(JupyterApp):
                 sys.exit(1)
 
         slug = slugify(workspace['metadata']['id'], base_url)
-        workspace_path = os.path.join(directory, slug + WORKSPACE_EXTENSION)
+        workspace_path = pjoin(directory, slug + WORKSPACE_EXTENSION)
 
         # Write the workspace data to a file.
         with open(workspace_path, 'w') as fid:
             fid.write(json.dumps(workspace))
 
         print('Saved workspace: %s' % workspace_path)
+
+    def _smart_open(self):
+        file_name = self.extra_args[0]
+
+        if file_name == '-':
+            return sys.stdin
+        else:
+            file_path = osp.abspath(file_name)
+
+            if not osp.exists(file_path):
+                print('%s does not exist.' % file_name)
+                sys.exit(1)
+
+            return open(file_path)
 
     def _validate(self, data, base_url, page_url, workspaces_url):
         workspace = json.load(data)

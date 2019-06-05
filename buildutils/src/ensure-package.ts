@@ -212,6 +212,16 @@ export async function ensurePackage(
     delete data.devDependencies;
   }
 
+  // Make sure there are no gitHead keys, which are only temporary keys used
+  // when a package is actually being published.
+  delete data.gitHead;
+
+  // Ensure there is a minimal prepublishOnly script
+  if (!data.private && !data.scripts.prepublishOnly) {
+    messages.push(`prepublishOnly script missing in ${pkgPath}`);
+    data.scripts.prepublishOnly = 'npm run build';
+  }
+
   if (utils.writePackageData(path.join(pkgPath, 'package.json'), data)) {
     messages.push('Updated package.json');
   }

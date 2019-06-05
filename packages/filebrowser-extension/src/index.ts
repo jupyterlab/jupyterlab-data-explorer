@@ -11,7 +11,6 @@ import {
 import {
   Clipboard,
   InstanceTracker,
-  IWindowResolver,
   MainAreaWidget,
   ToolbarButton
 } from '@jupyterlab/apputils';
@@ -135,7 +134,7 @@ const factory: JupyterFrontEndPlugin<IFileBrowserFactory> = {
 const shareFile: JupyterFrontEndPlugin<void> = {
   activate: activateShareFile,
   id: '@jupyterlab/filebrowser-extension:share-file',
-  requires: [IFileBrowserFactory, IWindowResolver],
+  requires: [IFileBrowserFactory],
   autoStart: true
 };
 
@@ -212,7 +211,7 @@ function activateFactory(
 
     // Add a launcher toolbar item.
     let launcher = new ToolbarButton({
-      iconClassName: 'jp-AddIcon jp-Icon jp-Icon-16',
+      iconClassName: 'jp-AddIcon',
       onClick: () => {
         return Private.createLauncher(commands, widget);
       },
@@ -221,7 +220,7 @@ function activateFactory(
     widget.toolbar.insertItem(0, 'launch', launcher);
 
     // Track the newly created file browser.
-    tracker.add(widget);
+    void tracker.add(widget);
 
     return widget;
   };
@@ -259,17 +258,17 @@ function activateBrowser(
   labShell.add(browser, 'left', { rank: 100 });
 
   // If the layout is a fresh session without saved data, open file browser.
-  labShell.restored.then(layout => {
+  void labShell.restored.then(layout => {
     if (layout.fresh) {
-      commands.execute(CommandIDs.showBrowser, void 0);
+      void commands.execute(CommandIDs.showBrowser, void 0);
     }
   });
 
-  Promise.all([app.restored, browser.model.restored]).then(() => {
+  void Promise.all([app.restored, browser.model.restored]).then(() => {
     function maybeCreate() {
       // Create a launcher if there are no open items.
       if (labShell.isEmpty('main')) {
-        Private.createLauncher(commands, browser);
+        void Private.createLauncher(commands, browser);
       }
     }
 
@@ -280,7 +279,7 @@ function activateBrowser(
 
     let navigateToCurrentDirectory: boolean = false;
 
-    settingRegistry
+    void settingRegistry
       .load('@jupyterlab/filebrowser-extension:browser')
       .then(settings => {
         settings.changed.connect(settings => {
@@ -319,8 +318,7 @@ function activateBrowser(
 
 function activateShareFile(
   app: JupyterFrontEnd,
-  factory: IFileBrowserFactory,
-  resolver: IWindowResolver
+  factory: IFileBrowserFactory
 ): void {
   const { commands } = app;
   const { tracker } = factory;
@@ -332,9 +330,7 @@ function activateShareFile(
         return;
       }
       const path = encodeURI(widget.selectedItems().next().path);
-      const tree = PageConfig.getTreeUrl({ workspace: resolver.name });
-
-      Clipboard.copyToSystem(URLExt.join(tree, path));
+      Clipboard.copyToSystem(URLExt.join(PageConfig.getTreeUrl(), path));
     },
     isVisible: () =>
       tracker.currentWidget &&
@@ -432,9 +428,9 @@ function addCommands(
   commands.addCommand(CommandIDs.navigate, {
     execute: args => {
       const path = (args.path as string) || '';
-      Private.navigateToPath(path, factory)
+      return Private.navigateToPath(path, factory)
         .then(() => {
-          commands.execute('docmanager:open', { path });
+          return commands.execute('docmanager:open', { path });
         })
         .catch((reason: any) => {
           console.warn(
@@ -627,7 +623,7 @@ function addCommands(
       }
     },
     iconClass: 'jp-MaterialIcon jp-StopIcon',
-    label: 'Shutdown Kernel'
+    label: 'Shut Down Kernel'
   });
 
   commands.addCommand(CommandIDs.toggleBrowser, {
@@ -826,12 +822,9 @@ namespace Private {
     return commands
       .execute('launcher:create', { cwd: model.path })
       .then((launcher: MainAreaWidget<Launcher>) => {
-        model.pathChanged.connect(
-          () => {
-            launcher.content.cwd = model.path;
-          },
-          launcher
-        );
+        model.pathChanged.connect(() => {
+          launcher.content.cwd = model.path;
+        }, launcher);
         return launcher;
       });
   }

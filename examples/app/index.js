@@ -1,11 +1,14 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
-// ES6 Promise polyfill
-require('es6-promise/auto');
+import { PageConfig, URLExt } from '@jupyterlab/coreutils';
+// eslint-disable-next-line
+__webpack_public_path__ = URLExt.join(
+  PageConfig.getBaseUrl(),
+  'example/static/'
+);
 
-window.addEventListener('load', function() {
-  require('font-awesome/css/font-awesome.min.css');
+window.addEventListener('load', async function() {
   var JupyterLab = require('@jupyterlab/application').JupyterLab;
 
   var mods = [
@@ -30,17 +33,19 @@ window.addEventListener('load', function() {
     require('@jupyterlab/running-extension'),
     require('@jupyterlab/settingeditor-extension'),
     require('@jupyterlab/shortcuts-extension'),
+    require('@jupyterlab/statusbar-extension'),
     require('@jupyterlab/tabmanager-extension'),
     require('@jupyterlab/terminal-extension'),
     require('@jupyterlab/theme-dark-extension'),
     require('@jupyterlab/theme-light-extension'),
     require('@jupyterlab/tooltip-extension')
   ];
-  var lab = new JupyterLab({
-    name: 'JupyterLab Example',
-    namespace: 'lab-example',
-    version: require('./package.json').version
-  });
+  var lab = new JupyterLab();
   lab.registerPluginModules(mods);
-  lab.start();
+  /* eslint-disable no-console */
+  console.log('Starting app');
+  await lab.start();
+  console.log('App started, waiting for restore');
+  await lab.restored;
+  console.log('Example started!');
 });

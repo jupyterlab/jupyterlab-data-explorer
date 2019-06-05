@@ -17,7 +17,14 @@ import { createClientSession, signalToPromise } from '@jupyterlab/testutils';
 
 const mockHistory: KernelMessage.IHistoryReplyMsg = {
   header: null,
-  parent_header: {},
+  parent_header: {
+    date: '',
+    msg_id: '',
+    msg_type: 'history_request',
+    username: '',
+    session: '',
+    version: '5.3'
+  },
   metadata: null,
   buffers: null,
   channel: 'shell',
@@ -55,9 +62,7 @@ describe('console/history', () => {
     session = await createClientSession();
   });
 
-  after(() => {
-    session.shutdown();
-  });
+  after(() => session.shutdown());
 
   describe('ConsoleHistory', () => {
     describe('#constructor()', () => {

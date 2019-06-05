@@ -3,6 +3,8 @@
 
 import { UseSignal, ReactWidget } from './vdom';
 
+import { Kernel } from '@jupyterlab/services';
+
 import { Button } from '@jupyterlab/ui-components';
 
 import { IIterator, find, map, some } from '@phosphor/algorithm';
@@ -346,10 +348,10 @@ export namespace Toolbar {
    */
   export function createInterruptButton(session: IClientSession): Widget {
     return new ToolbarButton({
-      iconClassName: 'jp-StopIcon jp-Icon jp-Icon-16',
+      iconClassName: 'jp-StopIcon',
       onClick: () => {
         if (session.kernel) {
-          session.kernel.interrupt();
+          void session.kernel.interrupt();
         }
       },
       tooltip: 'Interrupt the kernel'
@@ -361,9 +363,9 @@ export namespace Toolbar {
    */
   export function createRestartButton(session: IClientSession): Widget {
     return new ToolbarButton({
-      iconClassName: 'jp-RefreshIcon jp-Icon jp-Icon-16',
+      iconClassName: 'jp-RefreshIcon',
       onClick: () => {
-        session.restart();
+        void session.restart();
       },
       tooltip: 'Restart the kernel'
     });
@@ -400,8 +402,7 @@ export namespace Toolbar {
    * Create a kernel status indicator item.
    *
    * #### Notes
-   * It show display a busy status if the kernel status is
-   * not idle.
+   * It will show a busy status if the kernel status is busy.
    * It will show the current status in the node title.
    * It can handle a change to the context or the kernel.
    */
@@ -434,7 +435,11 @@ export namespace ToolbarButtonComponent {
  * @param props - The props for ToolbarButtonComponent.
  */
 export function ToolbarButtonComponent(props: ToolbarButtonComponent.IProps) {
-  const handleClick = (event: React.MouseEvent) => {
+  // In some browsers, a button click event moves the focus from the main
+  // content to the button (see https://developer.mozilla.org/en-US/docs/Web/HTML/Element/button#Clicking_and_focus).
+  // We avoid a click event by calling preventDefault in mousedown, and
+  // we bind the button action to `mousedown`.
+  const handleMouseDown = (event: React.MouseEvent) => {
     event.preventDefault();
     props.onClick();
   };
@@ -454,14 +459,17 @@ export function ToolbarButtonComponent(props: ToolbarButtonComponent.IProps) {
           : 'jp-ToolbarButtonComponent'
       }
       disabled={props.enabled === false}
-      onClick={handleClick}
+      onMouseDown={handleMouseDown}
       onKeyDown={handleKeyDown}
       title={props.tooltip || props.iconLabel}
       minimal
     >
       {props.iconClassName && (
         <span
-          className={props.iconClassName + ' jp-ToolbarButtonComponent-icon'}
+          className={
+            props.iconClassName +
+            ' jp-ToolbarButtonComponent-icon jp-Icon jp-Icon-16'
+          }
         />
       )}
       {props.label && (
@@ -533,9 +541,9 @@ export function CommandToolbarButtonComponent(
 }
 
 /*
-  * Adds the command toolbar button class to the command toolbar widget.
-  * @param w Command toolbar button widget.
-  */
+ * Adds the command toolbar button class to the command toolbar widget.
+ * @param w Command toolbar button widget.
+ */
 export function addCommandToolbarButtonClass(w: Widget): Widget {
   w.addClass('jp-CommandToolbarButton');
   return w;
@@ -579,7 +587,7 @@ namespace Private {
     }
     const tooltip = commands.caption(id) || label || iconLabel;
     const onClick = () => {
-      commands.execute(id);
+      void commands.execute(id);
     };
     const enabled = commands.isEnabled(id);
     return { className, iconClassName, tooltip, onClick, enabled, label };
@@ -675,10 +683,20 @@ namespace Private {
         return;
       }
       let status = session.status;
-      this.toggleClass(TOOLBAR_IDLE_CLASS, status === 'idle');
-      this.toggleClass(TOOLBAR_BUSY_CLASS, status !== 'idle');
+      const busy = this._isBusy(status);
+      this.toggleClass(TOOLBAR_BUSY_CLASS, busy);
+      this.toggleClass(TOOLBAR_IDLE_CLASS, !busy);
       let title = 'Kernel ' + status[0].toUpperCase() + status.slice(1);
       this.node.title = title;
+    }
+
+    /**
+     * Check if status should be shown as busy.
+     */
+    private _isBusy(status: Kernel.Status): boolean {
+      return (
+        status === 'busy' || status === 'starting' || status === 'restarting'
+      );
     }
   }
 }

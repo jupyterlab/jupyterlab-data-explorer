@@ -9,9 +9,9 @@ import { UUID } from '@phosphor/coreutils';
 
 import { Signal } from '@phosphor/signaling';
 
-import { Kernel, KernelMessage } from '@jupyterlab/services/src/kernel';
+import { Kernel, KernelMessage } from '@jupyterlab/services';
 
-import { Session } from '@jupyterlab/services/src/session';
+import { Session } from '@jupyterlab/services';
 
 import {
   expectFailure,
@@ -124,11 +124,12 @@ describe('session', () => {
         const emission = testEmission(session.unhandledMessage, {
           find: (k, msg) => msg.header.msg_id === msgId
         });
-        const msg = KernelMessage.createShellMessage({
-          msgType: 'foo',
+        const msg = KernelMessage.createMessage({
+          msgType: 'kernel_info_request',
           channel: 'shell',
           session: tester.serverSessionId,
-          msgId
+          msgId,
+          content: {}
         });
         msg.parent_header = { session: session.kernel.clientId };
         tester.send(msg);

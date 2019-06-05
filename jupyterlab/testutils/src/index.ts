@@ -90,7 +90,7 @@ export function signalToPromises<T, U>(
   numberValues: number
 ): Promise<[T, U]>[] {
   const values: Promise<[T, U]>[] = new Array(numberValues);
-  const resolvers: Array<((value: [T, U]) => void)> = new Array(numberValues);
+  const resolvers: Array<(value: [T, U]) => void> = new Array(numberValues);
 
   for (let i = 0; i < numberValues; i++) {
     values[i] = new Promise<[T, U]>(resolve => {
@@ -219,40 +219,28 @@ export async function createNotebookContext(
 /**
  * Wait for a dialog to be attached to an element.
  */
-export function waitForDialog(
-  host?: HTMLElement,
-  timeout?: number
+export async function waitForDialog(
+  host: HTMLElement = document.body,
+  timeout: number = 250
 ): Promise<void> {
-  return new Promise<void>((resolve, reject) => {
-    let counter = 0;
-    const interval = 25;
-    const limit = Math.floor((timeout || 250) / interval);
-    const seek = () => {
-      if (++counter === limit) {
-        reject(new Error('Dialog not found'));
-        return;
-      }
-
-      if ((host || document.body).getElementsByClassName('jp-Dialog')[0]) {
-        resolve(undefined);
-        return;
-      }
-
-      setTimeout(seek, interval);
-    };
-
-    seek();
-  });
+  const interval = 25;
+  const limit = Math.floor(timeout / interval);
+  for (let counter = 0; counter < limit; counter++) {
+    if (host.getElementsByClassName('jp-Dialog')[0]) {
+      return;
+    }
+    await sleep(interval);
+  }
+  throw new Error('Dialog not found');
 }
 
 /**
  * Accept a dialog after it is attached by accepting the default button.
  */
 export async function acceptDialog(
-  host?: HTMLElement,
-  timeout?: number
+  host: HTMLElement = document.body,
+  timeout: number = 250
 ): Promise<void> {
-  host = host || document.body;
   await waitForDialog(host, timeout);
 
   const node = host.getElementsByClassName('jp-Dialog')[0];
@@ -269,11 +257,9 @@ export async function acceptDialog(
  * This promise will always resolve successfully.
  */
 export async function dismissDialog(
-  host?: HTMLElement,
-  timeout?: number
+  host: HTMLElement = document.body,
+  timeout: number = 250
 ): Promise<void> {
-  host = host || document.body;
-
   try {
     await waitForDialog(host, timeout);
   } catch (error) {
@@ -302,7 +288,7 @@ namespace Private {
    */
   export function getManager(): ServiceManager {
     if (!manager) {
-      manager = new ServiceManager();
+      manager = new ServiceManager({ standby: 'never' });
     }
     return manager;
   }

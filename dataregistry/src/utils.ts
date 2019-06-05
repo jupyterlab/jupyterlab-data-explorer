@@ -42,9 +42,11 @@ export class ObservableSet<T> {
     new Set()
   );
 
-  constructor(values: Iterable<T>) {
+  constructor(values?: Iterable<T>) {
     this.observable = this._observable.pipe(tag("ObservableSet"));
-    this.add(...values);
+    if (values) {
+      this.add(...values);
+    }
   }
 
   add(...values: Array<T>) {

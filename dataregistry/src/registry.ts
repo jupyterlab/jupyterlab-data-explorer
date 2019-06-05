@@ -1,4 +1,4 @@
-import { Datasets, Dataset, URL_, MimeType_, Data } from "./datasets";
+import { Datasets, Dataset, URL_ } from "./datasets";
 import {
   Converter,
   combineManyConverters,
@@ -30,11 +30,14 @@ export class Registry {
     this._converters.add(converter);
   }
 
-  addDataset(url: URL_, mimeType: MimeType_, data: Data): void {
+  addDatasets(datasets: Datasets): void {
     this._converters.add(
-      resolveDataType.createSingleConverter((_, url_) =>
-        url === url_ ? [mimeType, () => data] : null
-      )
+      (_mimeType, url) =>
+        new Map(
+          [...(datasets.get(url) || (new Map() as Dataset))].map(
+            ([mimeType, [cost, data]]) => [mimeType, () => data]
+          )
+        )
     );
   }
 

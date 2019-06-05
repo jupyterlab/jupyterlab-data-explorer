@@ -9,34 +9,25 @@ import {
   ILabShell,
   ILayoutRestorer
 } from "@jupyterlab/application";
-import {
-  createDataExplorer,
-  IDataExplorer,
-  IDataRegistry,
-  IActiveDataset
-} from "@jupyterlab/dataregistry";
-
-/*-----------------------------------------------------------------------------
-| Copyright (c) Jupyter Development Team.
-| Distributed under the terms of the Modified BSD License.
-|----------------------------------------------------------------------------*/
 
 import { Classes } from "@blueprintjs/core";
 import { ReactWidget } from "@jupyterlab/apputils";
-import {
-  Dataset,
-  Datasets,
-  Datasets$,
-  URL_
-} from "@jupyterlab/dataregistry-core";
+
 import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { classes, style } from "typestyle";
 import { IActiveDataset } from "./active";
-import { IDataRegistry } from "./registry";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";
+import { RegistryToken } from "./registry";
+import {
+  Registry,
+  URL_,
+  ObservableSet,
+  nestedDataType
+} from "@jupyterlab/dataregistry";
+import { Observable } from "rxjs";
 
 const buttonClassName = style({
   color: "#2196F3",
@@ -104,16 +95,50 @@ const activeDatasetClassName = style({
   }
 });
 
+/**
+ * Shows/hides the children based on a button
+ */
+class Collapsable extends React.Component<
+  { children: React.ReactElement },
+  { collapsed: boolean }
+> {
+  state: { collapsed: boolean } = {
+    collapsed: true
+  };
+
+  render() {
+    if (this.state.collapsed) {
+      return (
+        <Button
+          onClick={() => this.setState({ collapsed: true })}
+          text="Show"
+        />
+      );
+    }
+    return (
+      <>
+        <Button
+          onClick={() => this.setState({ collapsed: false })}
+          text="hide"
+        />
+        {this.props.children}
+      </>
+    );
+  }
+}
+
 function DatasetCompononent({
   url,
   active$,
-  dataset
+  registry
 }: {
   url: URL_;
-  dataset: Dataset;
+  registry: Registry;
   active$: IActiveDataset;
 }) {
-  const viewers = viewerDataType.filterDataset(dataset);
+  const dataset = registry.getURL(url);
+  const viewers = [...viewerDataType.filterDataset(dataset)];
+  const nestedURLs = nestedDataType.filterDataset(dataset).get(undefined);
   // Sort viewers by label
   viewers.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
   return (
@@ -124,7 +149,7 @@ function DatasetCompononent({
           classNames.push(activeDatasetClassName);
         }
         return (
-          <div
+          <li
             className={classes(...classNames)}
             onClick={() => active$.next(url)}
           >
@@ -142,15 +167,22 @@ function DatasetCompononent({
               {url.toString()}
             </h3>
             <span>
-              {viewers.map(([label, view$]) => (
-                <UseObservable observable={view$} initial={() => {}}>
-                  {view => (
-                    <Button key={label} onClick={() => view()} text={label} />
-                  )}
-                </UseObservable>
+              {viewers.map(([label, view]) => (
+                <Button key={label} onClick={() => view()} text={label} />
               ))}
             </span>
-          </div>
+            {nestedURLs ? (
+              <Collapsable>
+                <DatasetsComponent
+                  active={active$}
+                  registry={registry}
+                  urls$={nestedURLs}
+                />
+              </Collapsable>
+            ) : (
+              undefined
+            )}
+          </li>
         );
       }}
     </UseObservable>
@@ -159,26 +191,32 @@ function DatasetCompononent({
 
 function DatasetsComponent({
   active,
-  datasets$
+  registry,
+  urls$
 }: {
   active: IActiveDataset;
-  datasets$: Datasets$;
+  registry: Registry;
+  urls$: Observable<Set<URL_>>;
 }) {
   return (
-    <div style={{ flex: 1, overflow: "auto" }}>
-      <UseObservable observable={datasets$} initial={new Map() as Datasets}>
-        {datasets =>
-          [...datasets].map(([url, dataset]) => (
-            <DatasetCompononent
-              key={url}
-              url={url}
-              dataset={dataset}
-              active$={active}
-            />
-          ))
+    <ol>
+      <UseObservable observable={urls$} initial={undefined}>
+        {urls =>
+          urls ? (
+            [...urls].map(([url]) => (
+              <DatasetCompononent
+                key={url}
+                url={url}
+                registry={registry}
+                active$={active}
+              />
+            ))
+          ) : (
+            <li>loading...</li>
+          )
         }
       </UseObservable>
-    </div>
+    </ol>
   );
 }
 
@@ -222,8 +260,9 @@ function Heading({
 
 class DataExplorer extends React.Component<
   {
-    dataRegistry: IDataRegistry;
+    registry: Registry;
     active: IActiveDataset;
+    urls$: Observable<Set<URL_>>;
   },
   { search: string }
 > {
@@ -248,32 +287,33 @@ class DataExplorer extends React.Component<
           onSearch={(search: string) => this.setState({ search })}
         />
         <DatasetsComponent
-          datasets$={this.props.dataRegistry.datasets$}
+          registry={this.props.registry}
           active={this.props.active}
+          urls$={this.props.urls$}
         />
       </div>
     );
   }
 }
 
-export function createDataExplorer(
-  dataRegistry: IDataRegistry,
-  active: IActiveDataset
-): IDataExplorer {
-  const widget = ReactWidget.create((
-    <DataExplorer dataRegistry={dataRegistry} active={active} />
-  ) as any);
-  widget.id = "@jupyterlab-dataRegistry/explorer";
-  widget.title.iconClass = "jp-SpreadsheetIcon  jp-SideBar-tabIcon";
-  widget.title.caption = "Data Explorer";
-  return widget;
-}
 /* tslint:disable */
 export const IDataExplorer = new Token<IDataExplorer>(
   "@jupyterlab/dataRegistry:IDataExplorer"
 );
 
-export interface IDataExplorer extends Widget {}
+export interface IDataExplorer {
+  widget: Widget;
+
+  /**
+   * Adds a URL to display on the top level of the data explorer.
+   */
+  addURL(url: URL_): void;
+
+  /**
+   * Removes a URL from the top level of the data explorer.
+   */
+  removeURL(url: URL_): void;
+}
 
 const id = "@jupyterlab/dataregistry-extension:data-explorer";
 /**
@@ -282,20 +322,33 @@ const id = "@jupyterlab/dataregistry-extension:data-explorer";
 export default {
   activate,
   id,
-  requires: [ILabShell, IDataRegistry, ILayoutRestorer, IActiveDataset],
+  requires: [ILabShell, RegistryToken, ILayoutRestorer, IActiveDataset],
   provides: IDataExplorer,
   autoStart: true
 } as JupyterFrontEndPlugin<IDataExplorer>;
 
 function activate(
-  app: JupyterFrontEnd,
+  lab: JupyterFrontEnd,
   labShell: ILabShell,
-  dataRegistry: IDataRegistry,
+  registry: Registry,
   restorer: ILayoutRestorer,
   active: IActiveDataset
 ): IDataExplorer {
-  const widget = createDataExplorer();
+  const displayedURLs = new ObservableSet<string>();
+
+  // Create a dataset with this URL
+  const widget = ReactWidget.create(
+    <DataExplorer
+      registry={registry}
+      active={active}
+      urls$={displayedURLs.observable}
+    />
+  );
+  widget.id = "@jupyterlab-dataRegistry/explorer";
+  widget.title.iconClass = "jp-SpreadsheetIcon jp-SideBar-tabIcon";
+  widget.title.caption = "Data Explorer";
+
   restorer.add(widget, widget.id);
   labShell.add(widget, "left");
-  return widget;
+  return { widget, addURL: displayedURLs.add, removeURL: displayedURLs.remove };
 }

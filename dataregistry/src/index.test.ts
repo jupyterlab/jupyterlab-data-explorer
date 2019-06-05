@@ -2,7 +2,7 @@ import { Registry, Converter } from "./index";
 import { resolveDataType } from "./resolvers";
 
 import { create } from "rxjs-spy";
-import { getURLs, getMimeTypes, getData } from "./datasets";
+import { getURLs, getMimeTypes, getData, createDatasets } from "./datasets";
 
 const spy = create();
 spy.log("");
@@ -27,7 +27,7 @@ test("Adding dataset URL registers it", () => {
   const mimeType = "some-mimetype";
   const data = "data";
 
-  r.addDataset(url, mimeType, data);
+  r.addDatasets(createDatasets(url, mimeType, data));
   const dataset = r.getURL(url);
 
   expect(new Set(dataset.keys())).toEqual(
@@ -49,7 +49,7 @@ test("Adding a converter gives the new mimetype", () => {
 
   const r = new Registry();
 
-  r.addDataset(url, initialMimeType, initialData);
+  r.addDatasets(createDatasets(url, initialMimeType, initialData));
 
   const converter: Converter<string, string> = (mimeType, url) =>
     mimeType === initialMimeType

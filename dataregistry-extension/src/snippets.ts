@@ -7,47 +7,29 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
 } from "@jupyterlab/application";
-import {
-  IConverterRegistry,
-  snippetViewerConverter,
-  fileSnippetConverter,
-  URL_SnippetConverter
-} from "@jupyterlab/dataregistry";
+import { relative, dirname } from "path";
 import { INotebookTracker } from "@jupyterlab/notebook";
 
-export default {
-  activate,
-  id: "@jupyterlab/dataregistry-extension:snippets",
-  requires: [IConverterRegistry, INotebookTracker],
-  autoStart: true
-} as JupyterFrontEndPlugin<void>;
-
-/**
- * Support for exporting datasets as code snippets.
- */
-
-import { viewerDataType, View } from "./viewers";
-
-import { relative, dirname } from "path";
+import { map, first } from "rxjs/operators";
 import {
   DataTypeStringArg,
-  Converter,
-  FilePath,
   fileDataType,
   URL_,
-  URLDataType
-} from "@jupyterlab/dataregistry-core";
-import { map } from "rxjs/operators";
+  URLDataType,
+  TypedConverter,
+  Registry
+} from "@jupyterlab/dataregistry";
+import { viewerDataType } from "./viewers";
+import { RegistryToken } from "./registry";
+import { Observable, BehaviorSubject } from "rxjs";
+
 type SnippetContext = {
   path: string;
 };
 
-type Snippet = (context: SnippetContext) => string;
-
-export const snippedDataType = new DataTypeStringArg<Snippet>(
-  "application/x.jupyter.snippet",
-  "label"
-);
+export const snippedDataType = new DataTypeStringArg<
+  Observable<(context: SnippetContext) => string>
+>("application/x.jupyter.snippet", "label");
 
 export interface IFileSnippetConverterOptions {
   mimeType: string;
@@ -59,7 +41,10 @@ export function fileSnippetConverter({
   mimeType,
   createSnippet,
   label
-}: IFileSnippetConverterOptions): Converter<FilePath, Snippet> {
+}: IFileSnippetConverterOptions): TypedConverter<
+  typeof fileDataType,
+  typeof snippedDataType
+> {
   return fileDataType.createSingleTypedConverter(
     snippedDataType,
     innerMimeType => {
@@ -68,18 +53,16 @@ export function fileSnippetConverter({
       }
       return [
         label,
-        [
-          1,
-          map(dataPath => (context: SnippetContext) =>
+        dataPath =>
+          new BehaviorSubject((context: SnippetContext) =>
             createSnippet(relative(dirname(context.path), dataPath))
           )
-        ]
       ];
     }
   );
 }
 
-export interface IURL_SnippetConverter {
+export interface IURLSnippetConverter {
   mimeType: string;
   createSnippet: (url: URL_) => string;
   label: string;
@@ -89,61 +72,63 @@ export function URLSnippetConverter({
   mimeType,
   createSnippet,
   label
-}: IURL_SnippetConverter): Converter<URL_, Snippet> {
+}: IURLSnippetConverter): TypedConverter<
+  typeof URLDataType,
+  typeof snippedDataType
+> {
   return URLDataType.createSingleTypedConverter(
     snippedDataType,
     (innerMimeType: string) => {
       if (innerMimeType !== mimeType) {
         return null;
       }
-      return [label, [1, map((url: URL_) => () => createSnippet(url))]];
+      return [label, map(url => () => createSnippet(url))];
     }
   );
 }
 
-export function snippetViewerConverter(
-  insert: (snippet: string) => Promise<void>,
-  getContext: () => Promise<SnippetContext>
-): Converter<Snippet, View> {
-  return snippedDataType.createSingleTypedConverter(viewerDataType, label => {
-    return [
-      label,
-      [1, map(data => async () => await insert(data(await getContext())))]
-    ];
-  });
-}
-
-function activate(
-  app: JupyterFrontEnd,
-  converters: IConverterRegistry,
-  notebookTracker: INotebookTracker
-) {
-  converters.register(
-    snippetViewerConverter(
-      async (snippet: string) => {
-        notebookTracker.activeCell.model.value.insert(0, snippet);
-      },
-      async () => ({
-        path: notebookTracker.currentWidget!.context.path
+export default {
+  id: "@jupyterlab/dataregistry-extension:snippets",
+  requires: [RegistryToken, INotebookTracker],
+  activate: (
+    app: JupyterFrontEnd,
+    registry: Registry,
+    notebookTracker: INotebookTracker
+  ) => {
+    registry.addConverter(
+      snippedDataType.createSingleTypedConverter(viewerDataType, label => [
+        label,
+        data$ => () =>
+          data$
+            .pipe(first())
+            .toPromise()
+            .then(data =>
+              notebookTracker.activeCell.model.value.insert(
+                0,
+                data({
+                  path: notebookTracker.currentWidget!.context.path
+                })
+              )
+            )
+      ])
+    );
+    registry.addConverter(
+      fileSnippetConverter({
+        mimeType: "text/csv",
+        label: "Snippet",
+        createSnippet: path =>
+          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(path)})\ndf`
       })
-    )
-  );
-  converters.register(
-    fileSnippetConverter({
-      mimeType: "text/csv",
-      label: "Snippet",
-      createSnippet: path =>
-        `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(path)})\ndf`
-    })
-  );
-  converters.register(
-    URL_SnippetConverter({
-      mimeType: "text/csv",
-      label: "Snippet",
-      createSnippet: (url: string | URL_) =>
-        `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(
-          url.toString()
-        )})\ndf`
-    })
-  );
-}
+    );
+    registry.addConverter(
+      URLSnippetConverter({
+        mimeType: "text/csv",
+        label: "Snippet",
+        createSnippet: (url: URL_) =>
+          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(url)})\ndf`
+      })
+    );
+  },
+
+  autoStart: true
+} as JupyterFrontEndPlugin<void>;

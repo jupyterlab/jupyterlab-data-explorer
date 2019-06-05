@@ -6,6 +6,25 @@
 
 We are currently building a data registry for JupyterLab [#5548](https://github.com/jupyterlab/jupyterlab/issues/5548). The idea is to show users datasets that have been registered and allow users to view those datasets, by relying on a series of data converters.
 
+## TODO
+
+- [ ] Get everything building and working
+- [x] Add support for nested datasets in viewer
+- [ ] Add open window tracker nested datasets
+  - [ ] Add to viewer
+  - [ ] Register open windows with this
+- [x] Add viewer nested datasets
+  - [x] Add a way to register a URL with the viewer
+  - [ ] Register base filesystem
+- [ ] Add support for folder subfiles
+- [ ] Add support for all Notebook outputs
+  - [ ] Try this with nteract data viewer
+
+### Later
+
+- [ ] Add support for registered notebook outputs (provide a special URL mimetype)
+- [ ] Fix observable -> component workflow... Support react components that takes observable.
+
 ## Development
 
 This relies on features in an unreleased version of JupyterLab, so you you have to run it linked against that version of JupyterLab.

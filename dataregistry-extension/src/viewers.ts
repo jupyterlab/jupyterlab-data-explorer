@@ -1,11 +1,9 @@
 import { DataTypeStringArg } from "@jupyterlab/dataregistry";
 
 /**
- * A function that is called to view the data in some way.
+ * Subscribe to this observable to view the dataset. The label should be display in the UI for the user.
  */
-export type View = () => Promise<void>;
-
-export const viewerDataType = new DataTypeStringArg<View>(
+export const viewerDataType = new DataTypeStringArg<() => void>(
   "application/x.jupyter.viewer",
   "label"
 );

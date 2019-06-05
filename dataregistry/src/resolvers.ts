@@ -1,6 +1,6 @@
 import { MimeType_, URL_ } from "./datasets";
 import { Converter, Convert } from "./converters";
-import { DataTypeNoArgs, DataTypeStringArg } from "./datatypes";
+import { DataTypeNoArgs, DataTypeStringArg, TypedConverter } from "./datatypes";
 import { identity } from "rxjs";
 
 /**
@@ -23,7 +23,9 @@ export const resolveMimetypeDataType = new DataTypeStringArg<void>(
  */
 export type Resolver = (url: URL_) => Set<MimeType_>;
 
-export function resolveConverter(resolver: Resolver): Converter<void, void> {
+export function resolveConverter(
+  resolver: Resolver
+): TypedConverter<typeof resolveDataType, typeof resolveMimetypeDataType> {
   return resolveDataType.createTypedConverter(
     resolveMimetypeDataType,
     (_, url) => {

@@ -22,6 +22,22 @@ import {
 
 export const INVALID = Symbol("INVALID");
 
+/**
+ * TypedConverter gives you the Converter type between two types. If either is a TypedConverter,
+ * uses the inner data type. I.e:
+ *
+ * ```
+ * TypedConverter<DataType<any, string>, DataType<any, int>< === Converter<string, int>
+ * ```
+ */
+export type TypedConverter<T, U> = T extends DataType<any, infer V>
+  ? U extends DataType<any, infer X>
+    ? Converter<V, X>
+    : Converter<V, U>
+  : U extends DataType<any, infer X>
+  ? Converter<T, X>
+  : Converter<T, U>;
+
 export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
   abstract createMimeType(typeData: T): MimeType_;
@@ -36,12 +52,12 @@ export abstract class DataType<T, U> {
   /**
    * Filer dataset for mimetypes of this type.
    */
-  filterDataset(dataset: Dataset): Array<[T, U]> {
-    const res = new Array<[T, U]>();
-    for (const [mimeType, [, data$]] of dataset) {
-      const typeData = this.parseMimeType(mimeType);
-      if (typeData !== INVALID) {
-        res.push([typeData, data$ as any]);
+  filterDataset(dataset: Dataset): Map<T, U> {
+    const res = new Map<T, U>();
+    for (const [mimeType, [, data]] of dataset) {
+      const typeData_ = this.parseMimeType(mimeType);
+      if (typeData_ !== INVALID) {
+        res.set(typeData_, data as any);
       }
     }
     return res;

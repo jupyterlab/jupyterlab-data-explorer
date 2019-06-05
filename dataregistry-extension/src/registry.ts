@@ -9,8 +9,8 @@ import {
 } from "@jupyterlab/application";
 import { Token } from "@phosphor/coreutils";
 import { Registry } from "@jupyterlab/dataregistry";
-export const IDataRegistry = new Token<Registry>(
-  "@jupyterlab/dataregistry:IDataRegistry"
+export const RegistryToken = new Token<Registry>(
+  "@jupyterlab/dataregistry:Registry"
 );
 
 /**
@@ -20,7 +20,7 @@ export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:data-registry",
   requires: [],
-  provides: IDataRegistry,
+  provides: RegistryToken,
   autoStart: true
 } as JupyterFrontEndPlugin<Registry>;
 

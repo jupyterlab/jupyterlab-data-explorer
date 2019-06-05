@@ -5,14 +5,10 @@
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
-import converterRegistryPlugin from "./converters";
 import csvViewerPlugin from "./csvviewer";
 import dataRegistryPlugin from "./registry";
-import datasetsPlugin from "./datasets";
 import dataExplorerPlugin from "./explorer";
-import filePlugin from "./file";
 import filesPlugin from "./files";
-import renderMimePlugin from "./rendermime";
 import snippetsPlugin from "./snippets";
 import URLPlugin from "./urls";
 import widgetPlugin from "./widgets";
@@ -20,14 +16,10 @@ import tableDataPlugin from "./tableData";
 
 export default [
   activePlugin,
-  converterRegistryPlugin,
   csvViewerPlugin,
   dataExplorerPlugin,
   dataRegistryPlugin,
-  datasetsPlugin,
-  filePlugin,
   filesPlugin,
-  renderMimePlugin,
   snippetsPlugin,
   URLPlugin,
   widgetPlugin,

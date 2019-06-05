@@ -3,11 +3,10 @@
  *
  * Then convert to known filetype, with URL on it.
  */
-import { Converter } from "./converters";
 import { URLDataType } from "./urls";
-import { DataTypeStringArg } from "./datatypes";
+import { DataTypeStringArg, TypedConverter } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { from, Observable } from "rxjs";
+import { from } from "rxjs";
 import { URL_ } from "./datasets";
 import { shareReplay } from "rxjs/operators";
 
@@ -37,11 +36,11 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
 );
 
 /**
- * Creates a converter from file paths to their download URL_s
+ * Creates a converter from file paths to their download URLs
  */
 export function fileURLConverter(
   getDownloadURL: (path: FilePath) => Promise<URL_>
-): Converter<FilePath, Observable<URL_>> {
+): TypedConverter<typeof fileDataType, typeof URLDataType> {
   return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
     mimeType,
     path =>

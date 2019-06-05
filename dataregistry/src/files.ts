@@ -1,15 +1,15 @@
 /**
- * Start with files as unkown mimetype
+ * Start with files as unknown mimetype
  *
- * Then convert to known filetype, with URL_ on it.
+ * Then convert to known filetype, with URL on it.
  */
 import { Converter } from "./converters";
 import { URLDataType } from "./urls";
 import { DataTypeStringArg } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { from, BehaviorSubject } from "rxjs";
+import { from, Observable } from "rxjs";
 import { URL_ } from "./datasets";
-import { switchMap } from "rxjs/operators";
+import { shareReplay } from "rxjs/operators";
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(
@@ -32,7 +32,7 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
     if (url.protocol !== "file:") {
       return null;
     }
-    return [innerMimeType, [1, () => new BehaviorSubject(url.pathname)]];
+    return [innerMimeType, () => url.pathname];
   }
 );
 
@@ -41,12 +41,12 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
  */
 export function fileURLConverter(
   getDownloadURL: (path: FilePath) => Promise<URL_>
-): Converter<FilePath, URL_> {
-  return fileDataType.createSingleTypedConverter(
-    URLDataType,
-    (mimeType, url) => [
-      mimeType,
-      [1, switchMap(path => from(getDownloadURL(path)))]
-    ]
-  );
+): Converter<FilePath, Observable<URL_>> {
+  return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
+    mimeType,
+    path =>
+      from(getDownloadURL(path)).pipe(
+        shareReplay({ refCount: true, bufferSize: 1 })
+      )
+  ]);
 }

@@ -2,3 +2,5 @@ lib
 node_modules
 yarn-error.log
 **/.ipynb_checkpoints
+*.tsbuildinfo
+.vscode

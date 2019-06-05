@@ -1,15 +1,15 @@
 import { DataTypeNoArgs } from "./datatypes";
-import { createResolveDataset } from ".";
 import { nestedDataType } from "./nested";
 
-import { map } from "rxjs/operators";
+import { map, shareReplay } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
-import { Convert, Converter } from "./converters";
-import { from } from "rxjs";
+import { Converter } from "./converters";
+import { from, Observable } from "rxjs";
+
 /**
  * A folder is a list paths in it as strings
  */
-export const folderDataType = new DataTypeNoArgs<Array<string>>(
+export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
   "application/x.jupyter.folder"
 );
 
@@ -18,21 +18,21 @@ export const folderDataType = new DataTypeNoArgs<Array<string>>(
  * by fetching the contents of the folder
  */
 export function createFolderConverter(
-  folderContents: (path: string) => Promise<Array<string>>
-): Converter<null, Array<string>> {
+  folderContents: (path: string) => Promise<Set<string>>
+): Converter<void, Observable<Set<string>>> {
   return resolveDataType.createSingleTypedConverter(
     folderDataType,
     (_, url) => {
       const url_ = new URL(url);
-      return [
-        undefined,
-        [
-          1,
-          url_.protocol === "file:" && url_.pathname.endsWith("/")
-            ? () => from(folderContents(url_.pathname))
-            : null
-        ] as Convert<null, Array<string>>
-      ];
+      return url_.protocol === "file:" && url_.pathname.endsWith("/")
+        ? [
+            ,
+            () =>
+              from(folderContents(url_.pathname)).pipe(
+                shareReplay({ bufferSize: 1, refCount: true })
+              )
+          ]
+        : null;
     }
   );
 }
@@ -42,11 +42,5 @@ export function createFolderConverter(
  */
 export const folderDatasetsConverter = folderDataType.createSingleTypedConverter(
   nestedDataType,
-  (_, url) => [
-    ,
-    [
-      1,
-      map(paths => createResolveDataset(...paths.map(path => `${url}${path}`)))
-    ]
-  ]
+  (_, url) => [, map(paths => new Set([...paths].map(path => `${url}${path}`)))]
 );

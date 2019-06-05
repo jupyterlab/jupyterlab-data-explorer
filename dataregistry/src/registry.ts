@@ -1,59 +1,47 @@
-import { Datasets$, Datasets, mergeDatasets } from "./datasets";
+import { Datasets, Dataset, URL_, MimeType_, Data } from "./datasets";
 import {
   Converter,
-  applyConverter$,
-  combineManyConverters
+  combineManyConverters,
+  applyConverterDataset
 } from "./converters";
-import { ObservableSet } from "./utils";
-import { map, shareReplay } from "rxjs/operators";
-import { tag } from "rxjs-spy/operators/tag";
-import { Observable } from "rxjs";
-import { createNestedConverter } from ".";
+import { resolveDataType } from "./resolvers";
 
 export class Registry {
-  public readonly datasets$: Datasets$;
-
-  private readonly _converters: ObservableSet<
-    Converter<any, any>
-  > = new ObservableSet();
-  private readonly _datasets: ObservableSet<Datasets> = new ObservableSet();
-  private readonly _converter$: Observable<Converter<any, any>>;
-  private readonly _datasets$: Datasets$;
-
-  constructor() {
-    this._converter$ = this._converters.observable.pipe(
-      tag("Registry/converters"),
-      map(converters => combineManyConverters(...converters)),
-      shareReplay({ bufferSize: 1, refCount: true }),
-      tag("Registry/datasets-combined")
-    );
-    this._datasets$ = this._datasets.observable.pipe(
-      tag("Registry/datasets"),
-      map(datasets => mergeDatasets(...datasets)),
-      shareReplay({ bufferSize: 1, refCount: true }),
-      tag("Registry/datasets-merged")
-    );
-    this.datasets$ = applyConverter$(this._datasets$, this._converter$).pipe(
-      tag("Registry/datasets$")
-    );
-
-    this.addConverter(createNestedConverter(this._converter$));
-  }
   /**
-   * Adds a new dataseset.
-   *
-   * If it has already been registered, throws an error.
+   * Returns the dataset for a URL.
    */
-  addDatasets(datasets: Datasets): () => void {
-    this._datasets.add(datasets);
-    return () => this._datasets.remove(datasets);
+  getURL(url: URL_): Dataset {
+    if (this._datasets.has(url)) {
+      return this._datasets.get(url)!;
+    }
+    const dataset = applyConverterDataset(
+      url,
+      resolveDataType.createDataset(),
+      this._converter
+    );
+    this._datasets.set(url, dataset);
+    return dataset;
   }
 
   /**
    * Adds a new converter.
    */
-  addConverter(converter: Converter<any, any>): () => void {
+  addConverter(converter: Converter<any, any>): void {
     this._converters.add(converter);
-    return () => this._converters.remove(converter);
   }
+
+  addDataset(url: URL_, mimeType: MimeType_, data: Data): void {
+    this._converters.add(
+      resolveDataType.createSingleConverter((_, url_) =>
+        url === url_ ? [mimeType, () => data] : null
+      )
+    );
+  }
+
+  public get _converter(): Converter<any, any> {
+    return combineManyConverters(...this._converters);
+  }
+
+  private readonly _datasets: Datasets = new Map();
+  private readonly _converters: Set<Converter<any, any>> = new Set();
 }

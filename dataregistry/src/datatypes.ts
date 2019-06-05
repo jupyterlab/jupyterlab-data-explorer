@@ -17,10 +17,8 @@ import {
   Dataset,
   URL_,
   createDatasets,
-  Datasets,
-  getData$
+  createDataset
 } from "./datasets";
-import { Observable } from "rxjs";
 
 export const INVALID = Symbol("INVALID");
 
@@ -28,30 +26,25 @@ export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
   abstract createMimeType(typeData: T): MimeType_;
 
-  createDatasets(url: URL_, data: Observable<U>, typeData: T) {
+  createDataset(data: U, typeData: T) {
+    return createDataset(this.createMimeType(typeData), data);
+  }
+  createDatasets(url: URL_, data: U, typeData: T) {
     return createDatasets(url, this.createMimeType(typeData), data);
   }
 
   /**
    * Filer dataset for mimetypes of this type.
    */
-  filterDataset(dataset: Dataset): Array<[T, Observable<U>]> {
-    const res = new Array<[T, Observable<U>]>();
+  filterDataset(dataset: Dataset): Array<[T, U]> {
+    const res = new Array<[T, U]>();
     for (const [mimeType, [, data$]] of dataset) {
       const typeData = this.parseMimeType(mimeType);
       if (typeData !== INVALID) {
-        res.push([typeData, data$ as Observable<any>]);
+        res.push([typeData, data$ as any]);
       }
     }
     return res;
-  }
-
-  getData$(datasets: Datasets, url: URL_, typeData: T): null | Observable<U> {
-    return getData$(
-      datasets,
-      url,
-      this.createMimeType(typeData)
-    ) as null | Observable<any>;
   }
 
   /**
@@ -127,7 +120,7 @@ export class DataTypeNoArgs<T> extends DataType<void, T> {
 
 /**
  * Data type with one arg in it's mimetype in form:
- * `{baseMimeType}; {paramaterKey}=<parameterValue>}`
+ * `{baseMimeType}; {parameterKey}=<parameterValue>}`
  */
 export class DataTypeStringArg<T> extends DataType<string, T> {
   constructor(baseMimeType: string, parameterKey: string) {

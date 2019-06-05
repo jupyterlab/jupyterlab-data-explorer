@@ -19,30 +19,13 @@
  * * For the explorer, we have a top level `explorer:` URL that has a list of URLS to display.
  */
 
-import { Observable } from "rxjs";
-import { applyConverter$, Converter } from "./converters";
-import { Datasets } from "./datasets";
+import { URL_ } from "./datasets";
 import { DataTypeNoArgs } from "./datatypes";
+import { Observable } from "rxjs";
 
 /**
  * A nested data type has datasets inside of it.
  */
-export const nestedDataType = new DataTypeNoArgs<Datasets>(
-  "application/x.jupyter.datasets"
+export const nestedDataType = new DataTypeNoArgs<Observable<Set<URL_>>>(
+  "application/x.jupyter.dataset-urls"
 );
-
-export const convertedNestedDataType = new DataTypeNoArgs<Datasets>(
-  "application/x.jupyter.converted-datasets"
-);
-
-/**
- * Given some converter, returns a converter that will apply it to the nested datasets.
- */
-export function createNestedConverter(
-  converter$: Observable<Converter<any, any>>
-): Converter<Datasets, Datasets> {
-  return nestedDataType.createSingleTypedConverter(
-    convertedNestedDataType,
-    () => [, [1, datasets$ => applyConverter$(datasets$, converter$)]]
-  );
-}

@@ -49,9 +49,8 @@ export type MimeType_ = string;
  */
 export type Cost = number;
 export type Data = unknown;
-export type Data$ = Observable<Data>;
 
-export type DataValue = [Cost, Data$];
+export type DataValue = [Cost, Data];
 export type Dataset = Map<MimeType_, DataValue>;
 
 export type Datasets = Map<URL_, Dataset>;
@@ -77,8 +76,16 @@ export function mergeDatasets(...datasets: Array<Datasets>): Datasets {
   return mergeMaps(mergeDataset, ...datasets);
 }
 
-export function createDatasets(url: URL_, mimeType: MimeType_, data: Data$) {
-  return new Map([[url, new Map([[mimeType, [0, data] as [Cost, Data$]]])]]);
+export function createDataset(mimeType: MimeType_, data: Data): Dataset {
+  return new Map([[mimeType, [0, data] as [Cost, Data]]]);
+}
+
+export function createDatasets(
+  url: URL_,
+  mimeType: MimeType_,
+  data: Data
+): Datasets {
+  return new Map([[url, createDataset(mimeType, data)]]);
 }
 
 export function getURLs(datasets: Datasets): Set<URL_> {
@@ -90,11 +97,11 @@ export function getMimeTypes(datasets: Datasets, url: URL_): Set<MimeType_> {
   return new Set(dataset && [...dataset.keys()]);
 }
 
-export function getData$(
+export function getData(
   datasets: Datasets,
   url: URL_,
   mimeType: MimeType_
-): Data$ | null {
+): Data | null {
   const dataset = datasets.get(url);
   if (!dataset) {
     return null;

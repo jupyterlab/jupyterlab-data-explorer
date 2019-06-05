@@ -42,19 +42,24 @@ export class ObservableSet<T> {
     new Set()
   );
 
-  constructor() {
+  constructor(values: Iterable<T>) {
     this.observable = this._observable.pipe(tag("ObservableSet"));
+    this.add(...values);
   }
 
-  add(value: T) {
+  add(...values: Array<T>) {
     const newSet = new Set(this._observable.value);
-    newSet.add(value);
+    for (const value of values) {
+      newSet.add(value);
+    }
     this._observable.next(newSet);
   }
 
-  remove(value: T) {
+  remove(...values: Array<T>) {
     const newSet = new Set(this._observable.value);
-    newSet.delete(value);
+    for (const value of values) {
+      newSet.delete(value);
+    }
     this._observable.next(newSet);
   }
 }

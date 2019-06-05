@@ -1,18 +1,7 @@
-import { Observable, combineLatest } from "rxjs";
-import { scan, shareReplay } from "rxjs/operators";
-import {
-  Cost,
-  Dataset,
-  Datasets,
-  Datasets$,
-  mergeDataset,
-  MimeType_,
-  URL_
-} from "./datasets";
-import { mapValues, mergeMaps } from "./utils";
-import { tag } from "rxjs-spy/operators/tag";
+import { Cost, Dataset, MimeType_, URL_, Data } from "./datasets";
+import { mergeMaps } from "./utils";
 
-export type Convert<T, V> = [Cost, (data: Observable<T>) => Observable<V>];
+export type Convert<T, V> = (data: T) => V;
 export type Converts<T, V> = Map<MimeType_, Convert<T, V>>;
 
 /**
@@ -30,80 +19,40 @@ export type Converter<T, V> = (
   url: URL_
 ) => Converts<T, V>;
 
-function* applyConverterDataset(
+/**
+ * Applies the converter to a dataset iteratively until all mimetypes are filled out.
+ *
+ * Uses an implementation of Dijkstra's algorithm.
+ */
+export function applyConverterDataset(
   url: URL_,
-  dataset: Dataset,
-  converter: Converter<any, any>
-): Iterable<Dataset> {
-  for (const [mimeType, [cost, data$]] of dataset) {
-    const newDataset: Dataset = new Map();
-    for (const [newMimeType, [addedCost, dataCreator]] of converter(
-      mimeType,
-      url
-    )) {
-      const newCost = cost + addedCost;
-      newDataset.set(newMimeType, [
-        newCost,
-        data$.pipe(
-          dataCreator,
-          shareReplay({ bufferSize: 1, refCount: true })
-        )
-      ]);
-    }
-    yield newDataset;
-  }
-}
-
-function applyConverterDataset$(
-  url: URL_,
-  prevDataset: Dataset | undefined,
   dataset: Dataset,
   converter: Converter<any, any>
 ): Dataset {
-  return mergeDataset(
-    // Existing datasets
-    dataset,
-    // Previously converted dataset
-    prevDataset || new Map(),
-    // Latest conversions
-    ...applyConverterDataset(url, dataset, converter)
+  // mimeTypes that we still need to convert
+  const toProcess: Array<[MimeType_, Cost, Data]> = [...dataset].map(
+    ([mimeType, [cost, data$]]) => [mimeType, cost, data$]
   );
-}
-/**
- * Applies the converter to the datasets, defaulting to the keys in the prevDatasets.
- */
-function applyConverterDatasets(
-  prevDatasets: Datasets,
-  datasets: Datasets,
-  converter: Converter<any, any>
-): Datasets {
-  return mapValues(datasets, (url, dataset) =>
-    applyConverterDataset$(url, prevDatasets.get(url), dataset, converter)
-  );
-}
+  // processed mimetypes
+  const processed: Dataset = new Map();
+  // We should only process each mimeType once. They will start on the toProcess map
+  // and then move to the processed.
+  while (toProcess.length !== 0) {
+    const [mimeType, cost, data] = toProcess.pop()!;
 
-/**
- * Applies each converter to each dataset, returning a new dataset of all the existing values
- * plus all those the converter can get to.
- *
- * We keep the last converted datasets around so that we don't recreate a new conversion
- * if we have already computed it.
- */
-export function applyConverter$(
-  datasets$: Datasets$,
-  converter$: Observable<Converter<any, any>>
-): Datasets$ {
-  return combineLatest(datasets$, converter$).pipe(
-    tag("applyConverter$/zipped"),
-    // Take latest output and merge with most recent
-    scan(
-      (acc: Datasets, [datasets, converter]) =>
-        applyConverterDatasets(acc, datasets, converter),
-      new Map()
-    ),
-    shareReplay({ bufferSize: 1, refCount: true }),
-    tag("applyConverter$/scanned")
-  );
+    // If we already have this mimetype at a lower or equal cost, skip processing it.
+    if (processed.has(mimeType) && processed.get(mimeType)![0] <= cost) {
+      continue;
+    }
+    // Otherwise, add it to the processed map
+    processed.set(mimeType, [cost, data]);
+
+    // Iterate through its possible conversions and add
+    for (const [newMimeType, dataCreator] of converter(mimeType, url)) {
+      toProcess.push([newMimeType, cost + 1, dataCreator(data)]);
+    }
+  }
+  return processed;
 }
 
 export function combineManyConverters<T, V>(
@@ -111,7 +60,8 @@ export function combineManyConverters<T, V>(
 ): Converter<T, V> {
   return (mimeType: MimeType_, url: URL_) => {
     return mergeMaps(
-      (xData, yData) => (xData[0] < yData[0] ? yData : xData),
+      // Just choose left one by default
+      xData => xData,
       ...converters.map(c => c(mimeType, url))
     );
   };

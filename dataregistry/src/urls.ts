@@ -1,21 +1,22 @@
 import { DataTypeStringArg } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
 import { URL_ } from "./datasets";
-import { of, pipe } from "rxjs";
+import { pipe, Observable, BehaviorSubject } from "rxjs";
 import { ajax } from "rxjs/ajax";
-import { switchMap, map } from "rxjs/operators";
+import { switchMap, map, distinct, shareReplay } from "rxjs/operators";
 
 /**
- * Type where data is a HTTP URL_ pointing to the data.
- *
- * Note: it can either be a URL_ or a string type to accomedate loading it directly
- * from JSON as a string type.
+ * Type where data is a HTTP URL_ pointing to the data. It should be downloaded as a string and that
+ * string will end up as the nested mimeType
  */
-export const URLDataType = new DataTypeStringArg<URL_>(
+export const URLDataType = new DataTypeStringArg<Observable<URL_>>(
   "application/x.jupyter.url",
   "mimeType"
 );
 
+/**
+ * Resolve URLs with mimetypes to URL datatypes
+ */
 export const resolverURLConverter = resolveMimetypeDataType.createSingleTypedConverter(
   URLDataType,
   (resMimeType, url_) => {
@@ -23,21 +24,23 @@ export const resolverURLConverter = resolveMimetypeDataType.createSingleTypedCon
     const isHTTP = url.protocol === "http:";
     const isHTTPS = url.protocol === "https:";
     if (isHTTP || isHTTPS) {
-      return [resMimeType, [1, () => of(url.toString())]];
+      return [resMimeType, () => new BehaviorSubject(url.toString())];
     }
     return null;
   }
 );
 
-export const URLStringConverter = URLDataType.createSingleConverter<string>(
-  mimeType => [
-    mimeType,
-    [
-      1,
-      pipe(
-        switchMap(ajax),
-        map(r => r.responseText)
-      )
-    ]
-  ]
-);
+/**
+ * Download URLs and put in their string mimetypes
+ */
+export const URLStringConverter = URLDataType.createSingleConverter<
+  Observable<string>
+>(mimeType => [
+  mimeType,
+  pipe(
+    distinct(),
+    switchMap(ajax),
+    map(r => r.responseText),
+    shareReplay({ refCount: true, bufferSize: 1 })
+  )
+]);

@@ -110,7 +110,7 @@ class Collapsable extends React.Component<
     if (this.state.collapsed) {
       return (
         <Button
-          onClick={() => this.setState({ collapsed: true })}
+          onClick={() => this.setState({ collapsed: false })}
           text="Show"
         />
       );
@@ -118,7 +118,7 @@ class Collapsable extends React.Component<
     return (
       <>
         <Button
-          onClick={() => this.setState({ collapsed: false })}
+          onClick={() => this.setState({ collapsed: true })}
           text="hide"
         />
         {this.props.children}
@@ -160,7 +160,6 @@ function DatasetCompononent({
                 margin: "unset",
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                direction: "rtl",
                 textAlign: "left"
               }}
             >
@@ -203,7 +202,7 @@ function DatasetsComponent({
       <UseObservable observable={urls$} initial={undefined}>
         {urls =>
           urls ? (
-            [...urls].map(([url]) => (
+            [...urls].map(url => (
               <DatasetCompononent
                 key={url}
                 url={url}

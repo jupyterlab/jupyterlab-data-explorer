@@ -10,7 +10,7 @@ import {
 } from "@jupyterlab/dataregistry";
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
 import { RegistryToken } from "./registry";
-import { Contents } from "../../jupyterlab/packages/services/lib";
+import { Contents } from "@jupyterlab/services";
 
 export default {
   activate,
@@ -34,7 +34,10 @@ function activate(
             ...(await fileBrowserFactory.defaultBrowser.model.manager.services.contents.get(
               path
             )).content
-          ].map((model: Contents.IModel) => model.path)
+          ].map((model: Contents.IModel) =>
+            // Add trailing slash if this is a directory so that we know that.
+            model.type === "directory" ? `${model.path}/` : model.path
+          )
         )
     )
   );

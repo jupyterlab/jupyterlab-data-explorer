@@ -3,10 +3,7 @@
 | Distributed under the terms of the Modified BSD License.
 |----------------------------------------------------------------------------*/
 
-import {
-  JupyterFrontEnd,
-  JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import { Token } from "@phosphor/coreutils";
 import { Registry } from "@jupyterlab/dataregistry";
 export const RegistryToken = new Token<Registry>(
@@ -24,6 +21,6 @@ export default {
   autoStart: true
 } as JupyterFrontEndPlugin<Registry>;
 
-function activate(_app: JupyterFrontEnd): Registry {
+function activate(): Registry {
   return new Registry();
 }

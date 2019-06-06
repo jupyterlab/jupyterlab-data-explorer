@@ -4,15 +4,27 @@
 |----------------------------------------------------------------------------*/
 
 import {
+  ILabShell,
   ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
-  ILabShell
+  JupyterFrontEndPlugin
 } from "@jupyterlab/application";
-
+import {
+  InstanceTracker,
+  MainAreaWidget,
+  ReactWidget
+} from "@jupyterlab/apputils";
+import {
+  DataType,
+  DataTypeStringArg,
+  Registry,
+  URL_
+} from "@jupyterlab/dataregistry";
+import { Widget } from "@phosphor/widgets";
 import * as React from "react";
-
 import { Observable, Subscription } from "rxjs";
+import { viewerDataType } from "./viewers";
+import { RegistryToken } from "./registry";
 
 interface IUseObservableProps<T, U> {
   observable: Observable<T>;
@@ -44,20 +56,8 @@ export class UseObservable<T, U> extends React.Component<
   }
 }
 
-import { InstanceTracker, ReactWidget } from "@jupyterlab/apputils";
-import { Widget } from "@phosphor/widgets";
-
 const tracker = new InstanceTracker({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
-
-import { MainAreaWidget } from "@jupyterlab/apputils";
-import { viewerDataType } from "./viewers";
-import {
-  DataTypeStringArg,
-  URL_,
-  Registry,
-  DataType
-} from "@jupyterlab/dataregistry";
 
 export const widgetDataType = new DataTypeStringArg<Widget>(
   "application/x.jupyter.widget",
@@ -109,7 +109,7 @@ export const reactDataType: DataType<
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:widgets",
-  requires: [ILabShell, Registry, ILayoutRestorer],
+  requires: [ILabShell, RegistryToken, ILayoutRestorer],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

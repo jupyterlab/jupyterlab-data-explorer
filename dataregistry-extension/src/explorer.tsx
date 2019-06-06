@@ -17,7 +17,7 @@ import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { classes, style } from "typestyle";
-import { IActiveDataset } from "./active";
+import { IActiveDataset, ACTIVE_URL } from "./active";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";
 import { RegistryToken } from "./registry";
@@ -335,6 +335,8 @@ function activate(
   active: IActiveDataset
 ): IDataExplorer {
   const displayedURLs = new ObservableSet<string>();
+  displayedURLs.add(ACTIVE_URL);
+  displayedURLs.add("file:/");
 
   // Create a dataset with this URL
   const widget = ReactWidget.create(

@@ -13,7 +13,7 @@ import snippetsPlugin from "./snippets";
 import URLPlugin from "./urls";
 import widgetPlugin from "./widgets";
 import tableDataPlugin from "./tableData";
-
+import foldersPlugin from "./folders";
 export default [
   activePlugin,
   csvViewerPlugin,
@@ -23,5 +23,6 @@ export default [
   snippetsPlugin,
   URLPlugin,
   widgetPlugin,
-  tableDataPlugin
+  tableDataPlugin,
+  foldersPlugin
 ] as JupyterFrontEndPlugin<any>[];

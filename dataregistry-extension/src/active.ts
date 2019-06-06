@@ -11,28 +11,43 @@ import {
 import { DocumentWidget } from "@jupyterlab/docregistry";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
-import { URL_ } from "@jupyterlab/dataregistry";
+import { URL_, Registry, nestedDataType } from "@jupyterlab/dataregistry";
 import { hasURL_ } from "./widgets";
 import { Token } from "@phosphor/coreutils";
+import { RegistryToken } from "./registry";
+import { map } from "rxjs/operators";
 
 export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
 export const IActiveDataset = new Token<IActiveDataset>(
   "@jupyterlab/dataregistry:IActiveDataset"
 );
 
+export const ACTIVE_URL = "active:";
 /**
  * The active dataset extension.
  */
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:active-dataset",
-  requires: [ILabShell],
+  requires: [ILabShell, RegistryToken],
   provides: IActiveDataset,
   autoStart: true
 } as JupyterFrontEndPlugin<IActiveDataset>;
 
-function activate(app: JupyterFrontEnd, labShell: ILabShell): IActiveDataset {
+function activate(
+  app: JupyterFrontEnd,
+  labShell: ILabShell,
+  registry: Registry
+): IActiveDataset {
   const active = new BehaviorSubject<URL_ | null>(null);
+
+  // Show active datasets in explorerr
+  registry.addDatasets(
+    nestedDataType.createDatasets(
+      ACTIVE_URL,
+      active.pipe(map(url => (url ? new Set([url]) : new Set())))
+    )
+  );
 
   // Track active documents open.
   labShell.currentChanged.connect((sender, args) => {

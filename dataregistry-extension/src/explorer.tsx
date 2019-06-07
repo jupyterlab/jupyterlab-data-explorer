@@ -52,7 +52,14 @@ const buttonClassName = style({
 
 function Button({ onClick, text }: { onClick: () => void; text: string }) {
   return (
-    <button className={buttonClassName} onClick={onClick}>
+    <button
+      className={buttonClassName}
+      onClick={e => {
+        console.log("clicking button");
+        e.stopPropagation();
+        onClick();
+      }}
+    >
       {text}
     </button>
   );
@@ -154,7 +161,10 @@ function DatasetCompononent({
         return (
           <li
             className={classes(...classNames)}
-            onClick={() => active$.next(url)}
+            onClick={e => {
+              e.stopPropagation();
+              active$.next(url);
+            }}
           >
             <h3
               style={{

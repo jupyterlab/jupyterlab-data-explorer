@@ -215,14 +215,16 @@ function DatasetsComponent({
       <UseObservable observable={urls$} initial={undefined}>
         {urls =>
           urls ? (
-            [...urls].map(url => (
-              <DatasetCompononent
-                key={url}
-                url={url}
-                registry={registry}
-                active$={active}
-              />
-            ))
+            [...urls]
+              .sort()
+              .map(url => (
+                <DatasetCompononent
+                  key={url}
+                  url={url}
+                  registry={registry}
+                  active$={active}
+                />
+              ))
           ) : (
             <li>loading...</li>
           )

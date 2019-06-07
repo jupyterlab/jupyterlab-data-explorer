@@ -141,6 +141,9 @@ function DatasetCompononent({
   const nestedURLs = nestedDataType.filterDataset(dataset).get(undefined);
   // Sort viewers by label
   viewers.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  if (viewers.length === 0 && nestedURLs === undefined) {
+    return <></>;
+  }
   return (
     <UseObservable observable={active$} initial={null}>
       {active => {

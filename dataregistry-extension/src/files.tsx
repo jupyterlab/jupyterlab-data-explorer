@@ -50,9 +50,10 @@ function activate(
     })
   );
   registry.addConverter(
-    fileURLConverter(
-      fileBrowserFactory.defaultBrowser.model.manager.services.contents
-        .getDownloadUrl
+    fileURLConverter(path =>
+      fileBrowserFactory.defaultBrowser.model.manager.services.contents.getDownloadUrl(
+        path
+      )
     )
   );
 }

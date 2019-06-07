@@ -1,9 +1,9 @@
+import { BehaviorSubject, from, Observable, pipe, throwError } from "rxjs";
+import { fromFetch } from "rxjs/fetch";
+import { distinct, shareReplay, switchMap } from "rxjs/operators";
+import { URL_ } from "./datasets";
 import { DataTypeStringArg } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { URL_ } from "./datasets";
-import { pipe, Observable, BehaviorSubject } from "rxjs";
-import { ajax } from "rxjs/ajax";
-import { switchMap, map, distinct, shareReplay } from "rxjs/operators";
 
 /**
  * Type where data is a HTTP URL_ pointing to the data. It should be downloaded as a string and that
@@ -39,8 +39,14 @@ export const URLStringConverter = URLDataType.createSingleConverter<
   mimeType,
   pipe(
     distinct(),
-    switchMap(ajax),
-    map(r => r.responseText),
+    switchMap(url => fromFetch(url)),
+    switchMap(r => {
+      if (r.ok) {
+        return from(r.text());
+      } else {
+        return throwError(new Error(`Bad response ${r}`));
+      }
+    }),
     shareReplay({ refCount: true, bufferSize: 1 })
   )
 ]);

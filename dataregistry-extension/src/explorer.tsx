@@ -55,7 +55,6 @@ function Button({ onClick, text }: { onClick: () => void; text: string }) {
     <button
       className={buttonClassName}
       onClick={e => {
-        console.log("clicking button");
         e.stopPropagation();
         onClick();
       }}
@@ -159,7 +158,7 @@ function DatasetCompononent({
           classNames.push(activeDatasetClassName);
         }
         return (
-          <li
+          <div
             className={classes(...classNames)}
             onClick={e => {
               e.stopPropagation();
@@ -180,7 +179,7 @@ function DatasetCompononent({
             </h3>
             <span>
               {viewers.map(([label, view]) => (
-                <Button key={label} onClick={() => view()} text={label} />
+                <Button key={label} onClick={view} text={label} />
               ))}
             </span>
             {nestedURLs ? (
@@ -194,7 +193,7 @@ function DatasetCompononent({
             ) : (
               undefined
             )}
-          </li>
+          </div>
         );
       }}
     </UseObservable>
@@ -211,26 +210,24 @@ function DatasetsComponent({
   urls$: Observable<Set<URL_>>;
 }) {
   return (
-    <ol>
-      <UseObservable observable={urls$} initial={undefined}>
-        {urls =>
-          urls ? (
-            [...urls]
-              .sort()
-              .map(url => (
-                <DatasetCompononent
-                  key={url}
-                  url={url}
-                  registry={registry}
-                  active$={active}
-                />
-              ))
-          ) : (
-            <li>loading...</li>
-          )
-        }
-      </UseObservable>
-    </ol>
+    <UseObservable observable={urls$} initial={undefined}>
+      {urls =>
+        urls ? (
+          [...urls]
+            .sort()
+            .map(url => (
+              <DatasetCompononent
+                key={url}
+                url={url}
+                registry={registry}
+                active$={active}
+              />
+            ))
+        ) : (
+          <div>loading...</div>
+        )
+      }
+    </UseObservable>
   );
 }
 

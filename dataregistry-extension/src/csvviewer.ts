@@ -1,45 +1,54 @@
-import { widgetDataType, IDataRegistry } from '@jupyterlab/dataregistry';
-import { DataGrid } from '@phosphor/datagrid';
-import { DSVModel } from '@jupyterlab/csvviewer';
-import { DataTypeNoArgs } from '@jupyterlab/dataregistry/lib/datatype';
-import { JupyterFrontEndPlugin, JupyterFrontEnd } from '@jupyterlab/application';
+import { DataGrid } from "@phosphor/datagrid";
+import { DSVModel } from "@jupyterlab/csvviewer";
+import {
+  JupyterFrontEndPlugin,
+  JupyterFrontEnd
+} from "@jupyterlab/application";
+import { Registry, DataTypeNoArgs } from "@jupyterlab/dataregistry";
+import { widgetDataType } from "./widgets";
+import { Observable, Subscription } from "rxjs";
+import { RegistryToken } from "./registry";
+import { Message } from "@phosphor/messaging";
 
-export const CSVDataType = new DataTypeNoArgs<string>('text/csv');
+export const CSVDataType = new DataTypeNoArgs<Observable<string>>("text/csv");
 
-export const CSVConverter = CSVDataType.createSingleTypedConverter(
+const CSVConverter = CSVDataType.createSingleTypedConverter(
   widgetDataType,
   () => [
-    'Grid',
-    async (data: string) => async () => {
-      // Copies the default grid setup from `widget.ts`
-      // It would be great to use `CSVViewer` itself,
-      // But it assumes a model that changes over time, whereas
-      // we just have a static string.
-      const grid = new DataGrid({
-        baseRowSize: 24,
-        baseColumnSize: 144,
-        baseColumnHeaderSize: 36,
-        baseRowHeaderSize: 64
-      });
-      grid.headerVisibility = 'all';
-      grid.model = new DSVModel({ data, delimiter: ',' });
+    "Grid",
+    data$ => {
+      const grid = new (class MyDataGrid extends DataGrid {
+        onBeforeAttach(msg: Message) {
+          this._subscription = data$.subscribe(data => {
+            if (this.model) {
+              (this.model as DSVModel).dispose();
+            }
+            this.model = new DSVModel({ data, delimiter: "," });
+          });
+          super.onBeforeAttach(msg);
+        }
+
+        onBeforeDetach(msg: Message) {
+          this._subscription && this._subscription.unsubscribe();
+          super.onBeforeDetach(msg);
+        }
+        private _subscription?: Subscription;
+      })();
+      grid.headerVisibility = "all";
       return grid;
     }
   ]
 );
 
-const id = '@jupyterlab/dataregistry-extension:csv-viewer';
+const id = "@jupyterlab/dataregistry-extension:csv-viewer";
 
 export default {
   activate,
   id,
-  requires: [IDataRegistry],
+  requires: [RegistryToken],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 
-function activate(
-  app: JupyterFrontEnd,
-  dataRegistry: IDataRegistry,
-): void {
-  dataRegistry.converters.register(CSVConverter);
+function activate(app: JupyterFrontEnd, registry: Registry): void {
+  registry.addConverter(CSVConverter);
 }

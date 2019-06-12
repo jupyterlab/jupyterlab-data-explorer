@@ -36,7 +36,7 @@ import { IChangedArgs, nbformat } from '@jupyterlab/coreutils';
 
 import { IObservableMap, IObservableList } from '@jupyterlab/observables';
 
-import { RenderMimeRegistry } from '@jupyterlab/rendermime';
+import { IRenderMimeRegistry } from '@jupyterlab/rendermime';
 
 import { INotebookModel } from './model';
 
@@ -199,7 +199,7 @@ export class StaticNotebook extends Widget {
   /**
    * The Rendermime instance used by the widget.
    */
-  readonly rendermime: RenderMimeRegistry;
+  readonly rendermime: IRenderMimeRegistry;
 
   /**
    * The model for the widget.
@@ -216,7 +216,7 @@ export class StaticNotebook extends Widget {
     this._model = newValue;
 
     if (oldValue && oldValue.modelDB.isCollaborative) {
-      oldValue.modelDB.connected.then(() => {
+      void oldValue.modelDB.connected.then(() => {
         oldValue.modelDB.collaborators.changed.disconnect(
           this._onCollaboratorsChanged,
           this
@@ -224,7 +224,7 @@ export class StaticNotebook extends Widget {
       });
     }
     if (newValue && newValue.modelDB.isCollaborative) {
-      newValue.modelDB.connected.then(() => {
+      void newValue.modelDB.connected.then(() => {
         newValue.modelDB.collaborators.changed.connect(
           this._onCollaboratorsChanged,
           this
@@ -382,6 +382,11 @@ export class StaticNotebook extends Widget {
     }
     this._updateMimetype();
     let cells = newValue.cells;
+    if (!cells.length) {
+      cells.push(
+        newValue.contentFactory.createCell(this.notebookConfig.defaultCell, {})
+      );
+    }
     each(cells, (cell: ICellModel, i: number) => {
       this._insertCell(i, cell);
     });
@@ -421,6 +426,22 @@ export class StaticNotebook extends Widget {
         each(args.oldValues, value => {
           this._removeCell(args.oldIndex);
         });
+        // Add default cell if there are no cells remaining.
+        if (!sender.length) {
+          const model = this.model;
+          // Add the cell in a new context to avoid triggering another
+          // cell changed event during the handling of this signal.
+          requestAnimationFrame(() => {
+            if (!model.isDisposed && !model.cells.length) {
+              model.cells.push(
+                model.contentFactory.createCell(
+                  this.notebookConfig.defaultCell,
+                  {}
+                )
+              );
+            }
+          });
+        }
         break;
       case 'set':
         // TODO: reuse existing widgets if possible.
@@ -451,6 +472,9 @@ export class StaticNotebook extends Widget {
         break;
       case 'markdown':
         widget = this._createMarkdownCell(cell as IMarkdownCellModel);
+        if (cell.value.text === '') {
+          (widget as MarkdownCell).rendered = false;
+        }
         break;
       default:
         widget = this._createRawCell(cell as IRawCellModel);
@@ -475,7 +499,11 @@ export class StaticNotebook extends Widget {
       contentFactory,
       updateEditorOnShow: false
     };
-    return this.contentFactory.createCodeCell(options, this);
+    const cell = this.contentFactory.createCodeCell(options, this);
+    cell.syncCollapse = true;
+    cell.syncEditable = true;
+    cell.syncScrolled = true;
+    return cell;
   }
 
   /**
@@ -492,7 +520,10 @@ export class StaticNotebook extends Widget {
       contentFactory,
       updateEditorOnShow: false
     };
-    return this.contentFactory.createMarkdownCell(options, this);
+    const cell = this.contentFactory.createMarkdownCell(options, this);
+    cell.syncCollapse = true;
+    cell.syncEditable = true;
+    return cell;
   }
 
   /**
@@ -507,7 +538,10 @@ export class StaticNotebook extends Widget {
       contentFactory,
       updateEditorOnShow: false
     };
-    return this.contentFactory.createRawCell(options, this);
+    const cell = this.contentFactory.createRawCell(options, this);
+    cell.syncCollapse = true;
+    cell.syncEditable = true;
+    return cell;
   }
 
   /**
@@ -590,9 +624,10 @@ export class StaticNotebook extends Widget {
   }
 
   /**
-   * Update editor settings for notebook.
+   * Apply updated notebook settings.
    */
   private _updateNotebookConfig() {
+    // Apply scrollPastEnd setting.
     this.toggleClass(
       'jp-mod-scrollPastEnd',
       this._notebookConfig.scrollPastEnd
@@ -619,7 +654,7 @@ export namespace StaticNotebook {
     /**
      * The rendermime instance used by the widget.
      */
-    rendermime: RenderMimeRegistry;
+    rendermime: IRenderMimeRegistry;
 
     /**
      * The language preference for the model.
@@ -728,12 +763,18 @@ export namespace StaticNotebook {
      * Enable scrolling past the last cell
      */
     scrollPastEnd: boolean;
+
+    /**
+     * The default type for new notebook cells.
+     */
+    defaultCell: nbformat.CellType;
   }
   /**
    * Default configuration options for notebooks.
    */
   export const defaultNotebookConfig: INotebookConfig = {
-    scrollPastEnd: true
+    scrollPastEnd: true,
+    defaultCell: 'code'
   };
 
   /**
@@ -755,7 +796,7 @@ export namespace StaticNotebook {
       if (!options.contentFactory) {
         options.contentFactory = this;
       }
-      return new CodeCell(options);
+      return new CodeCell(options).initializeState();
     }
 
     /**
@@ -772,7 +813,7 @@ export namespace StaticNotebook {
       if (!options.contentFactory) {
         options.contentFactory = this;
       }
-      return new MarkdownCell(options);
+      return new MarkdownCell(options).initializeState();
     }
 
     /**
@@ -786,7 +827,7 @@ export namespace StaticNotebook {
       if (!options.contentFactory) {
         options.contentFactory = this;
       }
-      return new RawCell(options);
+      return new RawCell(options).initializeState();
     }
   }
 
@@ -1183,7 +1224,7 @@ export class Notebook extends StaticNotebook {
    */
   setFragment(fragment: string): void {
     // Wait all cells are rendered then set fragment and update.
-    Promise.all(this.widgets.map(widget => widget.ready)).then(() => {
+    void Promise.all(this.widgets.map(widget => widget.ready)).then(() => {
       this._fragment = fragment;
       this.update();
     });
@@ -1402,7 +1443,7 @@ export class Notebook extends StaticNotebook {
   protected onCellInserted(index: number, cell: Cell): void {
     if (this.model && this.model.modelDB.isCollaborative) {
       let modelDB = this.model.modelDB;
-      modelDB.connected.then(() => {
+      void modelDB.connected.then(() => {
         if (!cell.isDisposed) {
           // Setup the selection style for collaborators.
           let localCollaborator = modelDB.collaborators.localCollaborator;
@@ -1996,7 +2037,7 @@ export class Notebook extends StaticNotebook {
     document.removeEventListener('mousemove', this, true);
     document.removeEventListener('mouseup', this, true);
     this._mouseMode = null;
-    this._drag.start(clientX, clientY).then(action => {
+    void this._drag.start(clientX, clientY).then(action => {
       if (this.isDisposed) {
         return;
       }

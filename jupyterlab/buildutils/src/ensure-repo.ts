@@ -27,7 +27,7 @@ let UNUSED: { [key: string]: string[] } = {
   '@jupyterlab/services': ['node-fetch', 'ws'],
   '@jupyterlab/testutils': ['node-fetch', 'identity-obj-proxy'],
   '@jupyterlab/test-csvviewer': ['csv-spectrum'],
-  '@jupyterlab/vega4-extension': ['vega', 'vega-lite']
+  '@jupyterlab/vega5-extension': ['vega', 'vega-lite']
 };
 
 let pkgData: { [key: string]: any } = {};
@@ -95,17 +95,12 @@ function ensureMetaPackage(): string[] {
  * Ensure the jupyterlab application package.
  */
 function ensureJupyterlab(): string[] {
-  // Get the current version of JupyterLab
-  let cmd = 'python setup.py --version';
-  let version = utils.run(cmd, { stdio: 'pipe' }, true);
-
   let basePath = path.resolve('.');
   let corePath = path.join(basePath, 'dev_mode', 'package.json');
   let corePackage = utils.readJSONFile(corePath);
 
   corePackage.jupyterlab.extensions = {};
   corePackage.jupyterlab.mimeExtensions = {};
-  corePackage.jupyterlab.version = version;
   corePackage.jupyterlab.linkedPackages = {};
   corePackage.dependencies = {};
 
@@ -120,7 +115,23 @@ function ensureJupyterlab(): string[] {
     } catch (e) {
       return;
     }
-    if (data.private === true || data.name === '@jupyterlab/metapackage') {
+    // Determine whether to include the package.
+    if (!data.jupyterlab) {
+      return;
+    }
+    // Skip if explicitly marked as not a core dep.
+    if (
+      'coreDependency' in data.jupyterlab &&
+      !data.jupyterlab.coreDependency
+    ) {
+      return;
+    }
+    // Skip if it is not marked as an extension or a core dep.
+    if (
+      !data.jupyterlab.coreDependency &&
+      !data.jupyterlab.extension &&
+      !data.jupyterlab.mimeExtension
+    ) {
       return;
     }
 
@@ -268,5 +279,5 @@ export async function ensureIntegrity(): Promise<boolean> {
 }
 
 if (require.main === module) {
-  ensureIntegrity();
+  void ensureIntegrity();
 }

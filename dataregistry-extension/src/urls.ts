@@ -6,21 +6,22 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from '@jupyterlab/application';
+} from "@jupyterlab/application";
 import {
-  IConverterRegistry,
   URLStringConverter,
-  resolverURLConverter
-} from '@jupyterlab/dataregistry';
+  resolverURLConverter,
+  Registry
+} from "@jupyterlab/dataregistry";
+import { RegistryToken } from "./registry";
 
 export default {
   activate,
-  id: '@jupyterlab/dataregistry-extension:urls',
-  requires: [IConverterRegistry],
+  id: "@jupyterlab/dataregistry-extension:urls",
+  requires: [RegistryToken],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 
-function activate(app: JupyterFrontEnd, converters: IConverterRegistry) {
-  converters.register(URLStringConverter);
-  converters.register(resolverURLConverter);
+function activate(_app: JupyterFrontEnd, registry: Registry) {
+  registry.addConverter(URLStringConverter);
+  registry.addConverter(resolverURLConverter);
 }

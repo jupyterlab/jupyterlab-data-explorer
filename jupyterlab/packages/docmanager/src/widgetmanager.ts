@@ -85,8 +85,22 @@ export class DocumentWidgetManager implements IDisposable {
     context: DocumentRegistry.Context
   ): IDocumentWidget {
     let widget = factory.createNew(context);
-    Private.factoryProperty.set(widget, factory);
+    this._initializeWidget(widget, factory, context);
+    return widget;
+  }
 
+  /**
+   * When a new widget is created, we need to hook it up
+   * with some signals, update the widget extensions (for
+   * this kind of widget) in the docregistry, among
+   * other things.
+   */
+  private _initializeWidget(
+    widget: IDocumentWidget,
+    factory: DocumentRegistry.WidgetFactory,
+    context: DocumentRegistry.Context
+  ) {
+    Private.factoryProperty.set(widget, factory);
     // Handle widget extensions.
     let disposables = new DisposableSet();
     each(this._registry.widgetExtensions(factory.name), extender => {
@@ -107,10 +121,9 @@ export class DocumentWidgetManager implements IDisposable {
       this._onPathChanged,
       this
     );
-    context.ready.then(() => {
-      this.setCaption(widget);
+    void context.ready.then(() => {
+      void this.setCaption(widget);
     });
-    return widget;
   }
 
   /**
@@ -196,7 +209,8 @@ export class DocumentWidgetManager implements IDisposable {
     if (!factory) {
       return undefined;
     }
-    let newWidget = this.createWidget(factory, context);
+    let newWidget = factory.clone(widget as IDocumentWidget, context);
+    this._initializeWidget(newWidget, factory, context);
     return newWidget;
   }
 
@@ -238,7 +252,7 @@ export class DocumentWidgetManager implements IDisposable {
   messageHook(handler: IMessageHandler, msg: Message): boolean {
     switch (msg.type) {
       case 'close-request':
-        this.onClose(handler as Widget);
+        void this.onClose(handler as Widget);
         return false;
       case 'activate-request':
         let context = this.contextForWidget(handler as Widget);
@@ -257,7 +271,7 @@ export class DocumentWidgetManager implements IDisposable {
    *
    * @param widget - The target widget.
    */
-  protected setCaption(widget: Widget): void {
+  protected setCaption(widget: Widget): Promise<void> {
     let context = Private.contextProperty.get(widget);
     if (!context) {
       return;
@@ -267,7 +281,7 @@ export class DocumentWidgetManager implements IDisposable {
       widget.title.caption = '';
       return;
     }
-    context
+    return context
       .listCheckpoints()
       .then((checkpoints: Contents.ICheckpointModel[]) => {
         if (widget.isDisposed) {
@@ -397,7 +411,7 @@ export class DocumentWidgetManager implements IDisposable {
   private _onFileChanged(context: DocumentRegistry.Context): void {
     let widgets = Private.widgetsProperty.get(context);
     each(widgets, widget => {
-      this.setCaption(widget);
+      void this.setCaption(widget);
     });
   }
 
@@ -407,7 +421,7 @@ export class DocumentWidgetManager implements IDisposable {
   private _onPathChanged(context: DocumentRegistry.Context): void {
     let widgets = Private.widgetsProperty.get(context);
     each(widgets, widget => {
-      this.setCaption(widget);
+      void this.setCaption(widget);
     });
   }
 

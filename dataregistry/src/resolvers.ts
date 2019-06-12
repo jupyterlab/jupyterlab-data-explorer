@@ -1,31 +1,37 @@
-import { Dataset } from './datasets';
-import { Converter, MimeType_ } from './converters';
-import { DataTypeNoArgs, DataTypeStringArg } from './datatype';
-
-export const resolveDataType = new DataTypeNoArgs<null>(
-  'application/x.jupyter.resolve'
-);
-export const resolveMimetypeDataType = new DataTypeStringArg<null>(
-  'application/x.jupyter.resolve',
-  'mimetype'
-);
-
-export function resolveDataSet(url: URL): Dataset<null> {
-  return new Dataset(resolveDataType.createMimeType(), url, null);
-}
+import { MimeType_, URL_ } from "./datasets";
+import { Converter, Convert } from "./converters";
+import { DataTypeNoArgs, DataTypeStringArg, TypedConverter } from "./datatypes";
+import { identity } from "rxjs";
 
 /**
- * Returns a set of possible mimetype for a URL.
+ * Datasets without a known mimetype start as just a resolve mimetype and no data.
  */
-export type Resolver = (url: URL) => Set<MimeType_>;
+export const resolveDataType = new DataTypeNoArgs<void>(
+  "application/x.jupyter.resolve"
+);
 
-export function resolveConverter<T>(resolver: Resolver): Converter<null, null> {
+/**
+ * Then, their mimetype is resolved.
+ */
+export const resolveMimetypeDataType = new DataTypeStringArg<void>(
+  "application/x.jupyter.resolve",
+  "mimetype"
+);
+
+/**
+ * Returns a set of possible mimetype for a URL_.
+ */
+export type Resolver = (url: URL_) => Set<MimeType_>;
+
+export function resolveConverter(
+  resolver: Resolver
+): TypedConverter<typeof resolveDataType, typeof resolveMimetypeDataType> {
   return resolveDataType.createTypedConverter(
     resolveMimetypeDataType,
     (_, url) => {
-      const res = new Map<MimeType_, (data: null) => Promise<null>>();
+      const res = new Map<string, Convert<void, void>>();
       for (const mimeType of resolver(url)) {
-        res.set(mimeType, async () => null);
+        res.set(mimeType, identity);
       }
       return res;
     }
@@ -38,9 +44,9 @@ export function resolveConverter<T>(resolver: Resolver): Converter<null, null> {
 export function resolveExtensionConverter(
   extension: string,
   mimeType: string
-): Converter<null, null> {
-  return resolveConverter((url: URL) => {
-    if (url.pathname.endsWith(extension)) {
+): Converter<void, void> {
+  return resolveConverter((url: URL_) => {
+    if (new URL(url).pathname.endsWith(extension)) {
       return new Set([mimeType]);
     }
     return new Set();

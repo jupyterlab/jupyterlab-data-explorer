@@ -86,7 +86,6 @@ A Jupyter front-end application object is given to each plugin in its
 ``activate()`` function. The application object has:
 
 -  commands - used to add and execute commands in the application.
--  keymap - used to add keyboard shortcuts to the application.
 -  shell - a generic Jupyter front-end shell instance.
 
 Jupyter Front-End Shell
@@ -191,9 +190,8 @@ subsequently reversed by running
 
     jlpm run remove:package <extension-dir-name>
 
-This will remove the package metadata from the source tree, but will
-**not** remove any files added by the ``addsibling`` script, which
-should be removed manually.
+This will remove the package metadata from the source tree and delete
+all of the package files.
 
 The package should export EMCAScript 5 compatible JavaScript. It can
 import CSS using the syntax ``require('foo.css')``. The CSS files can

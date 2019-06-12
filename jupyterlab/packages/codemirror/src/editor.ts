@@ -15,6 +15,8 @@ import { Signal } from '@phosphor/signaling';
 
 import { showDialog } from '@jupyterlab/apputils';
 
+import { Poll } from '@jupyterlab/coreutils';
+
 import { CodeEditor } from '@jupyterlab/codeeditor';
 
 import { UUID } from '@phosphor/coreutils';
@@ -123,9 +125,16 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
     this.clearHistory();
     this._onMimeTypeChanged();
     this._onCursorActivity();
-    this._timer = window.setInterval(() => {
-      this._checkSync();
-    }, 3000);
+    this._poll = new Poll({
+      factory: async () => {
+        this._checkSync();
+      },
+      frequency: { interval: 3000, backoff: false },
+      standby: () => {
+        // If changed, only stand by when hidden, otherwise always stand by.
+        return this._lastChange ? 'when-hidden' : true;
+      }
+    });
 
     // Connect to changes.
     model.value.changed.connect(
@@ -264,7 +273,7 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
     this.host.removeEventListener('blur', this, true);
     this.host.removeEventListener('scroll', this, true);
     this._keydownHandlers.length = 0;
-    window.clearInterval(this._timer);
+    this._poll.dispose();
     Signal.clearData(this);
   }
 
@@ -672,7 +681,9 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
   private _onMimeTypeChanged(): void {
     const mime = this._model.mimeType;
     let editor = this._editor;
-    Mode.ensure(mime).then(spec => {
+    // TODO: should we provide a hook for when the
+    // mode is done being set?
+    void Mode.ensure(mime).then(spec => {
       editor.setOption('mode', spec.mime);
     });
     let extraKeys = editor.getOption('extraKeys') || {};
@@ -740,7 +751,19 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
       // Only render selections if the start is not equal to the end.
       // In that case, we don't need to render the cursor.
       if (!JSONExt.deepEqual(selection.start, selection.end)) {
-        const { anchor, head } = this._toCodeMirrorSelection(selection);
+        // Selections only appear to render correctly if the anchor
+        // is before the head in the document. That is, reverse selections
+        // do not appear as intended.
+        let forward: boolean =
+          selection.start.line < selection.end.line ||
+          (selection.start.line === selection.end.line &&
+            selection.start.column <= selection.end.column);
+        let anchor = this._toCodeMirrorPosition(
+          forward ? selection.start : selection.end
+        );
+        let head = this._toCodeMirrorPosition(
+          forward ? selection.end : selection.start
+        );
         let markerOptions: CodeMirror.TextMarkerOptions;
         if (collaborator) {
           markerOptions = this._toTextMarkerOptions({
@@ -812,18 +835,9 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
   private _toCodeMirrorSelection(
     selection: CodeEditor.IRange
   ): CodeMirror.Selection {
-    // Selections only appear to render correctly if the anchor
-    // is before the head in the document. That is, reverse selections
-    // do not appear as intended.
-    let forward: boolean =
-      selection.start.line < selection.end.line ||
-      (selection.start.line === selection.end.line &&
-        selection.start.column <= selection.end.column);
-    let anchor = forward ? selection.start : selection.end;
-    let head = forward ? selection.end : selection.start;
     return {
-      anchor: this._toCodeMirrorPosition(anchor),
-      head: this._toCodeMirrorPosition(head)
+      anchor: this._toCodeMirrorPosition(selection.start),
+      head: this._toCodeMirrorPosition(selection.end)
     };
   }
 
@@ -862,12 +876,18 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
     switch (args.type) {
       case 'insert':
         let pos = doc.posFromIndex(args.start);
-        doc.replaceRange(args.value, pos, pos);
+        // Replace the range, including a '+input' orign,
+        // which indicates that CodeMirror may merge changes
+        // for undo/redo purposes.
+        doc.replaceRange(args.value, pos, pos, '+input');
         break;
       case 'remove':
         let from = doc.posFromIndex(args.start);
         let to = doc.posFromIndex(args.end);
-        doc.replaceRange('', from, to);
+        // Replace the range, including a '+input' orign,
+        // which indicates that CodeMirror may merge changes
+        // for undo/redo purposes.
+        doc.replaceRange('', from, to, '+input');
         break;
       case 'set':
         doc.setValue(args.value);
@@ -1029,7 +1049,7 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
       return;
     }
 
-    showDialog({
+    void showDialog({
       title: 'Code Editor out of Sync',
       body:
         'Please open your browser JavaScript console for bug report instructions'
@@ -1066,7 +1086,7 @@ export class CodeMirrorEditor implements CodeEditor.IEditor {
   private _needsRefresh = false;
   private _isDisposed = false;
   private _lastChange: CodeMirror.EditorChange | null = null;
-  private _timer = -1;
+  private _poll: Poll;
 }
 
 /**
@@ -1204,7 +1224,7 @@ export namespace CodeMirrorEditor {
      * CodeMirror-activeline-background, and adds the class
      * CodeMirror-activeline-gutter to the line's gutter space is enabled.
      */
-    styleActiveLine: boolean | object;
+    styleActiveLine: boolean | CodeMirror.StyleActiveLine;
 
     /**
      * Whether to causes the selected text to be marked with the CSS class
@@ -1242,7 +1262,7 @@ export namespace CodeMirrorEditor {
     lineWiseCopyCut: true,
     scrollPastEnd: false,
     styleActiveLine: false,
-    styleSelectedText: false,
+    styleSelectedText: true,
     selectionPointer: false,
     rulers: [],
     foldGutter: false
@@ -1259,7 +1279,7 @@ export namespace CodeMirrorEditor {
     name: string,
     command: (cm: CodeMirror.Editor) => void
   ) {
-    CodeMirror.commands[name] = command;
+    (CodeMirror.commands as any)[name] = command;
   }
 }
 
@@ -1284,7 +1304,7 @@ namespace Private {
       ...otherOptions
     } = config;
     let bareConfig = {
-      autoCloseBrackets: autoClosingBrackets,
+      autoCloseBrackets: autoClosingBrackets ? {} : false,
       indentUnit: tabSize,
       indentWithTabs: !insertSpaces,
       lineWrapping: lineWrap === 'off' ? false : true,

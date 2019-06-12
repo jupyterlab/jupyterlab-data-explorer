@@ -1,22 +1,24 @@
 /**
- * Start with files as unkown mimetype
+ * Start with files as unknown mimetype
  *
  * Then convert to known filetype, with URL on it.
  */
-import { Converter } from './converters';
-import { URLDataType } from './urls';
-import { DataTypeStringArg } from './datatype';
-import { resolveMimetypeDataType } from './resolvers';
+import { URLDataType } from "./urls";
+import { DataTypeStringArg, TypedConverter } from "./datatypes";
+import { resolveMimetypeDataType } from "./resolvers";
+import { from } from "rxjs";
+import { URL_ } from "./datasets";
+import { shareReplay } from "rxjs/operators";
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(
-  'application/x.jupyter.file',
-  'mimeType'
+  "application/x.jupyter.file",
+  "mimeType"
 );
-export function createFileURL(path: string): URL {
-  const url = new URL('file:');
+export function createFileURL_(path: string): URL_ {
+  const url = new URL("file:");
   url.pathname = path;
-  return url;
+  return url.toString();
 }
 
 /**
@@ -24,12 +26,12 @@ export function createFileURL(path: string): URL {
  */
 export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedConverter(
   fileDataType,
-  (innerMimeType, url) => {
-    const path = parseFileURL(url);
-    if (path === null) {
+  (innerMimeType, url_) => {
+    const url = new URL(url_);
+    if (url.protocol !== "file:") {
       return null;
     }
-    return [innerMimeType, async () => path];
+    return [innerMimeType, () => url.pathname];
   }
 );
 
@@ -37,21 +39,13 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
  * Creates a converter from file paths to their download URLs
  */
 export function fileURLConverter(
-  getDownloadURL: (path: FilePath) => Promise<URL>
-): Converter<FilePath, URL | string> {
+  getDownloadURL: (path: FilePath) => Promise<URL_>
+): TypedConverter<typeof fileDataType, typeof URLDataType> {
   return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
     mimeType,
-    getDownloadURL
+    path =>
+      from(getDownloadURL(path)).pipe(
+        shareReplay({ refCount: true, bufferSize: 1 })
+      )
   ]);
-}
-
-/**
- * Returns the path of a file URL, or null if it is not one.
- * @param url
- */
-function parseFileURL(url: URL): null | FilePath {
-  if (url.protocol !== 'file:') {
-    return null;
-  }
-  return url.pathname;
 }

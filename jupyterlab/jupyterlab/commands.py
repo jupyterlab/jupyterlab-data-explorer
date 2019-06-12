@@ -35,13 +35,13 @@ from .jlpmapp import YARN_PATH, HERE
 WEBPACK_EXPECT = re.compile(r'.*/index.out.js')
 
 # The dev mode directory.
-DEV_DIR = osp.realpath(os.path.join(HERE, '..', 'dev_mode'))
+DEV_DIR = osp.abspath(os.path.join(HERE, '..', 'dev_mode'))
 
 
 def pjoin(*args):
     """Join paths to create a real path.
     """
-    return osp.realpath(osp.join(*args))
+    return osp.abspath(osp.join(*args))
 
 
 def get_user_settings_dir():
@@ -51,7 +51,7 @@ def get_user_settings_dir():
     settings_dir = settings_dir or pjoin(
         jupyter_config_path()[0], 'lab', 'user-settings'
     )
-    return osp.realpath(settings_dir)
+    return osp.abspath(settings_dir)
 
 
 def get_workspaces_dir():
@@ -61,7 +61,7 @@ def get_workspaces_dir():
     workspaces_dir = workspaces_dir or pjoin(
         jupyter_config_path()[0], 'lab', 'workspaces'
     )
-    return osp.realpath(workspaces_dir)
+    return osp.abspath(workspaces_dir)
 
 
 def get_app_dir():
@@ -69,7 +69,7 @@ def get_app_dir():
     """
     # Default to the override environment variable.
     if os.environ.get('JUPYTERLAB_DIR'):
-        return osp.realpath(os.environ['JUPYTERLAB_DIR'])
+        return osp.abspath(os.environ['JUPYTERLAB_DIR'])
 
     # Use the default locations for data_files.
     app_dir = pjoin(sys.prefix, 'share', 'jupyter', 'lab')
@@ -87,20 +87,55 @@ def get_app_dir():
           osp.exists(app_dir) and
           osp.exists('/usr/local/share/jupyter/lab')):
         app_dir = '/usr/local/share/jupyter/lab'
+    return osp.abspath(app_dir)
 
-    return osp.realpath(app_dir)
+
+def dedupe_yarn(path, logger=None):
+    """ `yarn-deduplicate` with the `fewer` strategy to minimize total
+        packages installed in a given staging directory
+
+        This means a extension (or dependency) _could_ cause a downgrade of an
+        version expected at publication time, but core should aggressively set
+        pins above, for example, known-bad versions
+    """
+    had_dupes = Process(
+        ['node', YARN_PATH, 'yarn-deduplicate', '-s', 'fewer', '--fail'],
+        cwd=path, logger=logger
+    ).wait() != 0
+
+    if had_dupes:
+        yarn_proc = Process(['node', YARN_PATH], cwd=path, logger=logger)
+        yarn_proc.wait()
+
+
+def ensure_node_modules(cwd, logger=None):
+    """Ensure that node_modules is up to date.
+
+    Returns true if the node_modules was updated.
+    """
+    logger = _ensure_logger(logger)
+    yarn_proc = Process(['node', YARN_PATH, 'check', '--verify-tree'], cwd=cwd, logger=logger)
+    ret = yarn_proc.wait()
+
+    # Update node_modules if needed.
+    if ret != 0:
+        yarn_proc = Process(['node', YARN_PATH], cwd=cwd, logger=logger)
+        yarn_proc.wait()
+        parent = pjoin(HERE, '..')
+        dedupe_yarn(parent, logger)
+
+    return ret != 0
 
 
 def ensure_dev(logger=None):
     """Ensure that the dev assets are available.
     """
     parent = pjoin(HERE, '..')
+    logger = _ensure_logger(logger)
+    target = pjoin(parent, 'dev_mode', 'static')
 
-    if not osp.exists(pjoin(parent, 'node_modules')):
-        yarn_proc = Process(['node', YARN_PATH], cwd=parent, logger=logger)
-        yarn_proc.wait()
-
-    if not osp.exists(pjoin(parent, 'dev_mode', 'static')):
+    # Determine whether to build.
+    if ensure_node_modules(parent, logger) or not osp.exists(target):
         yarn_proc = Process(['node', YARN_PATH, 'build'], cwd=parent,
                             logger=logger)
         yarn_proc.wait()
@@ -110,19 +145,28 @@ def ensure_core(logger=None):
     """Ensure that the core assets are available.
     """
     staging = pjoin(HERE, 'staging')
+    logger = _ensure_logger(logger)
 
-    # Bail if the static directory already exists.
-    if osp.exists(pjoin(HERE, 'static')):
-        return
-
-    if not osp.exists(pjoin(staging, 'node_modules')):
-        yarn_proc = Process(['node', YARN_PATH], cwd=staging, logger=logger)
-        yarn_proc.wait()
-
-    if not osp.exists(pjoin(HERE, 'static')):
+    # Determine whether to build.
+    target = pjoin(HERE, 'static', 'index.html')
+    if not osp.exists(target):
+        ensure_node_modules(staging, logger)
         yarn_proc = Process(['node', YARN_PATH, 'build'], cwd=staging,
                             logger=logger)
         yarn_proc.wait()
+
+
+def ensure_app(app_dir):
+    """Ensure that an application directory is available.
+
+    If it does not exist, return a list of messages to prompt the user.
+    """
+    if osp.exists(pjoin(app_dir, 'static', 'index.html')):
+        return
+
+    msgs = ['JupyterLab application assets not found in "%s"' % app_dir,
+            'Please run `jupyter lab build` or use a different app directory']
+    return msgs
 
 
 def watch_packages(logger=None):
@@ -138,13 +182,10 @@ def watch_packages(logger=None):
     A list of `WatchHelper` objects.
     """
     parent = pjoin(HERE, '..')
-
-    if not osp.exists(pjoin(parent, 'node_modules')):
-        yarn_proc = Process(['node', YARN_PATH], cwd=parent, logger=logger)
-        yarn_proc.wait()
-
     logger = _ensure_logger(logger)
-    ts_dir = osp.realpath(osp.join(HERE, '..', 'packages', 'metapackage'))
+    ensure_node_modules(parent, logger)
+
+    ts_dir = osp.abspath(osp.join(HERE, '..', 'packages', 'metapackage'))
 
     # Run typescript watch and wait for the string indicating it is done.
     ts_regex = r'.* Found 0 errors\. Watching for file changes\.'
@@ -211,7 +252,7 @@ def install_extension(extension, app_dir=None, logger=None):
     return handler.install_extension(extension)
 
 
-def uninstall_extension(name, app_dir=None, logger=None):
+def uninstall_extension(name=None, app_dir=None, logger=None, all_=False):
     """Uninstall an extension by name or path.
 
     Returns `True` if a rebuild is recommended, `False` otherwise.
@@ -219,6 +260,8 @@ def uninstall_extension(name, app_dir=None, logger=None):
     logger = _ensure_logger(logger)
     _node_check(logger)
     handler = _AppHandler(app_dir, logger)
+    if all_ is True:
+        return handler.uninstall_all_extensions()
     return handler.uninstall_extension(name)
 
 
@@ -441,10 +484,20 @@ class _AppHandler(object):
         staging = pjoin(app_dir, 'staging')
 
         # Make sure packages are installed.
-        self._run(['node', YARN_PATH, 'install'], cwd=staging)
+        ret = self._run(['node', YARN_PATH, 'install', '--non-interactive'], cwd=staging)
+        if ret != 0:
+            msg = 'npm dependencies failed to install'
+            self.logger.error(msg)
+            raise RuntimeError(msg)
+
+        dedupe_yarn(staging, self.logger)
 
         # Build the app.
-        self._run(['node', YARN_PATH, 'run', command], cwd=staging)
+        ret = self._run(['node', YARN_PATH, 'run', command], cwd=staging)
+        if ret != 0:
+            msg = 'JupyterLab failed to build'
+            self.logger.error(msg)
+            raise RuntimeError(msg)
 
     def watch(self):
         """Start the application watcher and then run the watch in
@@ -456,6 +509,7 @@ class _AppHandler(object):
 
         # Make sure packages are installed.
         self._run(['node', YARN_PATH, 'install'], cwd=staging)
+        dedupe_yarn(staging, self.logger)
 
         proc = WatchHelper(['node', YARN_PATH, 'run', 'watch'],
                            cwd=pjoin(self.app_dir, 'staging'),
@@ -469,43 +523,43 @@ class _AppHandler(object):
         logger = self.logger
         info = self.info
 
-        logger.info('JupyterLab v%s' % info['version'])
+        print('JupyterLab v%s' % info['version'])
 
         if info['extensions']:
             info['compat_errors'] = self._get_extension_compat()
-            logger.info('Known labextensions:')
+            print('Known labextensions:')
             self._list_extensions(info, 'app')
             self._list_extensions(info, 'sys')
         else:
-            logger.info('No installed extensions')
+            print('No installed extensions')
 
         local = info['local_extensions']
         if local:
-            logger.info('\n   local extensions:')
+            print('\n   local extensions:')
             for name in sorted(local):
-                logger.info('        %s: %s' % (name, local[name]))
+                print('        %s: %s' % (name, local[name]))
 
         linked_packages = info['linked_packages']
         if linked_packages:
-            logger.info('\n   linked packages:')
+            print('\n   linked packages:')
             for key in sorted(linked_packages):
                 source = linked_packages[key]['source']
-                logger.info('        %s: %s' % (key, source))
+                print('        %s: %s' % (key, source))
 
         uninstalled_core = info['uninstalled_core']
         if uninstalled_core:
-            logger.info('\nUninstalled core extensions:')
-            [logger.info('    %s' % item) for item in sorted(uninstalled_core)]
+            print('\nUninstalled core extensions:')
+            [print('    %s' % item) for item in sorted(uninstalled_core)]
 
         disabled_core = info['disabled_core']
         if disabled_core:
-            logger.info('\nDisabled core extensions:')
-            [logger.info('    %s' % item) for item in sorted(disabled_core)]
+            print('\nDisabled core extensions:')
+            [print('    %s' % item) for item in sorted(disabled_core)]
 
         messages = self.build_check(fast=True)
         if messages:
-            logger.info('\nBuild recommended, please run `jupyter lab build`:')
-            [logger.info('    %s' % item) for item in messages]
+            print('\nBuild recommended, please run `jupyter lab build`:')
+            [print('    %s' % item) for item in messages]
 
     def build_check(self, fast=False):
         """Determine whether JupyterLab should be built.
@@ -614,6 +668,17 @@ class _AppHandler(object):
 
         self.logger.warn('No labextension named "%s" installed' % name)
         return False
+
+    def uninstall_all_extensions(self):
+        """Uninstalls all extensions
+
+        Returns `True` if a rebuild is recommended, `False` otherwise
+        """
+        should_rebuild = False
+        for (extname, _) in self.info['extensions'].items():
+            uninstalled = self.uninstall_extension(extname)
+            should_rebuild = should_rebuild or uninstalled
+        return should_rebuild
 
     def update_all_extensions(self):
         """Update all non-local extensions.
@@ -862,12 +927,6 @@ class _AppHandler(object):
             target = pjoin(staging, fname)
             shutil.copy(pjoin(HERE, 'staging', fname), target)
 
-        # Remove an existing yarn.lock file
-        # Because otherwise we can end up with unwanted duplicates
-        # cf https://github.com/yarnpkg/yarn/issues/3967
-        if osp.exists(pjoin(staging, 'yarn.lock')):
-            os.remove(pjoin(staging, 'yarn.lock'))
-
         # Ensure a clean templates directory
         templates = pjoin(staging, 'templates')
         if osp.exists(templates):
@@ -933,6 +992,11 @@ class _AppHandler(object):
         pkg_path = pjoin(staging, 'package.json')
         with open(pkg_path, 'w') as fid:
             json.dump(data, fid, indent=4)
+
+        # copy known-good yarn.lock if missing
+        lock_path = pjoin(staging, 'yarn.lock')
+        if not osp.exists(lock_path):
+            shutil.copy(pjoin(HERE, 'staging', 'yarn.lock'), lock_path)
 
     def _get_package_template(self, silent=False):
         """Get the template the for staging package.json file.
@@ -1066,7 +1130,7 @@ class _AppHandler(object):
             deps = data.get('dependencies', dict())
             name = data['name']
             jlab = data.get('jupyterlab', dict())
-            path = osp.realpath(target)
+            path = osp.abspath(target)
             # homepage, repository  are optional
             if 'homepage' in data:
                 url = data['homepage']
@@ -1111,7 +1175,7 @@ class _AppHandler(object):
             return info
 
         for path in glob.glob(pjoin(dname, '*.tgz')):
-            path = osp.realpath(path)
+            path = osp.abspath(path)
             data = read_package(path)
             name = data['name']
             if name not in info:

@@ -1,6 +1,8 @@
 // Copyright (c) Jupyter Development Team.
 // Distributed under the terms of the Modified BSD License.
 
+import { IDisposable } from '@phosphor/disposable';
+
 /**
  * A generic interface for change emitter payloads.
  */
@@ -24,18 +26,15 @@ export interface IChangedArgs<T> {
 /**
  * The description of a general purpose data connector.
  *
- * #### Notes
- * The generic type arguments <T, U = T, V = string> semantics are:
+ * @typeparam T - The basic entity response type a service's connector.
  *
- * T - is the basic entity response type a particular service's connector.
+ * @typeparam U - The basic entity request type, which is conventionally the
+ * same as the response type but may be different if a service's implementation
+ * requires input data to be different from output responses. Defaults to `T`.
  *
- * U = T - is the basic entity request type, which is conventionally the same as
- * the response type but may be different if a service's implementation requires
- * input data to be different from output responses.
- *
- * V = string - is the basic token applied to a request, conventionally a string
+ * @typeparam V - The basic token applied to a request, conventionally a string
  * ID or filter, but may be set to a different type when an implementation
- * requires it.
+ * requires it. Defaults to `string`.
  */
 export interface IDataConnector<T, U = T, V = string> {
   /**
@@ -97,4 +96,29 @@ export interface IDataConnector<T, U = T, V = string> {
    * type `T` being saved while others may return no content.
    */
   save(id: V, value: U): Promise<any>;
+}
+
+/**
+ * A function whose invocations are rate limited and can be stopped after
+ * invocation before it has fired.
+ *
+ * @typeparam T - The resolved type of the underlying function. Defaults to any.
+ *
+ * @typeparam U - The rejected type of the underlying function. Defaults to any.
+ */
+export interface IRateLimiter<T = any, U = any> extends IDisposable {
+  /**
+   * The rate limit in milliseconds.
+   */
+  readonly limit: number;
+
+  /**
+   * Invoke the rate limited function.
+   */
+  invoke(): Promise<T>;
+
+  /**
+   * Stop the function if it is mid-flight.
+   */
+  stop(): Promise<void>;
 }

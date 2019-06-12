@@ -3,7 +3,7 @@
 
 import { showErrorMessage, Toolbar, ToolbarButton } from '@jupyterlab/apputils';
 
-import { DocumentManager } from '@jupyterlab/docmanager';
+import { IDocumentManager } from '@jupyterlab/docmanager';
 
 import { Contents, ServerConnection } from '@jupyterlab/services';
 
@@ -70,7 +70,7 @@ export class FileBrowser extends Widget {
 
     this._directoryPending = false;
     let newFolder = new ToolbarButton({
-      iconClassName: 'jp-NewFolderIcon jp-Icon jp-Icon-16',
+      iconClassName: 'jp-NewFolderIcon',
       onClick: () => {
         this.createNewDirectory();
       },
@@ -80,9 +80,9 @@ export class FileBrowser extends Widget {
     let uploader = new Uploader({ model });
 
     let refresher = new ToolbarButton({
-      iconClassName: 'jp-RefreshIcon jp-Icon jp-Icon-16',
+      iconClassName: 'jp-RefreshIcon',
       onClick: () => {
-        model.refresh();
+        void model.refresh();
       },
       tooltip: 'Refresh File List'
     });
@@ -103,7 +103,7 @@ export class FileBrowser extends Widget {
     layout.addWidget(this._listing);
 
     this.layout = layout;
-    model.restore(this.id);
+    void model.restore(this.id);
   }
 
   /**
@@ -165,13 +165,18 @@ export class FileBrowser extends Widget {
       return;
     }
     this._directoryPending = true;
-    this._manager
+    // TODO: We should provide a hook into when the
+    // directory is done being created. This probably
+    // means storing a pendingDirectory promise and
+    // returning that if there is already a directory
+    // request.
+    void this._manager
       .newUntitled({
         path: this.model.path,
         type: 'directory'
       })
-      .then(model => {
-        this._listing.selectItemByName(model.name);
+      .then(async model => {
+        await this._listing.selectItemByName(model.name);
         this._directoryPending = false;
       })
       .catch(err => {
@@ -200,8 +205,8 @@ export class FileBrowser extends Widget {
   /**
    * Download the currently selected item(s).
    */
-  download(): void {
-    this._listing.download();
+  download(): Promise<void> {
+    return this._listing.download();
   }
 
   /**
@@ -242,35 +247,23 @@ export class FileBrowser extends Widget {
    * Handle a connection lost signal from the model.
    */
   private _onConnectionFailure(sender: FileBrowserModel, args: Error): void {
-    if (this._showingError) {
-      return;
+    if (
+      !this._showingError &&
+      args instanceof ServerConnection.ResponseError &&
+      args.response.status === 404
+    ) {
+      const title = 'Directory not found';
+      args.message = `Directory not found: "${this.model.path}"`;
+      this._showingError = true;
+      void showErrorMessage(title, args).then(() => {
+        this._showingError = false;
+      });
     }
-    this._showingError = true;
-
-    let title = 'Server Connection Error';
-    let networkMsg =
-      'A connection to the Jupyter server could not be established.\n' +
-      'JupyterLab will continue trying to reconnect.\n' +
-      'Check your network connection or Jupyter server configuration.\n';
-
-    // Check for a fetch error.
-    if (args instanceof ServerConnection.NetworkError) {
-      args.message = networkMsg;
-    } else if (args instanceof ServerConnection.ResponseError) {
-      if (args.response.status === 404) {
-        title = 'Directory not found';
-        args.message = `Directory not found: "${this.model.path}"`;
-      }
-    }
-
-    showErrorMessage(title, args).then(() => {
-      this._showingError = false;
-    });
   }
 
   private _crumbs: BreadCrumbs;
   private _listing: DirListing;
-  private _manager: DocumentManager;
+  private _manager: IDocumentManager;
   private _showingError = false;
   private _directoryPending: boolean;
 }

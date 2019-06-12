@@ -1,10 +1,14 @@
 {
   "name": "@jupyterlab/imageviewer-extension",
-  "version": "1.0.0-alpha.3",
+  "version": "1.0.0-alpha.9",
   "description": "JupyterLab - Image Widget Extension",
   "homepage": "https://github.com/jupyterlab/jupyterlab",
   "bugs": {
     "url": "https://github.com/jupyterlab/jupyterlab/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab.git"
   },
   "license": "BSD-3-Clause",
   "author": "Project Jupyter",
@@ -19,10 +23,6 @@
   "directories": {
     "lib": "lib/"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jupyterlab/jupyterlab.git"
-  },
   "scripts": {
     "build": "tsc -b",
     "clean": "rimraf lib",
@@ -31,20 +31,19 @@
     "watch": "tsc -b --watch"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.0.0-alpha.3",
-    "@jupyterlab/apputils": "^1.0.0-alpha.3",
-    "@jupyterlab/docregistry": "^1.0.0-alpha.3",
-    "@jupyterlab/imageviewer": "^1.0.0-alpha.3"
+    "@jupyterlab/application": "^1.0.0-alpha.9",
+    "@jupyterlab/apputils": "^1.0.0-alpha.9",
+    "@jupyterlab/docregistry": "^1.0.0-alpha.9",
+    "@jupyterlab/imageviewer": "^1.0.0-alpha.9"
   },
   "devDependencies": {
     "rimraf": "~2.6.2",
     "typedoc": "^0.14.2",
-    "typescript": "~3.3.1"
+    "typescript": "~3.5.1"
   },
   "publishConfig": {
     "access": "public"
   },
-  "gitHead": "31f68f6d1717b58c344a5fb4f4baf3b123b7c75c",
   "jupyterlab": {
     "extension": true,
     "schemaDir": "schema"

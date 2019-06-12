@@ -4,7 +4,7 @@
 
 ## Project Vision
 
-We have articulated our vision for this project as a ["Press Release from the Future"](./press_release.md). We are now pursing that vision to make it a _reality_. Have feedback or want to get involved? [Let us know!](https://discourse.jupyter.org/c/jupyterlab)
+We have articulated our vision for this project as a ["Press Release from the Future"](./press_release.md). We are now pursing that vision to make it a _reality_. Have feedback or want to get involved? [Post an issue!](https://github.com/jupyterlab/jupyterlab-data-explorer/issues/new)
 
 * Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 * Register **conversions** between the different data types.

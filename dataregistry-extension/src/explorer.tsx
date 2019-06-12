@@ -135,10 +135,12 @@ class Collapsable extends React.Component<
 
 function DatasetCompononent({
   url,
+  parentURL,
   active$,
   registry
 }: {
   url: URL_;
+  parentURL: URL_;
   registry: Registry;
   active$: IActiveDataset;
 }) {
@@ -147,6 +149,7 @@ function DatasetCompononent({
   const nestedURLs = nestedDataType.filterDataset(dataset).get(undefined);
   // Sort viewers by label
   viewers.sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0));
+  // Sort nested by URL
   if (viewers.length === 0 && nestedURLs === undefined) {
     return <></>;
   }
@@ -175,7 +178,7 @@ function DatasetCompononent({
                 textAlign: "left"
               }}
             >
-              {url.toString()}
+              {url.startsWith(parentURL) ? url.slice(parentURL.length) : url}
             </h3>
             <span>
               {viewers.map(([label, view]) => (
@@ -185,6 +188,7 @@ function DatasetCompononent({
             {nestedURLs ? (
               <Collapsable>
                 <DatasetsComponent
+                  url={url}
                   active={active$}
                   registry={registry}
                   urls$={nestedURLs}
@@ -203,11 +207,13 @@ function DatasetCompononent({
 function DatasetsComponent({
   active,
   registry,
-  urls$
+  urls$,
+  url
 }: {
   active: IActiveDataset;
   registry: Registry;
   urls$: Observable<Set<URL_>>;
+  url: URL_;
 }) {
   return (
     <UseObservable observable={urls$} initial={undefined}>
@@ -215,10 +221,11 @@ function DatasetsComponent({
         urls ? (
           [...urls]
             .sort()
-            .map(url => (
+            .map(innerURL => (
               <DatasetCompononent
-                key={url}
-                url={url}
+                key={innerURL}
+                url={innerURL}
+                parentURL={url}
                 registry={registry}
                 active$={active}
               />
@@ -297,11 +304,14 @@ class DataExplorer extends React.Component<
           search={this.state.search}
           onSearch={(search: string) => this.setState({ search })}
         />
-        <DatasetsComponent
-          registry={this.props.registry}
-          active={this.props.active}
-          urls$={this.props.urls$}
-        />
+        <div style={{ overflow: "auto" }}>
+          <DatasetsComponent
+            url=""
+            registry={this.props.registry}
+            active={this.props.active}
+            urls$={this.props.urls$}
+          />
+        </div>
       </div>
     );
   }

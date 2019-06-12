@@ -1,10 +1,28 @@
 # JupyterLab Data Explorer
 
-[![Stability Experimental](https://img.shields.io/badge/stability-experimental-red.svg)](https://img.shields.io/badge/stability-experimental-red.svg)
+[![Stability Experimental](https://img.shields.io/badge/stability-experimental-red.svg)](https://img.shields.io/badge/stability-experimental-red.svg) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/master)
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/master)
+*Datasets as first class entitiies in JupyterLab.* 
 
-We are currently building a data registry for JupyterLab [#5548](https://github.com/jupyterlab/jupyterlab/issues/5548). The idea is to show users datasets that have been registered and allow users to view those datasets, by relying on a series of data converters.
+* Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
+* Register **conversions** between the different data types.
+* Data changing on you? Use [`RxJS` **observables**](https://rxjs.dev/) to represent data over time.
+* Have a new way to look at your data? Create **React** or **Phosphor** components to view a certain type
+* Built in data **explorer UI** to find and use available datasets.
+* Dataset in your dataset? Use the **nested** datatype.
+* Building another data centric application? Use the **`dataregistry`** package which has no JupyterLab dependencies.
+
+![](https://user-images.githubusercontent.com/1186124/59360085-85becf80-8cfd-11e9-8fc8-98d8a7b83934.png)
+
+## Usage
+
+*Not released yet*
+
+
+## Extending
+
+*Docs to come. For now take a look at the code or open an issue.*
+
 
 ## Development
 

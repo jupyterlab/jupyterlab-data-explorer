@@ -2,8 +2,6 @@
 
 [![Stability Experimental](https://img.shields.io/badge/stability-experimental-red.svg)](https://img.shields.io/badge/stability-experimental-red.svg) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/master)
 
-*Datasets as first class entitiies in JupyterLab.* 
-
 * Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 * Register **conversions** between the different data types.
 * Data changing on you? Use [`RxJS` **observables**](https://rxjs.dev/) to represent data over time.

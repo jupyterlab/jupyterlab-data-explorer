@@ -2,10 +2,6 @@
 
 [![Stability Experimental](https://img.shields.io/badge/stability-experimental-red.svg)](https://img.shields.io/badge/stability-experimental-red.svg) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/master)
 
-## Project Vision
-
-We have articulated our vision for this project as a ["Press Release from the Future"](./press_release.md). We are now pursing that vision to make it a _reality_. Have feedback or want to get involved? [Post an issue!](https://github.com/jupyterlab/jupyterlab-data-explorer/issues/new)
-
 * Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 * Register **conversions** between the different data types.
 * Data changing on you? Use [`RxJS` **observables**](https://rxjs.dev/) to represent data over time.
@@ -15,6 +11,10 @@ We have articulated our vision for this project as a ["Press Release from the Fu
 * Building another data centric application? Use the **`dataregistry`** package which has no JupyterLab dependencies.
 
 ![](https://user-images.githubusercontent.com/1186124/59360085-85becf80-8cfd-11e9-8fc8-98d8a7b83934.png)
+
+## Project Vision
+
+We have articulated our vision for this project as a ["Press Release from the Future"](./press_release.md). We are now pursing that vision to make it a _reality_. Have feedback or want to get involved? [Post an issue!](https://github.com/jupyterlab/jupyterlab-data-explorer/issues/new)
 
 ## Usage
 

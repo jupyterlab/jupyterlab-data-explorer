@@ -22,6 +22,14 @@
 *Docs to come. For now take a look at the code or open an issue.*
 
 
+## Contributing
+
+This repo is in active development and we welcome any collaboration. If you have ideas or questions, feel free to open an issue. From there, we could setup a call to chat more in depth about how to work together. Please don't hesitate to reach out.
+
+Or, feel free to tackle an existing issue or contribute a PR that you think improves things. We try to keep the current issues relevent and matched to relevent milestones, to give a sense on where this is going.
+
+If the community grows around this we can adopt a more regular public meeting.
+
 ## Development
 
 This relies on features in an unreleased version of JupyterLab, so you you have to run it linked against that version of JupyterLab.

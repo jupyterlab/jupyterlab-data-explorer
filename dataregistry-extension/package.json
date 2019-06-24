@@ -28,26 +28,31 @@
     "watch": "tsc -w --listEmittedFiles"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.0.0-alpha.9",
-    "@jupyterlab/apputils": "^1.0.0-alpha.9",
-    "@jupyterlab/coreutils": "^3.0.0-alpha.9",
-    "@jupyterlab/dataregistry": "^0.7.1",
-    "@jupyterlab/docmanager": "^1.0.0-alpha.9",
-    "@jupyterlab/docregistry": "^1.0.0-alpha.9",
-    "@jupyterlab/filebrowser": "^1.0.0-alpha.9",
-    "@jupyterlab/notebook": "^1.0.0-alpha.9",
-    "@jupyterlab/rendermime": "^1.0.0-alpha.9",
+    "@jupyterlab/application": "1.0.0-rc.0",
+    "@jupyterlab/apputils": "1.0.0-rc.0",
+    "@jupyterlab/coreutils": "3.0.0-rc.0",
+    "@jupyterlab/csvviewer": "1.0.0-rc.0",
+    "@jupyterlab/docmanager": "1.0.0-rc.0",
+    "@jupyterlab/docregistry": "1.0.0-rc.0",
+    "@jupyterlab/filebrowser": "1.0.0-rc.0",
+    "@jupyterlab/notebook": "1.0.0-rc.0",
+    "@jupyterlab/rendermime": "1.0.0-rc.0",
     "@nteract/data-explorer": "7.0.1",
+    "@phosphor/datagrid": "^0.1.10",
     "@phosphor/messaging": "^1.2.3",
-    "@phosphor/widgets": "^1.7.0",
+    "@phosphor/widgets": "^1.8.0",
     "js-yaml": "3.12.2",
     "path": "0.12.7",
     "react": "16.8.4",
-    "rxjs": "6.5.2"
+    "rxjs": "6.5.2",
+    "styled-components": "4.3.2"
   },
   "devDependencies": {
     "rimraf": "~2.6.2",
     "typescript": "3.5.1"
+  },
+  "peerDependencies": {
+    "@jupyterlab/dataregistry": "0.7.1"
   },
   "publishConfig": {
     "access": "public"

@@ -2,10 +2,8 @@
 set -o errexit
 set -o xtrace
 
-cd jupyterlab
-pip install -e .
-jlpm run add:sibling ../dataregistry --no-build
-jlpm run add:sibling ../dataregistry-extension
-jlpm build:dev
-jupyter lab build --dev
-cd ../..
+yarn
+yarn run build
+
+jupyter labextension link ./dataregistry --no-build
+jupyter labextension link ./dataregistry-extension

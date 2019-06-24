@@ -2,8 +2,7 @@
   "private": true,
   "workspaces": [
     "dataregistry",
-    "dataregistry-extension",
-    "jupyterlab/packages/*"
+    "dataregistry-extension"
   ],
   "scripts": {
     "build": "tsc --build dataregistry dataregistry-extension",

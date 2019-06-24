@@ -10,7 +10,7 @@ import {
   JupyterFrontEndPlugin
 } from "@jupyterlab/application";
 import {
-  InstanceTracker,
+  WidgetTracker,
   MainAreaWidget,
   ReactWidget
 } from "@jupyterlab/apputils";
@@ -56,7 +56,7 @@ export class UseObservable<T, U> extends React.Component<
   }
 }
 
-const tracker = new InstanceTracker({ namespace: "dataregistry" });
+const tracker = new WidgetTracker({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
 
 export const widgetDataType = new DataTypeStringArg<Widget>(

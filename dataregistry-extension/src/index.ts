@@ -5,6 +5,7 @@
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
+export {IActiveDataset} from './active';
 import csvViewerPlugin from "./csvviewer";
 import dataRegistryPlugin from "./registry";
 import dataExplorerPlugin from "./explorer";

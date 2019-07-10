@@ -1,9 +1,8 @@
-import { DataTypeNoArgs } from "./datatypes";
+import { DataTypeNoArgs, TypedConverter } from "./datatypes";
 import { nestedDataType } from "./nested";
 
 import { map, shareReplay } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
-import { Converter } from "./converters";
 import { from, Observable } from "rxjs";
 
 /**
@@ -19,7 +18,7 @@ export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
  */
 export function createFolderConverter(
   folderContents: (path: string) => Promise<Set<string>>
-): Converter<void, Observable<Set<string>>> {
+): TypedConverter<typeof resolveDataType, typeof folderDataType> {
   return resolveDataType.createSingleTypedConverter(
     folderDataType,
     (_, url) => {

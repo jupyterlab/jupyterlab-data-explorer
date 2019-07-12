@@ -37,16 +37,20 @@ If the community grows around this we can adopt a more regular public meeting.
 ## Development
 
 ```bash
-conda create -n jupyterlab-data-explorer -c conda-forge python=3.6
-conda activate jupyterlab-data-explorer
+// Get this repo and `cd` into it
+git clone https://github.com/jupyterlab/jupyterlab-data-explorer.git
+cd jupyterlab-data-explorer
 
+// Alternatively, you can set up this repo using `conda`
+// conda create -n jupyterlab-data-explorer -c conda-forge python=3.6
+// conda activate jupyterlab-data-explorer
+
+// Install Jupyterlab
 pip install --pre jupyterlab
-yarn
-yarn run build
 
+// Build and link the data explorer packages
+jlpm build:dev
 
-jupyter labextension link ./dataregistry --no-build
-jupyter labextension link ./dataregistry-extension
-
+// Run Jupyterlab
 jupyter lab
 ```

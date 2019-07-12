@@ -6,6 +6,9 @@
   ],
   "scripts": {
     "build": "tsc --build dataregistry dataregistry-extension",
-    "build:watch": "yarn run build --watch"
+    "build:dev": "jlpm install && jlpm run build && jlpm run link",
+    "build:watch": "jlpm run build --watch",
+    "link": "jupyter labextension link dataregistry --no-build && jupyter labextension link dataregistry-extension",
+    "unlink": "jupyter labextension unlink dataregistry --no-build && jupyter labextension unlink dataregistry-extension"
   }
 }

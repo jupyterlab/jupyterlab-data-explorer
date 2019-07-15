@@ -4,7 +4,7 @@ import { nestedDataType } from "./nested";
 import { map, shareReplay } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
 import { from, Observable } from "rxjs";
-
+import {join} from 'path';
 /**
  * A folder is a list paths in it as strings
  */
@@ -48,7 +48,7 @@ export const folderDatasetsConverter = folderDataType.createSingleTypedConverter
         new Set(
           [...paths].map(path => {
             const u = new URL(url);
-            u.pathname = path;
+            u.pathname = join(u.pathname, path);
             return u.toString();
           })
         )

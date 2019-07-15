@@ -6,11 +6,9 @@ import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
 import {
   DataTypeNoArgs,
   DataTypeStringArg,
-  fileDataType,
   nestedDataType,
   Registry,
   resolveDataType,
-  resolveExtensionConverter,
   TypedConverter
 } from "@jupyterlab/dataregistry";
 import { IDocumentManager } from "@jupyterlab/docmanager";
@@ -51,9 +49,6 @@ import { RegistryToken } from "./registry";
  * `file:///notebook.ipynb` will have children `file:///notebook.ipynb#/cells/0/outputs/0`,etc
  */
 
-//  TODO: Update this to the right mimetype for a notebook
-const NOTEBOOK_MIMETYPE = "application/x.jupyterlab.notebook";
-
 const notebookContextDataType = new DataTypeNoArgs<
   Observable<Context<INotebookModel>>
 >("application/x.jupyterlab.notebook-context");
@@ -65,7 +60,7 @@ const notebookContextDataType = new DataTypeNoArgs<
  */
 function createNotebookContextConverter(
   docmanager: any
-): TypedConverter<typeof fileDataType, typeof notebookContextDataType> {
+): TypedConverter<typeof resolveDataType, typeof notebookContextDataType> {
   async function getNotebookContext(
     path: string
   ): Promise<Context<INotebookModel>> {
@@ -85,19 +80,24 @@ function createNotebookContextConverter(
     }
     return context;
   }
-  return fileDataType.createTypedConverter(notebookContextDataType, mimeType =>
-    mimeType === NOTEBOOK_MIMETYPE
-      ? new Map([
-          [
-            ,
-            // TODO: remove context once it has no more listeners
-            path =>
-              defer(() => getNotebookContext(path)).pipe(
-                shareReplay({ refCount: true, bufferSize: 1 })
-              )
-          ]
-        ])
-      : new Map()
+
+  // TODO: Converters should just take old new data and return new one?? include this in the initial params?
+  return resolveDataType.createSingleTypedConverter(
+    notebookContextDataType,
+    (_, url) => {
+      const u = new URL(url);
+      if (
+        u.protocol !== "file:" ||
+        !u.pathname.endsWith(".ipynb") ||
+        u.hash !== ""
+      ) {
+        return null;
+      }
+      const res = defer(() => getNotebookContext(u.pathname)).pipe(
+        shareReplay({ refCount: true, bufferSize: 1 })
+      );
+      return [, () => res];
+    }
   );
 }
 
@@ -326,7 +326,6 @@ function activate(
   registry: Registry,
   docmanager: IDocumentManager
 ) {
-  registry.addConverter(resolveExtensionConverter(".ipynb", NOTEBOOK_MIMETYPE));
   registry.addConverter(createNotebookContextConverter(docmanager));
   registry.addConverter(notebookContextToCells);
   registry.addConverter(notebookCellsToNested);

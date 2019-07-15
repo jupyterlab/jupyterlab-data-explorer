@@ -44,6 +44,7 @@ export function fileURLConverter(
   return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
     mimeType,
     path =>
+      // todo replace with `defer` instead of `from`
       from(getDownloadURL(path)).pipe(
         shareReplay({ refCount: true, bufferSize: 1 })
       )

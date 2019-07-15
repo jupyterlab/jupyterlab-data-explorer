@@ -13,7 +13,8 @@ import {
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
 import * as React from "react";
 import { RegistryToken } from "./registry";
-import { reactDataType, UseObservable } from "./widgets";
+import { reactDataType } from "./widgets";
+import { UseObservable } from "./utils";
 
 /**
  * Integrates the dataregistry into the doc registry.

@@ -357,7 +357,7 @@ function activate(
 ): IDataExplorer {
   const displayedURLs = new ObservableSet<string>();
   displayedURLs.add(ACTIVE_URL);
-  displayedURLs.add("file:/");
+  displayedURLs.add((new URL("file:")).toString());
 
   // Create a dataset with this URL
   const widget = ReactWidget.create(

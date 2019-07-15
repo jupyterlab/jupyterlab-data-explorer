@@ -1,6 +1,22 @@
 import * as React from "react";
 
-import { Observable, Subscription } from "rxjs";
+import { Observable, Subscription, BehaviorSubject } from "rxjs";
+
+interface IUseBehaviorSubjectProps<T> {
+  subject: BehaviorSubject<T>;
+  children: (value: T) => React.ReactNode;
+}
+
+export function UseBehaviorSubject<T>({
+  subject,
+  children
+}: IUseBehaviorSubjectProps<T>) {
+  return (
+    <UseObservable observable={subject} initial={subject.value}>
+      {children}
+    </UseObservable>
+  );
+}
 
 interface IUseObservableProps<T, U> {
   observable: Observable<T>;

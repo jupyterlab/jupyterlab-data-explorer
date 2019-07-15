@@ -41,5 +41,17 @@ export function createFolderConverter(
  */
 export const folderDatasetsConverter = folderDataType.createSingleTypedConverter(
   nestedDataType,
-  (_, url) => [, map(paths => new Set([...paths].map(path => `${url}${path}`)))]
+  (_, url) => [
+    ,
+    map(
+      paths =>
+        new Set(
+          [...paths].map(path => {
+            const u = new URL(url);
+            u.pathname = path;
+            return u.toString();
+          })
+        )
+    )
+  ]
 );

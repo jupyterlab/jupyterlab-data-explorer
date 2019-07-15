@@ -46,7 +46,8 @@ export function resolveExtensionConverter(
   mimeType: string
 ): Converter<void, void> {
   return resolveConverter((url: URL_) => {
-    if (new URL(url).pathname.endsWith(extension)) {
+    const u = new URL(url);
+    if (u.pathname.endsWith(extension) && !u.hash) {
       return new Set([mimeType]);
     }
     return new Set();

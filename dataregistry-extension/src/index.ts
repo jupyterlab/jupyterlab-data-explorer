@@ -5,7 +5,7 @@
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
-export {IActiveDataset} from './active';
+export { IActiveDataset } from "./active";
 import csvViewerPlugin from "./csvviewer";
 import dataRegistryPlugin from "./registry";
 import dataExplorerPlugin from "./explorer";
@@ -15,6 +15,8 @@ import URLPlugin from "./urls";
 import widgetPlugin from "./widgets";
 import tableDataPlugin from "./tableData";
 import foldersPlugin from "./folders";
+import notebooksPlugin from "./notebooks";
+import debuggerPlugin from "./debugger";
 export default [
   activePlugin,
   csvViewerPlugin,
@@ -25,5 +27,7 @@ export default [
   URLPlugin,
   widgetPlugin,
   tableDataPlugin,
-  foldersPlugin
+  foldersPlugin,
+  notebooksPlugin,
+  debuggerPlugin
 ] as JupyterFrontEndPlugin<any>[];

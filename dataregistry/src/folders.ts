@@ -1,11 +1,10 @@
-import { DataTypeNoArgs } from "./datatypes";
+import { DataTypeNoArgs, TypedConverter } from "./datatypes";
 import { nestedDataType } from "./nested";
 
 import { map, shareReplay } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
-import { Converter } from "./converters";
 import { from, Observable } from "rxjs";
-
+import {join} from 'path';
 /**
  * A folder is a list paths in it as strings
  */
@@ -19,7 +18,7 @@ export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
  */
 export function createFolderConverter(
   folderContents: (path: string) => Promise<Set<string>>
-): Converter<void, Observable<Set<string>>> {
+): TypedConverter<typeof resolveDataType, typeof folderDataType> {
   return resolveDataType.createSingleTypedConverter(
     folderDataType,
     (_, url) => {
@@ -42,5 +41,17 @@ export function createFolderConverter(
  */
 export const folderDatasetsConverter = folderDataType.createSingleTypedConverter(
   nestedDataType,
-  (_, url) => [, map(paths => new Set([...paths].map(path => `${url}${path}`)))]
+  (_, url) => [
+    ,
+    map(
+      paths =>
+        new Set(
+          [...paths].map(path => {
+            const u = new URL(url);
+            u.pathname = join(u.pathname, path);
+            return u.toString();
+          })
+        )
+    )
+  ]
 );

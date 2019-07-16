@@ -5,8 +5,16 @@ import {
   applyConverterDataset
 } from "./converters";
 import { resolveDataType } from "./resolvers";
+import { BehaviorSubject } from "rxjs";
 
 export class Registry {
+  /**
+   * Set of URLs which have been regstered so far.
+   */
+  public readonly URLs$: BehaviorSubject<Set<URL_>>;
+  constructor() {
+    this.URLs$ = new BehaviorSubject(new Set(this._datasets.keys()));
+  }
   /**
    * Returns the dataset for a URL.
    */
@@ -20,6 +28,10 @@ export class Registry {
       this._converter
     );
     this._datasets.set(url, dataset);
+
+    // Triggger update on registed URLs
+    this.URLs$.next(new Set([url, ...this.URLs$.value]));
+
     return dataset;
   }
 

@@ -132,6 +132,10 @@ export class DataTypeNoArgs<T> extends DataType<void, T> {
   createMimeType(_typeData: void): MimeType_ {
     return this.mimeType;
   }
+
+  getDataset(d: Dataset): T {
+    return this.filterDataset(d).values().next().value;
+  }
 }
 
 /**

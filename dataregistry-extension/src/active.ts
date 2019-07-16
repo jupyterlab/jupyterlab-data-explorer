@@ -22,7 +22,7 @@ export const IActiveDataset = new Token<IActiveDataset>(
   "@jupyterlab/dataregistry:IActiveDataset"
 );
 
-export const ACTIVE_URL = "active:";
+export const ACTIVE_URL = new URL("active:").toString();
 /**
  * The active dataset extension.
  */

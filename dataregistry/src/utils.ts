@@ -32,6 +32,11 @@ export function mapValues<K, V, VP>(
   return res;
 }
 
+type ObservableValue<T> =
+  | { next: T }
+  | { error: any }
+  | typeof COMPLETE
+  | typeof NO_VALUE;
 /**
  * Implements an observables set. Allows user to imperatively add or remove items and access an observable of the resulting set.
  */
@@ -83,15 +88,15 @@ export class CachedObservable<T> extends Observable<T> {
       if (!this._subscription) {
         this._subscription = from.subscribe({
           next: v => {
-            this._value = { next: v };
+            this.value.next({ next: v });
             this._subscribers.forEach(s => s.next(v));
           },
           error: e => {
-            this._value = { error: e };
+            this.value.next({ error: e });
             this._subscribers.forEach(s => s.error(e));
           },
           complete: () => {
-            this._value = COMPLETE;
+            this.value.next(COMPLETE);
             this._subscribers.forEach(s => s.complete());
           }
         });
@@ -108,22 +113,7 @@ export class CachedObservable<T> extends Observable<T> {
     });
   }
 
-  get value():
-    | { next: T }
-    | { error: any }
-    | typeof COMPLETE
-    | typeof NO_VALUE {
-    return this._value;
-  }
-
-  get refCount(): number {
-    return this._subscribers.size;
-  }
-  private _value:
-    | { next: T }
-    | { error: any }
-    | typeof COMPLETE
-    | typeof NO_VALUE = NO_VALUE;
+  public value = new BehaviorSubject<ObservableValue<T>>(NO_VALUE);
   private _subscribers: Set<Subscriber<T>> = new Set();
   private _subscription: Subscription | null = null;
 }

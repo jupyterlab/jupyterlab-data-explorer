@@ -38,8 +38,8 @@ export class Registry {
   /**
    * Adds a new converter.
    */
-  addConverter(converter: Converter<any, any>): void {
-    this._converters.add(converter);
+  addConverter(...converters: Array<Converter<any, any>>): void {
+    converters.forEach(converter => this._converters.add(converter));
   }
 
   addDatasets(datasets: Datasets<any>): void {

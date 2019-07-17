@@ -18,13 +18,13 @@ import {
   DataType,
   DataTypeStringArg,
   Registry,
-  URL_
+  URL_,
+  createConverter
 } from "@jupyterlab/dataregistry";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { viewerDataType } from "./viewers";
 import { RegistryToken } from "./registry";
-
 
 const tracker = new WidgetTracker({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
@@ -55,7 +55,7 @@ export function hasURL_(t: any): t is IHasURL_ {
 class DataWidget extends MainAreaWidget implements IHasURL_ {
   constructor(content: Widget, url: URL_, label: string) {
     super({ content });
-    this.id = JSON.stringify([label, url]);
+    this.id = JSON.stringify([label, url.toString()]);
     this.title.label = `${label}: ${url}`;
     this.title.closable = true;
     this.url = url;
@@ -90,32 +90,32 @@ function activate(
   restorer: ILayoutRestorer
 ) {
   registry.addConverter(
-    widgetDataType.createSingleTypedConverter(
-      wrappedWidgetDataType,
-      (label, url) => {
-        return [label, widget => new DataWidget(widget, url, label)];
-      }
+    createConverter(
+      { from: widgetDataType, to: wrappedWidgetDataType },
+      ({ type, url, data }) => ({
+        type,
+        data: new DataWidget(data, url.toString(), type)
+      })
+    ),
+    createConverter(
+      { from: reactDataType, to: widgetDataType },
+      ({ data, type }) => ({ type, data: ReactWidget.create(data) })
+    ),
+    createConverter(
+      { from: wrappedWidgetDataType, to: viewerDataType },
+      ({ data, type }) => ({
+        type,
+        data: () => {
+          if (!tracker.has(data)) {
+            tracker.add(data);
+          }
+          if (!data.isAttached) {
+            labShell.add(data, "main");
+          }
+          app.shell.activateById(data.id);
+        }
+      })
     )
-  );
-  registry.addConverter(
-    reactDataType.createSingleTypedConverter(widgetDataType, label => [
-      label,
-      ReactWidget.create
-    ])
-  );
-  registry.addConverter(
-    wrappedWidgetDataType.createSingleTypedConverter(viewerDataType, label => [
-      label,
-      widget => () => {
-        if (!tracker.has(widget)) {
-          tracker.add(widget);
-        }
-        if (!widget.isAttached) {
-          labShell.add(widget, "main");
-        }
-        app.shell.activateById(widget.id);
-      }
-    ])
   );
 
   app.commands.addCommand(commandID, {

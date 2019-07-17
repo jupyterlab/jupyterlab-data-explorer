@@ -24,8 +24,8 @@ function activate(
   registry: Registry,
   fileBrowserFactory: IFileBrowserFactory
 ) {
-  registry.addConverter(folderDatasetsConverter);
   registry.addConverter(
+    folderDatasetsConverter,
     // Inspired by filebrowser.model.FileBrowserModel._handleContents
     createFolderConverter(
       async path =>

@@ -9,6 +9,7 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
+import { Inspector } from "react-inspector";
 import {
   ReactWidget,
   ICommandPalette,
@@ -18,10 +19,21 @@ import {
 
 import * as React from "react";
 import { RegistryToken } from "./registry";
-import { Registry } from "@jupyterlab/dataregistry";
+import { Registry, CachedObservable } from "@jupyterlab/dataregistry";
 import { UseBehaviorSubject } from "./utils";
 
 const id = "@jupyterlab/dataregistry-extension:data-debugger";
+
+function Data({ data }: { data: unknown }) {
+  if (data instanceof CachedObservable) {
+    return (
+      <UseBehaviorSubject subject={data.value}>
+        {data_ => <Inspector data={data_} />}
+      </UseBehaviorSubject>
+    );
+  }
+  return <Inspector data={data} />;
+}
 
 function Debugger({ registry }: { registry: Registry }) {
   return (
@@ -33,11 +45,14 @@ function Debugger({ registry }: { registry: Registry }) {
               <li key={url}>
                 <code>{url}</code>
                 <ol style={{ listStyle: "none" }}>
-                  {[...registry.getURL(url).keys()].sort().map(mimeType => (
-                    <li key={mimeType}>
-                      <code>{mimeType}</code>
-                    </li>
-                  ))}
+                  {[...registry.getURL(url).entries()].map(
+                    ([mimeType, [cost, data]]) => (
+                      <li key={mimeType}>
+                        <code>{mimeType}</code>
+                        <Data data={data} />
+                      </li>
+                    )
+                  )}
                 </ol>
               </li>
             ))

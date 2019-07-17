@@ -4,6 +4,7 @@
 |----------------------------------------------------------------------------*/
 import { JupyterFrontEndPlugin, JupyterLab } from "@jupyterlab/application";
 import {
+  createConverter,
   fileURLConverter,
   Registry,
   resolveExtensionConverter,
@@ -13,8 +14,8 @@ import {
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
 import * as React from "react";
 import { RegistryToken } from "./registry";
-import { reactDataType } from "./widgets";
 import { UseObservable } from "./utils";
+import { reactDataType } from "./widgets";
 
 /**
  * Integrates the dataregistry into the doc registry.
@@ -32,25 +33,26 @@ function activate(
   fileBrowserFactory: IFileBrowserFactory
 ) {
   // Add default converters
-  registry.addConverter(resolveFileConverter);
-  registry.addConverter(resolveExtensionConverter(".csv", "text/csv"));
-  registry.addConverter(resolveExtensionConverter(".png", "image/png"));
   registry.addConverter(
-    URLDataType.createSingleTypedConverter(reactDataType, mimeType => {
-      if (mimeType !== "image/png") {
-        return null;
+    resolveFileConverter,
+    resolveExtensionConverter(".csv", "text/csv"),
+    resolveExtensionConverter(".png", "image/png"),
+    createConverter(
+      { from: URLDataType, to: reactDataType },
+      ({ type, data }) => {
+        if (type !== "image/png") {
+          return null;
+        }
+        return {
+          type: "Image",
+          data: (
+            <UseObservable observable={data} initial={undefined}>
+              {url => (url ? <img src={url} /> : <></>)}
+            </UseObservable>
+          )
+        };
       }
-      return [
-        "Image",
-        $url => (
-          <UseObservable observable={$url} initial={undefined}>
-            {url => (url ? <img src={url} /> : <></>)}
-          </UseObservable>
-        )
-      ];
-    })
-  );
-  registry.addConverter(
+    ),
     fileURLConverter(path =>
       fileBrowserFactory.defaultBrowser.model.manager.services.contents.getDownloadUrl(
         path

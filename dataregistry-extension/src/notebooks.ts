@@ -9,7 +9,8 @@ import {
   nestedDataType,
   Registry,
   resolveDataType,
-  TypedConverter
+  TypedConverter,
+  createConverter
 } from "@jupyterlab/dataregistry";
 import { IDocumentManager } from "@jupyterlab/docmanager";
 import { Context } from "@jupyterlab/docregistry";
@@ -23,26 +24,6 @@ import {
   outputAreaModelToObservable
 } from "./observables";
 import { RegistryToken } from "./registry";
-
-// class DataURL<T> {
-//     fromURL(url: )
-//     toString(): string
-// }
-
-// // Parent/child URLs?
-// new NotebookURL(notebookPath)
-
-// new CellURL(notebookURL, cellID)
-
-// new OutputURL(cellURL, outputID)
-
-// new OutputDataURL(outputURL, mimeType)
-
-// parse(URL) -> parentURL, params
-// generate(parentURL, params) -> URL
-// toString() => URL
-
-// new ChildURL()
 
 /**
  * This defines a nested data type for notebooks, so that a notebook
@@ -80,23 +61,20 @@ function createNotebookContextConverter(
     }
     return context;
   }
-
-  // TODO: Converters should just take old new data and return new one?? include this in the initial params?
-  return resolveDataType.createSingleTypedConverter(
-    notebookContextDataType,
-    (_, url) => {
-      const u = new URL(url);
+  return createConverter(
+    { from: resolveDataType, to: notebookContextDataType },
+    ({ url }) => {
       if (
-        u.protocol !== "file:" ||
-        !u.pathname.endsWith(".ipynb") ||
-        u.hash !== ""
+        url.protocol !== "file:" ||
+        !url.pathname.endsWith(".ipynb") ||
+        url.hash !== ""
       ) {
         return null;
       }
-      const res = defer(() => getNotebookContext(u.pathname)).pipe(
-        shareReplay({ refCount: true, bufferSize: 1 })
-      );
-      return [, () => res];
+      return {
+        data: defer(() => getNotebookContext(url.pathname)),
+        type: undefined
+      };
     }
   );
 }
@@ -108,37 +86,33 @@ const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
 /**
  * Convert from notebook context to a list of cells within the model
  */
-const notebookContextToCells = notebookContextDataType.createSingleTypedConverter(
-  notebookCellsDataType,
-  () => [
-    ,
-    context$ =>
-      context$.pipe(
-        switchMap(context => observableListToObservable(context.model.cells)),
-        shareReplay({ refCount: true, bufferSize: 1 })
-      )
-  ]
+const notebookContextToCells = createConverter(
+  { from: notebookContextDataType, to: notebookCellsDataType },
+  ({ data }) => ({
+    data: data.pipe(
+      switchMap(context => observableListToObservable(context.model.cells))
+    ),
+    type: undefined
+  })
 );
 
-const notebookCellsToNested = notebookCellsDataType.createSingleTypedConverter(
-  nestedDataType,
-  (_, url) => [
-    ,
-    cells$ =>
-      cells$.pipe(
-        map(
-          cells =>
-            new Set(
-              cells.map((_, i) => {
-                const u = new URL(url);
-                u.hash = `/cells/${i}`;
-                return u.toString();
-              })
-            )
-        ),
-        shareReplay({ refCount: true, bufferSize: 1 })
+const notebookCellsToNested = createConverter(
+  { from: notebookCellsDataType, to: nestedDataType },
+  ({ url, data }) => ({
+    type: undefined,
+    data: data.pipe(
+      map(
+        cells =>
+          new Set(
+            cells.map((_, i) => {
+              url = new URL(url.toString());
+              url.hash = `/cells/${i}`;
+              return url.toString();
+            })
+          )
       )
-  ]
+    )
+  })
 );
 
 const cellModelDataType = new DataTypeNoArgs<Observable<ICellModel>>(
@@ -151,29 +125,30 @@ const cellModelDataType = new DataTypeNoArgs<Observable<ICellModel>>(
 function createResolveCellModelConverter(
   registry: Registry
 ): TypedConverter<typeof resolveDataType, typeof cellModelDataType> {
-  return resolveDataType.createSingleTypedConverter(
-    cellModelDataType,
-    (_, url) => {
-      // Extract the cell ID from the URL
-      const u = new URL(url);
-
-      const result = u.hash.match(/^[#][/]cells[/](\d+)$/);
-      if (u.protocol !== "file:" || !u.pathname.endsWith(".ipynb") || !result) {
+  return createConverter(
+    { from: resolveDataType, to: cellModelDataType },
+    ({ url }) => {
+      const result = url.hash.match(/^[#][/]cells[/](\d+)$/);
+      if (
+        url.protocol !== "file:" ||
+        !url.pathname.endsWith(".ipynb") ||
+        !result
+      ) {
         return null;
       }
       const cellID = Number(result[1]);
 
       // Create the original notebook URL and get the cells from it
-      u.hash = "";
-      const notebookURL = u.toString();
-
-      return [
-        ,
-        () =>
+      url.hash = "";
+      const notebookURL = url.toString();
+      return {
+        type: undefined,
+        data: defer(() =>
           notebookCellsDataType
             .getDataset(registry.getURL(notebookURL))
             .pipe(map(cells => cells[cellID]))
-      ];
+        )
+      };
     }
   );
 }
@@ -185,35 +160,32 @@ const outputsDataType = new DataTypeNoArgs<Observable<Array<IOutputModel>>>(
 /**
  * Convert from a cell model to a list of output models. If the cell is not a code cell, the list is empty.
  */
-const cellToOutputs = cellModelDataType.createSingleTypedConverter(
-  outputsDataType,
-  () => [
-    null,
-    cellModel$ =>
-      cellModel$.pipe(
-        switchMap(cellModel => {
-          if (isCodeCellModel(cellModel)) {
-            return defer(() => outputAreaModelToObservable(cellModel.outputs));
-          }
-          return from([]);
-        }),
-        shareReplay({ refCount: true, bufferSize: 1 })
-      )
-  ]
+const cellToOutputs = createConverter(
+  { from: cellModelDataType, to: outputsDataType },
+  ({ data }) => ({
+    type: undefined,
+    data: data.pipe(
+      switchMap(cellModel => {
+        if (isCodeCellModel(cellModel)) {
+          return outputAreaModelToObservable(cellModel.outputs);
+        }
+        return from([]);
+      })
+    )
+  })
 );
 
 /**
  * Converts from a list of outputs to the resulting URLs
  */
-const outputsToNested = outputsDataType.createSingleTypedConverter(
-  nestedDataType,
-  (_, url) => [
-    null,
-    outputs$ =>
-      outputs$.pipe(
-        map(outputs => new Set(outputs.map((_, i) => `${url}/outputs/${i}`)))
-      )
-  ]
+const outputsToNested = createConverter(
+  { from: outputsDataType, to: nestedDataType },
+  ({ url, data }) => ({
+    type: undefined,
+    data: data.pipe(
+      map(outputs => new Set(outputs.map((_, i) => `${url}/outputs/${i}`)))
+    )
+  })
 );
 
 // The data in the mimebundle of an output cell
@@ -228,32 +200,33 @@ const mimeBundleDataType = new DataTypeNoArgs<Observable<ReadonlyJSONObject>>(
 function createOutputConverter(
   registry: Registry
 ): TypedConverter<typeof resolveDataType, typeof mimeBundleDataType> {
-  return resolveDataType.createSingleTypedConverter(
-    mimeBundleDataType,
-    (_, url) => {
-      const u = new URL(url);
-
-      const result = u.hash.match(/^[#]([/]cells[/]\d+)[/]outputs[/](\d+)$/);
-      if (u.protocol !== "file:" || !u.pathname.endsWith(".ipynb") || !result) {
+  return createConverter(
+    { from: resolveDataType, to: mimeBundleDataType },
+    ({ url }) => {
+      const result = url.hash.match(/^[#]([/]cells[/]\d+)[/]outputs[/](\d+)$/);
+      if (
+        url.protocol !== "file:" ||
+        !url.pathname.endsWith(".ipynb") ||
+        !result
+      ) {
         return null;
       }
       const cellHash = result[1];
       const outputID = Number(result[2]);
 
       // Create the original output URL and get the cells from it
-      u.hash = cellHash;
-      const cellURL = u.toString();
+      url.hash = cellHash;
+      const cellURL = url.toString();
 
-      const data$ = defer(() =>
+      const data = defer(() =>
         outputsDataType.getDataset(registry.getURL(cellURL)).pipe(
           map(outputs => {
             console.log(outputs, outputID);
             return outputs[outputID].data;
-          }),
-          shareReplay({ refCount: true, bufferSize: 1 })
+          })
         )
       );
-      return [, () => data$];
+      return { data, type: undefined };
     }
   );
 }
@@ -268,15 +241,19 @@ const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
  * Converts from a URL with a mimebundle, which is the output, to one with the mimeType
  * added.
  */
-const mimeBundleNested = mimeBundleDataType.createSingleTypedConverter(
-  nestedDataType,
-  (_, url) => [
-    ,
-    map(
-      data =>
-        new Set(Object.keys(data).map(mimeType => `${url}/data/${mimeType}`))
+const mimeBundleNested = createConverter(
+  { from: mimeBundleDataType, to: nestedDataType },
+  ({ url, data }) => ({
+    type: undefined,
+    data: data.pipe(
+      map(
+        mimeData =>
+          new Set(
+            Object.keys(mimeData).map(mimeType => `${url}/data/${mimeType}`)
+          )
+      )
     )
-  ]
+  })
 );
 
 /**
@@ -286,30 +263,32 @@ const mimeBundleNested = mimeBundleDataType.createSingleTypedConverter(
 function createMimeDataConverter(
   registry: Registry
 ): TypedConverter<typeof resolveDataType, typeof mimeDataDataType> {
-  return resolveDataType.createSingleTypedConverter(
-    mimeDataDataType,
-    (_, url) => {
-      const u = new URL(url);
-
-      const result = u.hash.match(
+  return createConverter(
+    { from: resolveDataType, to: mimeDataDataType },
+    ({ url }) => {
+      const result = url.hash.match(
         /^[#]([/]cells[/]\d+[/]outputs[/]\d+)[/]data[/](.*)$/
       );
-      if (u.protocol !== "file:" || !u.pathname.endsWith(".ipynb") || !result) {
+      if (
+        url.protocol !== "file:" ||
+        !url.pathname.endsWith(".ipynb") ||
+        !result
+      ) {
         return null;
       }
-      const [, outputHash, mimeType] = result;
+      const [, outputHash, type] = result;
 
       // Create the original output URL and get the cells from it
-      u.hash = outputHash;
-      const outputURL = u.toString();
+      url.hash = outputHash;
+      const outputURL = url.toString();
 
-      const data$ = defer(() =>
+      const data = defer(() =>
         mimeBundleDataType.getDataset(registry.getURL(outputURL)).pipe(
-          map(mimeBundle => mimeBundle[mimeType]),
+          map(mimeBundle => mimeBundle[type]),
           shareReplay({ refCount: true, bufferSize: 1 })
         )
       );
-      return [mimeType, () => data$];
+      return { type, data };
     }
   );
 }
@@ -317,8 +296,9 @@ function createMimeDataConverter(
 /**
  * Create the right mime type for for mime bundle data.
  */
-const mimeBundleDataConverter = mimeDataDataType.createSingleConverter(
-  mimeType => [mimeType, data => data]
+const mimeBundleDataConverter = createConverter(
+  { from: mimeDataDataType },
+  ({ type, data }) => ({ type, data })
 );
 
 function activate(

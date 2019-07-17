@@ -51,10 +51,15 @@ test("Adding a converter gives the new mimetype", () => {
 
   r.addDatasets(createDatasets(url, initialMimeType, initialData));
 
-  const converter: Converter<string, string> = (mimeType, url) =>
+  const converter: Converter<string, string> = ({
+    mimeType,
+    url,
+    data,
+    cost
+  }) =>
     mimeType === initialMimeType
-      ? new Map([[convertedMimeType, data => dataConverter(url, data)]])
-      : new Map();
+      ? [{ mimeType: convertedMimeType, data: dataConverter(url, data), cost }]
+      : [];
 
   r.addConverter(converter);
 

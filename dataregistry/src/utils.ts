@@ -1,4 +1,4 @@
-import { Observable, BehaviorSubject } from "rxjs";
+import { Observable, BehaviorSubject, Subscriber, Subscription } from "rxjs";
 import { tag } from "rxjs-spy/operators/tag";
 
 /**
@@ -64,4 +64,66 @@ export class ObservableSet<T> {
     }
     this._observable.next(newSet);
   }
+}
+
+export const NO_VALUE = Symbol("NO_VALUE");
+export const COMPLETE = Symbol("COMPLETE");
+
+/**
+ * `CachedObservable` is a refcounted observable that maintains a maximum of one subscription to its source.
+ *
+ * If at any time, it has no subscribers, it will unsubscribe from its source.
+ *
+ * Why use this over the `refCount` operator? Well we store the last value on the object for easier debugging and introspection.
+ */
+export class CachedObservable<T> extends Observable<T> {
+  constructor(from: Observable<T>) {
+    super(subscriber => {
+      this._subscribers.add(subscriber);
+      if (!this._subscription) {
+        this._subscription = from.subscribe({
+          next: v => {
+            this._value = { next: v };
+            this._subscribers.forEach(s => s.next(v));
+          },
+          error: e => {
+            this._value = { error: e };
+            this._subscribers.forEach(s => s.error(e));
+          },
+          complete: () => {
+            this._value = COMPLETE;
+            this._subscribers.forEach(s => s.complete());
+          }
+        });
+      }
+      return () => {
+        // delete subscriber on cleanup and unsubscribe from parent
+        // if there are no others left.
+        this._subscribers.delete(subscriber);
+        if (this._subscribers.size === 0) {
+          this._subscription!.unsubscribe();
+          this._subscription = null;
+        }
+      };
+    });
+  }
+
+  get value():
+    | { next: T }
+    | { error: any }
+    | typeof COMPLETE
+    | typeof NO_VALUE {
+    return this._value;
+  }
+
+  get refCount(): number {
+    return this._subscribers.size;
+  }
+  private _value:
+    | { next: T }
+    | { error: any }
+    | typeof COMPLETE
+    | typeof NO_VALUE = NO_VALUE;
+  private _subscribers: Set<Subscriber<T>> = new Set();
+  private _subscription: Subscription | null = null;
 }

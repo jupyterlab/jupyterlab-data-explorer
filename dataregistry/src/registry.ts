@@ -18,7 +18,7 @@ export class Registry {
   /**
    * Returns the dataset for a URL.
    */
-  getURL(url: URL_): Dataset {
+  getURL(url: URL_): Dataset<unknown> {
     if (this._datasets.has(url)) {
       return this._datasets.get(url)!;
     }
@@ -42,14 +42,15 @@ export class Registry {
     this._converters.add(converter);
   }
 
-  addDatasets(datasets: Datasets): void {
-    this._converters.add(
-      (_mimeType, url) =>
-        new Map(
-          [...(datasets.get(url) || (new Map() as Dataset))].map(
-            ([mimeType, [cost, data]]) => [mimeType, () => data]
-          )
-        )
+  addDatasets(datasets: Datasets<any>): void {
+    this._converters.add(({ mimeType, url }) =>
+      mimeType == resolveDataType.createMimeType() && datasets.has(url)
+        ? [...datasets.get(url)!.entries()].map(([mimeType, [cost, data]]) => ({
+            mimeType,
+            cost,
+            data
+          }))
+        : []
     );
   }
 
@@ -57,6 +58,6 @@ export class Registry {
     return combineManyConverters(...this._converters);
   }
 
-  private readonly _datasets: Datasets = new Map();
+  private readonly _datasets: Datasets<unknown> = new Map();
   private readonly _converters: Set<Converter<any, any>> = new Set();
 }

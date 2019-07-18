@@ -74,13 +74,17 @@ export const NOT_FINAL = Symbol("NOT_FINAL");
 /**
  * We want to capture the last emitted value and whether the observable is finalized yet.
  */
-type ObservableState<T> =
-  | {
-      subscription: Subscription;
-      value: T | typeof NO_VALUE;
-      final: { error: any } | typeof COMPLETE | typeof NOT_FINAL;
-    }
-  | typeof NOT_SUBSCRIBED;
+type ObservableState<T> = {
+  subscription: Subscription | typeof NOT_SUBSCRIBED;
+  value: T | typeof NO_VALUE;
+  final: { error: any } | typeof COMPLETE | typeof NOT_FINAL;
+};
+
+const INITIAL_STATE: ObservableState<any> = {
+  subscription: NOT_SUBSCRIBED,
+  value: NO_VALUE,
+  final: NOT_FINAL
+};
 
 /**
  * `CachedObservable` is a refcounted observable that maintains a maximum of one subscription to its source.
@@ -94,56 +98,53 @@ export class CachedObservable<T> extends Observable<T> {
     super(subscriber => {
       this._subscribers.add(subscriber);
       const state = this.state.value;
-      if (state == NOT_SUBSCRIBED) {
-        this.state.next({
-          final: NOT_FINAL,
-          value: NO_VALUE,
+      if (state.subscription === NOT_SUBSCRIBED) {
+        this._setState({
           subscription: from.subscribe(
-            v => this._setState({ value: v }),
-            e => this._setState({ final: { error: e } }),
-            () => this._setState({ final: COMPLETE })
+            v => {
+              this._setState({ value: v });
+              this._subscribers.forEach(s => s.next(v));
+            },
+            e => {
+              this._setState({ final: { error: e } }),
+                this._subscribers.forEach(s => s.error(e));
+            },
+            () => {
+              this._setState({ final: COMPLETE }),
+                this._subscribers.forEach(s => s.complete());
+            }
           )
-        })
-      } else {
-        if (state.value !== NO_VALUE) {
-          subscriber.next(state.value)
-        }
-        if (state.final === COMPLETE) {
-          subscriber.complete()
-        } else if (state.final !== NOT_FINAL) {
-          subscriber.error(state.final.error)
-        }
-      };
+        });
+      }
+      if (state.value !== NO_VALUE) {
+        subscriber.next(state.value);
+      }
+      if (state.final === COMPLETE) {
+        subscriber.complete();
+      } else if (state.final !== NOT_FINAL) {
+        subscriber.error(state.final.error);
+      }
+
       return () => {
         // delete subscriber on cleanup and unsubscribe from parent
         // if there are no others left.
         this._subscribers.delete(subscriber);
         const currentState = this.state.value;
-        if (this._subscribers.size === 0 && currentState !== NOT_SUBSCRIBED) {
+        if (
+          this._subscribers.size === 0 &&
+          currentState.subscription !== NOT_SUBSCRIBED
+        ) {
           currentState.subscription.unsubscribe();
-          this.state.next(NOT_SUBSCRIBED);
+          this.state.next(INITIAL_STATE);
         }
       };
     });
   }
 
-  private _setState(
-    newState: { value: T } | { final: { error: any } | typeof COMPLETE }
-  ) {
-    const state = this.state.value;
-    if (state === NOT_SUBSCRIBED) {
-      throw "Should have subscription";
-    }
-    this.state.next({ ...state, ...newState });
-    this._subscribers.forEach(s =>
-      "value" in newState
-        ? s.next(newState.value)
-        : newState.final === COMPLETE
-        ? s.complete()
-        : s.error(newState.final.error)
-    );
+  private _setState(newState: Partial<ObservableState<T>>) {
+    this.state.next({ ...this.state.value, ...newState });
   }
 
-  public state = new BehaviorSubject<ObservableState<T>>(NOT_SUBSCRIBED);
+  public state = new BehaviorSubject<ObservableState<T>>(INITIAL_STATE);
   private _subscribers: Set<Subscriber<T>> = new Set();
 }

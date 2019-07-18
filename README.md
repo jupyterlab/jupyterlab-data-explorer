@@ -37,11 +37,10 @@ If the community grows around this we can adopt a more regular public meeting.
 ## Development
 
 ```bash
-// Get this repo and `cd` into it
 git clone https://github.com/jupyterlab/jupyterlab-data-explorer.git
 cd jupyterlab-data-explorer
 
-// Alternatively, you can set up this repo using `conda`
+// (optional) Create a fresh conda environment
 // conda create -n jupyterlab-data-explorer -c conda-forge python=3.6
 // conda activate jupyterlab-data-explorer
 

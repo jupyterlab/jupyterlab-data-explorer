@@ -73,7 +73,7 @@ cd jupyterlab-data-explorer
 // conda activate jupyterlab-data-explorer
 
 // Install Jupyterlab
-pip install --pre jupyterlab
+pip install jupyterlab
 
 // Build and link the data explorer packages
 jlpm build:dev

@@ -9,6 +9,13 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
+// Need to set global regenerator runtime, since react-inspector
+// is built with it.
+const regeneratorRuntime = require("regenerator-runtime");
+
+(window as any).regeneratorRuntime = regeneratorRuntime;
+
+import { Inspector } from "react-inspector";
 import {
   ReactWidget,
   ICommandPalette,
@@ -18,10 +25,41 @@ import {
 
 import * as React from "react";
 import { RegistryToken } from "./registry";
-import { Registry } from "@jupyterlab/dataregistry";
+import { Registry, CachedObservable } from "@jupyterlab/dataregistry";
 import { UseBehaviorSubject } from "./utils";
 
 const id = "@jupyterlab/dataregistry-extension:data-debugger";
+
+class ErrorBoundary extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
+function Data({ data }: { data: unknown }) {
+  if (data instanceof CachedObservable) {
+    return (
+      <UseBehaviorSubject subject={data.state}>
+        {data_ => <Inspector data={data_} />}
+      </UseBehaviorSubject>
+    );
+  }
+  return <Inspector data={data} />;
+}
 
 function Debugger({ registry }: { registry: Registry }) {
   return (
@@ -33,11 +71,16 @@ function Debugger({ registry }: { registry: Registry }) {
               <li key={url}>
                 <code>{url}</code>
                 <ol style={{ listStyle: "none" }}>
-                  {[...registry.getURL(url).keys()].sort().map(mimeType => (
-                    <li key={mimeType}>
-                      <code>{mimeType}</code>
-                    </li>
-                  ))}
+                  {[...registry.getURL(url).entries()].map(
+                    ([mimeType, [cost, data]]) => (
+                      <li key={mimeType}>
+                        <code>{mimeType}</code>
+                        <ErrorBoundary>
+                          <Data data={data} />
+                        </ErrorBoundary>
+                      </li>
+                    )
+                  )}
                 </ol>
               </li>
             ))
@@ -74,6 +117,7 @@ function activate(
       if (!widget) {
         // Create a new widget if one does not exist
         const content = ReactWidget.create(<Debugger registry={registry} />);
+        content.addClass("scrollable");
         widget = new MainAreaWidget({ content });
         widget.id = "dataregistry-debugger";
         widget.title.label = "Data Debugger";

@@ -5,13 +5,7 @@
  * The use case is to be able to create converters in a type safe manner.
  */
 
-import {
-  Converter,
-  Convert,
-  Converts,
-  SingleConvert,
-  singleConverter
-} from "./converters";
+import { Converter } from "./converters";
 import {
   MimeType_,
   Dataset,
@@ -19,6 +13,8 @@ import {
   createDatasets,
   createDataset
 } from "./datasets";
+import { Observable } from "rxjs";
+import { CachedObservable } from "./utils";
 
 export const INVALID = Symbol("INVALID");
 
@@ -52,7 +48,7 @@ export abstract class DataType<T, U> {
   /**
    * Filer dataset for mimetypes of this type.
    */
-  filterDataset(dataset: Dataset): Map<T, U> {
+  filterDataset(dataset: Dataset<any>): Map<T, U> {
     const res = new Map<T, U>();
     for (const [mimeType, [, data]] of dataset) {
       const typeData_ = this.parseMimeType(mimeType);
@@ -62,62 +58,62 @@ export abstract class DataType<T, U> {
     }
     return res;
   }
+}
 
-  /**
-   * Creates a converter with a source of this data type.
-   *
-   * Your converter functions gets passed the type data associated
-   * with this data type.
-   */
-  createConverter<V>(
-    converter: (typeData: T, url: URL_) => Converts<U, V>
-  ): Converter<U, V> {
-    return (mimeType: MimeType_, url: URL_) => {
-      const typeData = this.parseMimeType(mimeType);
-      if (typeData === INVALID) {
-        return new Map();
-      }
-      return converter(typeData, url);
-    };
+/**
+ * Dummy mime type data type, that accepts any mimetype.
+ */
+class MimeTypeDataType<T> extends DataType<MimeType_, T> {
+  parseMimeType(mimeType: MimeType_): MimeType_ | typeof INVALID {
+    return mimeType;
   }
+  createMimeType(typeData: MimeType_): MimeType_ {
+    return typeData;
+  }
+}
 
-  createSingleConverter<V>(
-    converter: (typeData: T, url: URL_) => SingleConvert<U, V>
-  ): Converter<U, V> {
-    return singleConverter((mimeType: MimeType_, url: URL_) => {
-      const typeData = this.parseMimeType(mimeType);
-      if (typeData === INVALID) {
-        return null;
+/**
+ * Createa a new converter, assuming:
+ *
+ * * returns either a single value or nothing
+ * * Cost is one more than the input
+ * * if it returns an observable, we should cache this observable
+ */
+export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
+  {
+    from = new MimeTypeDataType<fromD>() as any,
+    to = new MimeTypeDataType<toD>() as any
+  }: {
+    from?: DataType<fromT, fromD>;
+    to?: DataType<toT, toD>;
+  },
+  fn: (_: {
+    data: fromD;
+    url: URL;
+    type: fromT;
+  }) => { data: toD; type: toT } | null
+): Converter<fromD, toD> {
+  return ({ url, mimeType, cost, data }) => {
+    const type = from.parseMimeType(mimeType);
+    if (type === INVALID) {
+      return [];
+    }
+    const res = fn({ url: new URL(url), data, type });
+    if (res === null) {
+      return [];
+    }
+    const { data: newData, type: newType } = res;
+    return [
+      {
+        data:
+          newData instanceof Observable
+            ? ((new CachedObservable(newData) as any) as toD)
+            : newData,
+        mimeType: to.createMimeType(newType),
+        cost: cost + 1
       }
-      return converter(typeData, url);
-    });
-  }
-
-  createTypedConverter<V, X>(
-    dest: DataType<V, X>,
-    converter: (typeData: T, url: URL_) => Map<V, Convert<U, X>>
-  ): Converter<U, X> {
-    return this.createConverter((typeData: T, url: URL_) => {
-      const res: Converts<U, X> = new Map();
-      for (const [resTypeData, convert] of converter(typeData, url)) {
-        res.set(dest.createMimeType(resTypeData), convert);
-      }
-      return res;
-    });
-  }
-  createSingleTypedConverter<V, X>(
-    dest: DataType<V, X>,
-    converter: (typeData: T, url: URL_) => null | [V, Convert<U, X>]
-  ): Converter<U, X> {
-    return this.createSingleConverter((typeData: T, url: URL_) => {
-      const newConverter = converter(typeData, url);
-      if (newConverter === null) {
-        return null;
-      }
-      const [resTypeData, convert] = newConverter;
-      return [dest.createMimeType(resTypeData), convert];
-    });
-  }
+    ];
+  };
 }
 
 export class DataTypeNoArgs<T> extends DataType<void, T> {
@@ -133,8 +129,10 @@ export class DataTypeNoArgs<T> extends DataType<void, T> {
     return this.mimeType;
   }
 
-  getDataset(d: Dataset): T {
-    return this.filterDataset(d).values().next().value;
+  getDataset(d: Dataset<any>): T {
+    return this.filterDataset(d)
+      .values()
+      .next().value;
   }
 }
 

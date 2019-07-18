@@ -15,10 +15,11 @@
   "author": "Project Jupyter",
   "files": [
     "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
-    "style/**/*.{css,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+    "style.css"
   ],
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
+  "style": "style.css",
   "directories": {
     "lib": "lib/"
   },
@@ -49,6 +50,7 @@
     "js-yaml": "3.12.2",
     "path": "0.12.7",
     "react": "16.8.4",
+    "react-inspector": "3.0.2",
     "rxjs": "6.5.2",
     "styled-components": "4.3.2"
   },

@@ -10,25 +10,25 @@ import {
 import { relative, dirname } from "path";
 import { INotebookTracker } from "@jupyterlab/notebook";
 
-import { map, first } from "rxjs/operators";
+import { first } from "rxjs/operators";
 import {
   DataTypeStringArg,
   fileDataType,
   URL_,
   URLDataType,
   TypedConverter,
+  createConverter,
   Registry
 } from "@jupyterlab/dataregistry";
 import { viewerDataType } from "./viewers";
 import { RegistryToken } from "./registry";
-import { Observable, BehaviorSubject } from "rxjs";
 
 type SnippetContext = {
   path: string;
 };
 
 export const snippedDataType = new DataTypeStringArg<
-  Observable<(context: SnippetContext) => string>
+  (context: SnippetContext) => Promise<string>
 >("application/x.jupyter.snippet", "label");
 
 export interface IFileSnippetConverterOptions {
@@ -45,19 +45,17 @@ export function fileSnippetConverter({
   typeof fileDataType,
   typeof snippedDataType
 > {
-  return fileDataType.createSingleTypedConverter(
-    snippedDataType,
-    innerMimeType => {
-      if (innerMimeType !== mimeType) {
+  return createConverter(
+    { from: fileDataType, to: snippedDataType },
+    ({ type, data }) => {
+      if (type !== mimeType) {
         return null;
       }
-      return [
-        label,
-        dataPath =>
-          new BehaviorSubject((context: SnippetContext) =>
-            createSnippet(relative(dirname(context.path), dataPath))
-          )
-      ];
+      return {
+        type: label,
+        data: async (context: SnippetContext) =>
+          createSnippet(relative(dirname(context.path), data))
+      };
     }
   );
 }
@@ -76,13 +74,16 @@ export function URLSnippetConverter({
   typeof URLDataType,
   typeof snippedDataType
 > {
-  return URLDataType.createSingleTypedConverter(
-    snippedDataType,
-    (innerMimeType: string) => {
-      if (innerMimeType !== mimeType) {
+  return createConverter(
+    { from: URLDataType, to: snippedDataType },
+    ({ type, data }) => {
+      if (type !== mimeType) {
         return null;
       }
-      return [label, map(url => () => createSnippet(url))];
+      return {
+        type: label,
+        data: async () => createSnippet(await data.pipe(first()).toPromise())
+      };
     }
   );
 }
@@ -96,31 +97,25 @@ export default {
     notebookTracker: INotebookTracker
   ) => {
     registry.addConverter(
-      snippedDataType.createSingleTypedConverter(viewerDataType, label => [
-        label,
-        data$ => () =>
-          data$
-            .pipe(first())
-            .toPromise()
-            .then(data =>
-              notebookTracker.activeCell.model.value.insert(
-                0,
-                data({
-                  path: notebookTracker.currentWidget!.context.path
-                })
-              )
+      createConverter(
+        { from: snippedDataType, to: viewerDataType },
+        ({ type, data }) => ({
+          type,
+          data: async () =>
+            notebookTracker.activeCell.model.value.insert(
+              0,
+              await data({
+                path: notebookTracker.currentWidget!.context.path
+              })
             )
-      ])
-    );
-    registry.addConverter(
+        })
+      ),
       fileSnippetConverter({
         mimeType: "text/csv",
         label: "Snippet",
         createSnippet: path =>
           `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(path)})\ndf`
-      })
-    );
-    registry.addConverter(
+      }),
       URLSnippetConverter({
         mimeType: "text/csv",
         label: "Snippet",

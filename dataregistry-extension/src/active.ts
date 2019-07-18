@@ -11,7 +11,13 @@ import {
 import { DocumentWidget } from "@jupyterlab/docregistry";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
-import { URL_, Registry, nestedDataType } from "@jupyterlab/dataregistry";
+import {
+  URL_,
+  Registry,
+  nestedDataType,
+  createConverter,
+  resolveDataType
+} from "@jupyterlab/dataregistry";
 import { hasURL_ } from "./widgets";
 import { Token } from "@phosphor/coreutils";
 import { RegistryToken } from "./registry";
@@ -42,11 +48,16 @@ function activate(
   const active = new BehaviorSubject<URL_ | null>(null);
 
   // Show active datasets in explorerr
-  registry.addDatasets(
-    nestedDataType.createDatasets(
-      ACTIVE_URL,
-      active.pipe(map(url => (url ? new Set([url]) : new Set())))
-    )
+  registry.addConverter(
+    createConverter({ from: resolveDataType }, ({ url }) => {
+      if (url.toString() !== ACTIVE_URL) {
+        return null;
+      }
+      return {
+        type: nestedDataType.createMimeType(),
+        data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
+      };
+    })
   );
 
   // Track active documents open.

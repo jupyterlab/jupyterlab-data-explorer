@@ -4,11 +4,14 @@
  * Then convert to known filetype, with URL on it.
  */
 import { URLDataType } from "./urls";
-import { DataTypeStringArg, TypedConverter } from "./datatypes";
+import {
+  DataTypeStringArg,
+  TypedConverter,
+  createConverter
+} from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { from } from "rxjs";
+import { defer } from "rxjs";
 import { URL_ } from "./datasets";
-import { shareReplay } from "rxjs/operators";
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(
@@ -24,14 +27,16 @@ export function createFileURL_(path: string): URL_ {
 /**
  * Creates a converter from a resolver mimetype to a file mimetype.
  */
-export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedConverter(
-  fileDataType,
-  (innerMimeType, url_) => {
-    const url = new URL(url_);
+export const resolveFileConverter = createConverter(
+  {
+    from: resolveMimetypeDataType,
+    to: fileDataType
+  },
+  ({ type, url }) => {
     if (url.protocol !== "file:") {
       return null;
     }
-    return [innerMimeType, () => url.pathname];
+    return { type, data: url.pathname };
   }
 );
 
@@ -41,12 +46,11 @@ export const resolveFileConverter = resolveMimetypeDataType.createSingleTypedCon
 export function fileURLConverter(
   getDownloadURL: (path: FilePath) => Promise<URL_>
 ): TypedConverter<typeof fileDataType, typeof URLDataType> {
-  return fileDataType.createSingleTypedConverter(URLDataType, mimeType => [
-    mimeType,
-    path =>
-      // todo replace with `defer` instead of `from`
-      from(getDownloadURL(path)).pipe(
-        shareReplay({ refCount: true, bufferSize: 1 })
-      )
-  ]);
+  return createConverter(
+    { from: fileDataType, to: URLDataType },
+    ({ type, data }) => ({
+      type,
+      data: defer(() => getDownloadURL(data))
+    })
+  );
 }

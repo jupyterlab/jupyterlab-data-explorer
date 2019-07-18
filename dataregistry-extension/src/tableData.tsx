@@ -4,7 +4,11 @@
 |----------------------------------------------------------------------------*/
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
-import { DataTypeNoArgs, Registry } from "@jupyterlab/dataregistry";
+import {
+  DataTypeNoArgs,
+  Registry,
+  createConverter
+} from "@jupyterlab/dataregistry";
 
 import NteractDataExplorer, { Props } from "@nteract/data-explorer";
 import * as React from "react";
@@ -27,12 +31,12 @@ export const TableDataType = new DataTypeNoArgs<Observable<Props["data"]>>(
  *
  * https://github.com/nteract/nteract/tree/master/packages/data-explorer
  */
-const nteractDataExplorerConverter = TableDataType.createSingleTypedConverter(
-  reactDataType,
-  () => [
-    "nteract Data Explorer",
-    data$ => (
-      <UseObservable observable={data$} initial={undefined}>
+const nteractDataExplorerConverter = createConverter(
+  { from: TableDataType, to: reactDataType },
+  ({ data }) => ({
+    type: "nteract Data Explorer",
+    data: (
+      <UseObservable observable={data} initial={undefined}>
         {data =>
           data ? (
             <NteractDataExplorer
@@ -47,7 +51,7 @@ const nteractDataExplorerConverter = TableDataType.createSingleTypedConverter(
         }
       </UseObservable>
     )
-  ]
+  })
 );
 
 export default {

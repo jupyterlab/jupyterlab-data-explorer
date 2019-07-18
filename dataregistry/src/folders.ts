@@ -1,10 +1,10 @@
-import { DataTypeNoArgs, TypedConverter } from "./datatypes";
+import { DataTypeNoArgs, TypedConverter, createConverter } from "./datatypes";
 import { nestedDataType } from "./nested";
 
-import { map, shareReplay } from "rxjs/operators";
+import { map } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
-import { from, Observable } from "rxjs";
-import {join} from 'path';
+import { Observable, defer } from "rxjs";
+import { join } from "path";
 /**
  * A folder is a list paths in it as strings
  */
@@ -19,39 +19,33 @@ export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
 export function createFolderConverter(
   folderContents: (path: string) => Promise<Set<string>>
 ): TypedConverter<typeof resolveDataType, typeof folderDataType> {
-  return resolveDataType.createSingleTypedConverter(
-    folderDataType,
-    (_, url) => {
-      const url_ = new URL(url);
-      return url_.protocol === "file:" && url_.pathname.endsWith("/")
-        ? [
-            ,
-            () =>
-              from(folderContents(url_.pathname)).pipe(
-                shareReplay({ bufferSize: 1, refCount: true })
-              )
-          ]
+  return createConverter(
+    { from: resolveDataType, to: folderDataType },
+    ({ url }) => {
+      return url.protocol === "file:" && url.pathname.endsWith("/")
+        ? { data: defer(() => folderContents(url.pathname)), type: undefined }
         : null;
     }
   );
 }
-
 /**
  * Convert from a folder of a list of paths to a nested datasets of those urls.
  */
-export const folderDatasetsConverter = folderDataType.createSingleTypedConverter(
-  nestedDataType,
-  (_, url) => [
-    ,
-    map(
-      paths =>
-        new Set(
-          [...paths].map(path => {
-            const u = new URL(url);
-            u.pathname = join(u.pathname, path);
-            return u.toString();
-          })
-        )
+export const folderDatasetsConverter = createConverter(
+  { from: folderDataType, to: nestedDataType },
+  ({ url, data }) => ({
+    type: undefined,
+    data: data.pipe(
+      map(
+        paths =>
+          new Set(
+            [...paths].map(path => {
+              const u = new URL(url.toString());
+              u.pathname = join(u.pathname, path);
+              return u.toString();
+            })
+          )
+      )
     )
-  ]
+  })
 );

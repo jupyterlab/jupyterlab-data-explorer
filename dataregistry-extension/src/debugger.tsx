@@ -9,7 +9,7 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
-import { Inspector } from "react-inspector";
+// import { Inspector } from "react-inspector";
 import {
   ReactWidget,
   ICommandPalette,
@@ -24,15 +24,35 @@ import { UseBehaviorSubject } from "./utils";
 
 const id = "@jupyterlab/dataregistry-extension:data-debugger";
 
+class ErrorBoundary extends React.Component<any, any> {
+  constructor(props: any) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: any) {
+    // Update state so the next render will show the fallback UI.
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      // You can render any custom fallback UI
+      return <h1>Something went wrong.</h1>;
+    }
+
+    return this.props.children;
+  }
+}
 function Data({ data }: { data: unknown }) {
   if (data instanceof CachedObservable) {
     return (
-      <UseBehaviorSubject subject={data.value}>
-        {data_ => <Inspector data={data_} />}
+      <UseBehaviorSubject subject={data.state}>
+        {data_ => <pre>{String(data_)}</pre>}
       </UseBehaviorSubject>
     );
   }
-  return <Inspector data={data} />;
+  return <pre>{String(data)}</pre>;
 }
 
 function Debugger({ registry }: { registry: Registry }) {
@@ -49,7 +69,9 @@ function Debugger({ registry }: { registry: Registry }) {
                     ([mimeType, [cost, data]]) => (
                       <li key={mimeType}>
                         <code>{mimeType}</code>
-                        <Data data={data} />
+                        <ErrorBoundary>
+                          <Data data={data} />
+                        </ErrorBoundary>
                       </li>
                     )
                   )}
@@ -89,6 +111,7 @@ function activate(
       if (!widget) {
         // Create a new widget if one does not exist
         const content = ReactWidget.create(<Debugger registry={registry} />);
+        content.addClass("scrollable");
         widget = new MainAreaWidget({ content });
         widget.id = "dataregistry-debugger";
         widget.title.label = "Data Debugger";

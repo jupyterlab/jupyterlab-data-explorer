@@ -58,6 +58,9 @@ made up the `application/x.jupyter.resolve` mime type for this. All datasets sta
 You can either add support in this repo or by creating a new JupyterLab extension
 that depends on the `RegistryToken` exposed by this extension. You can access a `Registry`, which you can use to add your own converter. 
 
+It might also be useful to view the existing data types, by looking at the source code in this repo and by using the debugger. You can open this in JupyterLab by looking for the "Data Debugger" command:
+
+![](./images/debugger.png)
 
 ### Develop on this repo:
 

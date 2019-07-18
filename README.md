@@ -16,24 +16,23 @@
 
 ## Core concepts
 
-The data registry is a global collection of datasets. Each dataset is conceptually a tuple of `(URL, MimeType, cost, data)`, however we store
+The data registry is a global collection of datasets. Each dataset is conceptually a tuple of `(URL, MimeType, cost, data)`, however, we store
 them in nested maps of `Map<URL, Map<MimeType, [cost, data]>>` so that for every unique pair of URL and MimeType we only have one dataset ([`./dataregistry/src/datasets.ts`](./dataregistry/src/datasets.ts)).
 
-A "converter" takes in a dataset and returns a number of
-other datasets that all have the same URL. We can apply a converter to a number of datasets
-all with the same URL by viewing this is a graph exploration problem. There is one node per Mime Type and we can [fill in the graph](https://en.wikipedia.org/wiki/Dijkstra's_algorithm) to add every reachable mimtype with the lowest cost ([`./dataregistry/src/converters.ts`](./dataregistry/src/converters.ts)). 
+A "converter" takes in a dataset and returns several
+other datasets that all have the same URL. We can apply a converter to a certain URL  by viewing it as a graph exploration problem. There is one node per Mime Type and we can [fill in the graph](https://en.wikipedia.org/wiki/Dijkstra's_algorithm) to add every reachable mime type with the lowest cost ([`./dataregistry/src/converters.ts`](./dataregistry/src/converters.ts)). 
 
 Conceptually, each Mime Type should correspond to some defined runtime type of data. For example `text/csv` corresponds to an `Observable<string>` which is the contents of CSV file. We need to be able to agree about these definitions so that if create
-a converter to produce a `text/csv` mime type and you create one that takes in that mime type and creates some visualization, we know we are dealing with the same type. A "data type" helps us here because we map a set of mime types to a TypeScript type. For example, we could define the CSV mimetype as `new DataTypeNoArgs<Observable<string>>("text/csv")`. We provide a way
+a converter to produce a `text/csv` mime type and you create one that takes in that mime type and creates some visualization, we know we are dealing with the same type. A "data type" helps us here because we map a set of mime types to a TypeScript type. For example, we could define the CSV mime type as `new DataTypeNoArgs<Observable<string>>("text/csv")`. We provide a way
 to create a converter from one data type to another, which is `createConverter`. Data types abstract away the textual representation of the mime type from the consumer of a data type and provide a type safe way to convert to or from that data type. All of our core conversions use this typed API ([`./dataregistry/src/datatypes.ts`](./dataregistry/src/datatypes.ts)):
 
 * [`resolveDataType`](./dataregistry/src/resolvers.ts) `void`: Every URL starts with this data type when you ask for it. It has no actual data in it, so when you write a converter from it you will use the URL.
-* [`nestedDataType`](./dataregistry/src/nested.ts) `Observable<Set<URL_>>`: This specifies the URLs that are "nested" under a URL. Use this if your dataset has some sense of children, like a folder has a number of files in it or a database has a number of tables. These are exposed in the data explorer as the children in the hierarchy.
+* [`nestedDataType`](./dataregistry/src/nested.ts) `Observable<Set<URL_>>`: This specifies the URLs that are "nested" under a URL. Use this if your dataset has some sense of children like a folder has a number of files in it or a database has a number of tables. These are exposed in the data explorer as the children in the hierarchy.
 * [`viewerDataType`](./dataregistry-extension/src/viewers.ts) `() => void`: This is a function you can call to "view" that
 dataset in some way. It has a parameter as well, the "label", which is included in the mime type as an argument. This is exposed in the explorer as a button on the dataset.
 
 <!-- 
-So conceptually, we can see a number of datasets as a number of graphs, one for each URL. Adding a new converter can expand the possible Mime Types for each URL. In the registry we can either register a new converter, get all the mimetypes for an existing URL, or retrieve the list of current URLs that are registered ([`./dataregistry/src/registry.ts`])(./dataregistry/src/registry.ts)). 
+So conceptually, we can see a number of datasets as a number of graphs, one for each URL. Adding a new converter can expand the possible Mime Types for each URL. In the registry we can either register a new converter, get all the mime types for an existing URL, or retrieve the list of current URLs that are registered ([`./dataregistry/src/registry.ts`])(./dataregistry/src/registry.ts)). 
 
 
 
@@ -47,7 +46,7 @@ made up the `application/x.jupyter.resolve` mime type for this. All datasets sta
 1. Install JupyterLab >= 1.0
 2. `jupyter labextension install @jupyterlab/dataregistry`
 3. Browse available datasets in the data explorer left side pane. We include support for viewing a few datasets. We plan on expanding this list
-   and any other extension can add their own support for their own datatypes:
+   and third party extension can extend it:
   1. Opening CSV files in the data grid and adding a snippet to open them with Pandas
   2. Opening PNG images in an image viewer
   3. Opening table data outputted in a notebook with [`nteract`'s data explorer](https://github.com/nteract/nteract/tree/master/packages/data-explorer)
@@ -57,7 +56,7 @@ made up the `application/x.jupyter.resolve` mime type for this. All datasets sta
 ### Support a new data type or conversion:
 
 You can either add support in this repo or by creating a new JupyterLab extension
-that depends on the `RegistryToken` exposed by this extension. You can access to a `Registry`, which you can use to add your own converter. 
+that depends on the `RegistryToken` exposed by this extension. You can access a `Registry`, which you can use to add your own converter. 
 
 
 ### Develop on this repo:

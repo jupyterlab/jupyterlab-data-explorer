@@ -32,11 +32,6 @@ export function mapValues<K, V, VP>(
   return res;
 }
 
-type ObservableValue<T> =
-  | { next: T }
-  | { error: any }
-  | typeof COMPLETE
-  | typeof NO_VALUE;
 /**
  * Implements an observables set. Allows user to imperatively add or remove items and access an observable of the resulting set.
  */
@@ -71,8 +66,21 @@ export class ObservableSet<T> {
   }
 }
 
-export const NO_VALUE = Symbol("NO_VALUE");
+export const NOT_SUBSCRIBED = Symbol("NOT_SUBSCRIBED");
 export const COMPLETE = Symbol("COMPLETE");
+export const NO_VALUE = Symbol("NO_VALUE");
+export const NOT_FINAL = Symbol("NOT_FINAL");
+
+/**
+ * We want to capture the last emitted value and whether the observable is finalized yet.
+ */
+type ObservableState<T> =
+  | {
+      subscription: Subscription;
+      value: T | typeof NO_VALUE;
+      final: { error: any } | typeof COMPLETE | typeof NOT_FINAL;
+    }
+  | typeof NOT_SUBSCRIBED;
 
 /**
  * `CachedObservable` is a refcounted observable that maintains a maximum of one subscription to its source.
@@ -85,35 +93,57 @@ export class CachedObservable<T> extends Observable<T> {
   constructor(from: Observable<T>) {
     super(subscriber => {
       this._subscribers.add(subscriber);
-      if (!this._subscription) {
-        this._subscription = from.subscribe({
-          next: v => {
-            this.value.next({ next: v });
-            this._subscribers.forEach(s => s.next(v));
-          },
-          error: e => {
-            this.value.next({ error: e });
-            this._subscribers.forEach(s => s.error(e));
-          },
-          complete: () => {
-            this.value.next(COMPLETE);
-            this._subscribers.forEach(s => s.complete());
-          }
-        });
-      }
+      const state = this.state.value;
+      if (state == NOT_SUBSCRIBED) {
+        this.state.next({
+          final: NOT_FINAL,
+          value: NO_VALUE,
+          subscription: from.subscribe(
+            v => this._setState({ value: v }),
+            e => this._setState({ final: { error: e } }),
+            () => this._setState({ final: COMPLETE })
+          )
+        })
+      } else {
+        if (state.value !== NO_VALUE) {
+          subscriber.next(state.value)
+        }
+        if (state.final === COMPLETE) {
+          subscriber.complete()
+        } else if (state.final !== NOT_FINAL) {
+          subscriber.error(state.final.error)
+        }
+      };
       return () => {
         // delete subscriber on cleanup and unsubscribe from parent
         // if there are no others left.
         this._subscribers.delete(subscriber);
-        if (this._subscribers.size === 0) {
-          this._subscription!.unsubscribe();
-          this._subscription = null;
+        const currentState = this.state.value;
+        if (this._subscribers.size === 0 && currentState !== NOT_SUBSCRIBED) {
+          currentState.subscription.unsubscribe();
+          this.state.next(NOT_SUBSCRIBED);
         }
       };
     });
   }
 
-  public value = new BehaviorSubject<ObservableValue<T>>(NO_VALUE);
+  private _setState(
+    newState: { value: T } | { final: { error: any } | typeof COMPLETE }
+  ) {
+    const state = this.state.value;
+    if (state === NOT_SUBSCRIBED) {
+      throw "Should have subscription";
+    }
+    this.state.next({ ...state, ...newState });
+    this._subscribers.forEach(s =>
+      "value" in newState
+        ? s.next(newState.value)
+        : newState.final === COMPLETE
+        ? s.complete()
+        : s.error(newState.final.error)
+    );
+  }
+
+  public state = new BehaviorSubject<ObservableState<T>>(NOT_SUBSCRIBED);
   private _subscribers: Set<Subscriber<T>> = new Set();
-  private _subscription: Subscription | null = null;
 }

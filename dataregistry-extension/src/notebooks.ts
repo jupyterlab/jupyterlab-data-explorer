@@ -220,10 +220,7 @@ function createOutputConverter(
 
       const data = defer(() =>
         outputsDataType.getDataset(registry.getURL(cellURL)).pipe(
-          map(outputs => {
-            console.log(outputs, outputID);
-            return outputs[outputID].data;
-          })
+          map(outputs => outputs[outputID].data)
         )
       );
       return { data, type: undefined };

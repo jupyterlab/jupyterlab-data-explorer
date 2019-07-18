@@ -92,19 +92,19 @@ const INITIAL_STATE: ObservableState<any> = {
  * If at any time, it has no subscribers, it will unsubscribe from its source.
  *
  * Why use this over the `refCount` operator? Well we store the last value on the object for easier debugging and introspection.
- * 
+ *
  * States:
  *  1. Not subscribed yet
  *  2. Subscribed and waiting for final state
  *  3. In final state, unsubscribed
- * 
+ *
  * New subscriber:
  * 1. If in state 1, then subscribe, move to state 2
  * 2. if in state 2 or 3, return last value if it exists and final state, if it exists
- * 
+ *
  * Unsubscribe:
  * 1. Should never be in state one when unsubscribing
- * 2. if this is last subscription, unsubscribe from parent  
+ * 2. if this is last subscription, unsubscribe from parent
  */
 export class CachedObservable<T> extends Observable<T> {
   constructor(from: Observable<T>) {
@@ -148,7 +148,14 @@ export class CachedObservable<T> extends Observable<T> {
           currentState.subscription !== NOT_SUBSCRIBED
         ) {
           currentState.subscription.unsubscribe();
-          this._setState({subscription: NOT_SUBSCRIBED});
+
+          // If we haven't finished yet, reset the value and subscription
+          if (currentState.final === NOT_FINAL) {
+            this._setState({ subscription: NOT_SUBSCRIBED, value: NO_VALUE });
+          } else {
+            // Otherwise, just reset the subscription, keeping the the last value and final status
+            this._setState({ subscription: NOT_SUBSCRIBED });
+          }
         }
       };
     });

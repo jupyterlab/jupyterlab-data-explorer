@@ -9,7 +9,13 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
-// import { Inspector } from "react-inspector";
+// Need to set global regenerator runtime, since react-inspector
+// is built with it.
+const regeneratorRuntime = require("regenerator-runtime");
+
+(window as any).regeneratorRuntime = regeneratorRuntime;
+
+import { Inspector } from "react-inspector";
 import {
   ReactWidget,
   ICommandPalette,
@@ -48,11 +54,11 @@ function Data({ data }: { data: unknown }) {
   if (data instanceof CachedObservable) {
     return (
       <UseBehaviorSubject subject={data.state}>
-        {data_ => <pre>{String(data_)}</pre>}
+        {data_ => <Inspector data={data_} />}
       </UseBehaviorSubject>
     );
   }
-  return <pre>{String(data)}</pre>;
+  return <Inspector data={data} />;
 }
 
 function Debugger({ registry }: { registry: Registry }) {

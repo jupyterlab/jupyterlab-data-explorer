@@ -16,9 +16,6 @@
  * We store a collection of datasets ([[Datasets]]) in a map of maps: `{url: {MimeType: [Cost, Data]}}` which preserves
  * the url/MimeType uniqueness and allows fast access to see what all the mimetypes are for a dataset.
  *
- * We use the cost to be able to implement a [[mergeDatasets]] function which takes two collections
- * of datasets and merges them, by choosing the data with lower costs, for duplicate url/mimetype pairs.
- *
  * ## Observables
  *
  * This would work great if we could hold all of our datasets at once and they will never change. However,
@@ -51,21 +48,6 @@ export type Dataset<T> = Map<MimeType_, DataValue<T>>;
 
 export type Datasets<T> = Map<URL_, Dataset<T>>;
 
-/**
- * Merges datasets, choosing the data with lower cost if there are conflicts.
- */
-export function mergeDataset<T>(...datasets: Array<Dataset<T>>): Dataset<T> {
-  const merged: Dataset<T> = new Map();
-  for (const dataset of datasets) {
-    for (const [mimeType, newValue] of dataset) {
-      const oldValue = merged.get(mimeType);
-      if (!oldValue || newValue[0] < oldValue[0]) {
-        merged.set(mimeType, newValue);
-      }
-    }
-  }
-  return merged;
-}
 
 export function createDataset<T>(mimeType: MimeType_, data: T): Dataset<T> {
   return new Map([[mimeType, [0, data]]]);

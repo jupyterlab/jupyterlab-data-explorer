@@ -2,8 +2,4 @@
 set -o errexit
 set -o xtrace
 
-yarn
-yarn run build
-
-jupyter labextension link ./dataregistry --no-build
-jupyter labextension link ./dataregistry-extension
+jlpm build:dev

@@ -20,12 +20,32 @@
  */
 
 import { URL_ } from "./datasets";
-import { DataTypeNoArgs } from "./datatypes";
+import { DataTypeNoArgs, createConverter } from "./datatypes";
 import { Observable } from "rxjs";
+import { map } from "rxjs/operators";
+
+/**
+ * a list of relative URLs to resolve against the current URL.
+ *
+ * Uses an array instead of a set and ends in +json for notebook mimetype compatability
+ */
+export const relativeNestedDataType = new DataTypeNoArgs<
+  Observable<Array<string>>
+>("application/x.jupyter.relative-dataset-urls+json");
 
 /**
  * A nested data type has datasets inside of it.
  */
 export const nestedDataType = new DataTypeNoArgs<Observable<Set<URL_>>>(
   "application/x.jupyter.dataset-urls"
+);
+
+export const relativeNestedURLConverter = createConverter(
+  { from: relativeNestedDataType, to: nestedDataType },
+  ({ data, url }) => ({
+    type: undefined,
+    data: data.pipe(
+      map(relURLs => new Set(relURLs.map(relURL => new URL(relURL, url).href)))
+    )
+  })
 );

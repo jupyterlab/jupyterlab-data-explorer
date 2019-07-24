@@ -17,7 +17,7 @@ import { Context } from "@jupyterlab/docregistry";
 import { INotebookModel } from "@jupyterlab/notebook";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { defer, from, Observable } from "rxjs";
+import { defer, from, Observable, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import {
   observableListToObservable,
@@ -169,7 +169,7 @@ const cellToOutputs = createConverter(
         if (isCodeCellModel(cellModel)) {
           return outputAreaModelToObservable(cellModel.outputs);
         }
-        return from([]);
+        return of([]);
       })
     )
   })

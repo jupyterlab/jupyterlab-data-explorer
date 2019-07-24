@@ -4,24 +4,24 @@
 |----------------------------------------------------------------------------*/
 
 import {
+  ILabShell,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
-  ILabShell
+  JupyterFrontEndPlugin
 } from "@jupyterlab/application";
-import { DocumentWidget } from "@jupyterlab/docregistry";
+import {
+  createConverter,
+  nestedDataType,
+  Registry,
+  resolveDataType,
+  URL_
+} from "@jupyterlab/dataregistry";
+import { IDocumentManager } from "@jupyterlab/docmanager";
+import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
-import {
-  URL_,
-  Registry,
-  nestedDataType,
-  createConverter,
-  resolveDataType
-} from "@jupyterlab/dataregistry";
-import { hasURL_ } from "./widgets";
-import { Token } from "@phosphor/coreutils";
-import { RegistryToken } from "./registry";
 import { map } from "rxjs/operators";
+import { RegistryToken } from "./registry";
+import { hasURL_ } from "./widgets";
 
 export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
 export const IActiveDataset = new Token<IActiveDataset>(
@@ -35,7 +35,7 @@ export const ACTIVE_URL = new URL("active:").toString();
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:active-dataset",
-  requires: [ILabShell, RegistryToken],
+  requires: [ILabShell, RegistryToken, IDocumentManager],
   provides: IActiveDataset,
   autoStart: true
 } as JupyterFrontEndPlugin<IActiveDataset>;
@@ -43,7 +43,8 @@ export default {
 function activate(
   app: JupyterFrontEnd,
   labShell: ILabShell,
-  registry: Registry
+  registry: Registry,
+  docManager: IDocumentManager
 ): IActiveDataset {
   const active = new BehaviorSubject<URL_ | null>(null);
 
@@ -62,24 +63,24 @@ function activate(
 
   // Track active documents open.
   labShell.currentChanged.connect((sender, args) => {
-    active.next(getURL_(args.newValue));
+    active.next(getURL_(docManager, args.newValue));
   });
   return active;
 }
 
-function getURL_(widget: Widget | null): URL_ | null {
+function getURL_(
+  docManager: IDocumentManager,
+  widget: Widget | null
+): URL_ | null {
   if (widget === null) {
     return null;
   }
-  if (isDocumentWidget(widget)) {
-    return new URL(`file://${widget.context.session.path}`).toString();
+  const context = docManager.contextForWidget(widget);
+  if (context) {
+    return new URL(context.session.path, "file:").toString();
   }
   if (hasURL_(widget)) {
     return widget.url;
   }
   return null;
-}
-
-function isDocumentWidget(widget: Widget): widget is DocumentWidget {
-  return (widget as DocumentWidget).context !== undefined;
 }

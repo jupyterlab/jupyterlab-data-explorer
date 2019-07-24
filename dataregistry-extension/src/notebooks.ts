@@ -17,8 +17,8 @@ import { Context } from "@jupyterlab/docregistry";
 import { INotebookModel } from "@jupyterlab/notebook";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { defer, from, Observable } from "rxjs";
-import { map, shareReplay, switchMap } from "rxjs/operators";
+import { defer, Observable, of } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import {
   observableListToObservable,
   outputAreaModelToObservable
@@ -169,7 +169,7 @@ const cellToOutputs = createConverter(
         if (isCodeCellModel(cellModel)) {
           return outputAreaModelToObservable(cellModel.outputs);
         }
-        return from([]);
+        return of([]);
       })
     )
   })
@@ -219,9 +219,9 @@ function createOutputConverter(
       const cellURL = url.toString();
 
       const data = defer(() =>
-        outputsDataType.getDataset(registry.getURL(cellURL)).pipe(
-          map(outputs => outputs[outputID].data)
-        )
+        outputsDataType
+          .getDataset(registry.getURL(cellURL))
+          .pipe(map(outputs => outputs[outputID].data))
       );
       return { data, type: undefined };
     }
@@ -263,7 +263,7 @@ function createMimeDataConverter(
   return createConverter(
     { from: resolveDataType, to: mimeDataDataType },
     ({ url }) => {
-      const result = url.hash.match(
+      const result = decodeURIComponent(url.hash).match(
         /^[#]([/]cells[/]\d+[/]outputs[/]\d+)[/]data[/](.*)$/
       );
       if (
@@ -280,10 +280,9 @@ function createMimeDataConverter(
       const outputURL = url.toString();
 
       const data = defer(() =>
-        mimeBundleDataType.getDataset(registry.getURL(outputURL)).pipe(
-          map(mimeBundle => mimeBundle[type]),
-          shareReplay({ refCount: true, bufferSize: 1 })
-        )
+        mimeBundleDataType
+          .getDataset(registry.getURL(outputURL))
+          .pipe(map(mimeBundle => mimeBundle[type]))
       );
       return { type, data };
     }

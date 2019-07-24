@@ -5,7 +5,7 @@
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import { Token } from "@phosphor/coreutils";
-import { Registry } from "@jupyterlab/dataregistry";
+import { Registry, relativeNestedURLConverter } from "@jupyterlab/dataregistry";
 export const RegistryToken = new Token<Registry>(
   "@jupyterlab/dataregistry:Registry"
 );
@@ -22,5 +22,7 @@ export default {
 } as JupyterFrontEndPlugin<Registry>;
 
 function activate(): Registry {
-  return new Registry();
+  const r = new Registry();
+  r.addConverter(relativeNestedURLConverter);
+  return r;
 }

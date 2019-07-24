@@ -1,4 +1,4 @@
-import { from, Observable, throwError } from "rxjs";
+import { from, Observable, throwError, of } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { distinct, switchMap } from "rxjs/operators";
 import { URL_ } from "./datasets";
@@ -23,7 +23,7 @@ export const resolverURLConverter = createConverter(
     const isHTTP = url.protocol === "http:";
     const isHTTPS = url.protocol === "https:";
     if (isHTTP || isHTTPS) {
-      return { type, data: from(url.toString()) };
+      return { type, data: of(url.toString()) };
     }
     return null;
   }
@@ -43,6 +43,7 @@ export const URLStringConverter = createConverter<
       if (r.ok) {
         return from(r.text());
       } else {
+        console.warn(r);
         return throwError(new Error(`Bad response ${r}`));
       }
     })

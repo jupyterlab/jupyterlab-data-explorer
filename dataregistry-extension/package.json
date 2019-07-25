@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "0.7.1",
+  "version": "1.0.0",
   "description": "Exposes the dataregistry to JupyterLab.",
   "keywords": [
     "jupyter",
@@ -59,7 +59,7 @@
     "typescript": "3.5.1"
   },
   "peerDependencies": {
-    "@jupyterlab/dataregistry": "0.7.1"
+    "@jupyterlab/dataregistry": "1.0.0"
   },
   "publishConfig": {
     "access": "public"

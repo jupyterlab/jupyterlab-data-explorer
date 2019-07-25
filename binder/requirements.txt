@@ -1,1 +1,2 @@
 pandas
+jupyterlab>=1.0

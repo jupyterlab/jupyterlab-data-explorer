@@ -132,7 +132,7 @@ class Collapsable extends React.Component<
   }
 }
 
-function DatasetCompononent({
+export function DatasetCompononent({
   url,
   parentURL,
   active$,

@@ -17,6 +17,7 @@ import tableDataPlugin from "./tableData";
 import foldersPlugin from "./folders";
 import notebooksPlugin from "./notebooks";
 import debuggerPlugin from "./debugger";
+import rendermimePlugin from "./rendermime";
 export default [
   activePlugin,
   csvViewerPlugin,
@@ -29,5 +30,6 @@ export default [
   tableDataPlugin,
   foldersPlugin,
   notebooksPlugin,
-  debuggerPlugin
+  debuggerPlugin,
+  rendermimePlugin
 ] as JupyterFrontEndPlugin<any>[];

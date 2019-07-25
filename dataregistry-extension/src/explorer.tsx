@@ -10,7 +10,6 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
-import { Classes } from "@blueprintjs/core";
 import { ReactWidget } from "@jupyterlab/apputils";
 
 import { Token } from "@phosphor/coreutils";
@@ -264,14 +263,14 @@ function Heading({
       }}
     >
       Datasets
-      <input
+      {/* <input
         type="text"
         placeholder="Search..."
         style={{ marginLeft: 12 }}
         className={classes(Classes.INPUT, Classes.SMALL)}
         value={search}
         onChange={event => onSearch(event.target.value)}
-      />
+      /> */}
     </h2>
   );
 }

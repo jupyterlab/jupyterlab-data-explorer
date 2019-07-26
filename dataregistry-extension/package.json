@@ -52,6 +52,7 @@
     "path": "0.12.7",
     "react": "16.8.4",
     "react-inspector": "3.0.2",
+    "regenerator-runtime": "0.13.3",
     "rxjs": "6.5.2",
     "styled-components": "4.3.2"
   },

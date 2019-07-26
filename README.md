@@ -1,8 +1,8 @@
-# JupyterLab Data Explorer
+# JupyterLab Data Explorer [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/a4ae231f6e1c52b5aee1dd7fad4985722d863456?urlpath=lab/tree/notebooks/Table.ipynb) [![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry-extension?label=%40jupyterlab%2Fdataregistry-extension&style=flat)](https://www.npmjs.com/package/@jupyterlab/dataregistry-extension) [![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry?label=%40jupyterlab%2Fdataregistry&style=flat)](https://www.npmjs.com/package/@jupyterlab/dataregistry)
 
-[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/a4ae231f6e1c52b5aee1dd7fad4985722d863456?urlpath=lab/tree/notebooks/Table.ipynb) 
-
-![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry-extension?label=%40jupyterlab%2Fdataregistry-extension&style=flat-square) ![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry?label=%40jupyterlab%2Fdataregistry&style=flat-square)
+```bash
+jupyter labextension install @jupyterlab/dataregistry-extension
+```
 
 * Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 * Register **conversions** between the different data types.
@@ -16,9 +16,6 @@
 ![](https://user-images.githubusercontent.com/1186124/59360085-85becf80-8cfd-11e9-8fc8-98d8a7b83934.png)
 
 
-```bash
-jupyter labextension install @jupyterlab/dataregistry-extension
-```
 
 ## Core concepts
 

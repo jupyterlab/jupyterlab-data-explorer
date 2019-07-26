@@ -16,7 +16,7 @@ import { IActiveDataset } from "./active";
 import { IRenderMimeRegistry, IRenderMime } from "@jupyterlab/rendermime";
 import { ReactWidget } from "@jupyterlab/apputils";
 import { RegistryToken } from "./registry";
-import React from "react";
+import * as React from "react";
 import { OutputArea } from "@jupyterlab/outputarea";
 import { PanelLayout, Panel } from "@phosphor/widgets";
 import { CodeCell } from "@jupyterlab/cells";

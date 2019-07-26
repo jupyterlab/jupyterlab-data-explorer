@@ -4152,10 +4152,10 @@ react-hot-loader@^4.1.2:
     shallowequal "^1.0.2"
     source-map "^0.7.3"
 
-react-inspector@3.0.2:
-  version "3.0.2"
-  resolved "https://registry.yarnpkg.com/react-inspector/-/react-inspector-3.0.2.tgz#c530a06101f562475537e47df428e1d7aff16ed8"
-  integrity sha512-PSR8xDoGFN8R3LKmq1NT+hBBwhxjd9Qwz8yKY+5NXY/CHpxXHm01CVabxzI7zFwFav/M3JoC/Z0Ro2kSX6Ef2Q==
+react-inspector@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-inspector/-/react-inspector-3.0.0.tgz#e9a6bf1195d02e5b76d9eaf260b1ce6ba23d46df"
+  integrity sha512-nKXmnRhotT+DGkif5Q877CmIiSJmHpquAMRmCYhZ5E8qX4RSB9W0LcHu0tGNJNJRX1KDsHsM2AkCje2fYkNSfg==
   dependencies:
     babel-runtime "^6.26.0"
     is-dom "^1.0.9"
@@ -4280,11 +4280,6 @@ realpath-native@^1.1.0:
   integrity sha512-wlgPA6cCIIg9gKz0fgAPjnzh4yR/LnXovwuo9hvyGvx3h8nX4+/iLZplfUWasXpqD8BdnGnP5njOFjkUwPzvjA==
   dependencies:
     util.promisify "^1.0.0"
-
-regenerator-runtime@0.13.3:
-  version "0.13.3"
-  resolved "https://registry.yarnpkg.com/regenerator-runtime/-/regenerator-runtime-0.13.3.tgz#7cf6a77d8f5c6f60eb73c5fc1955b2ceb01e6bf5"
-  integrity sha512-naKIZz2GQ8JWh///G7L3X6LaQUAMp2lvb1rvwwsURe/VXwD6VMfr+/1NuNw3ag8v2kY1aQ/go5SNn79O9JU7yw==
 
 regenerator-runtime@^0.11.0:
   version "0.11.1"

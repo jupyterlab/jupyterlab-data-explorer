@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Datasets as first class entities in Juptyerlab.",
   "keywords": [
     "jupyter",
@@ -51,8 +51,7 @@
     "js-yaml": "3.13.1",
     "path": "0.12.7",
     "react": "16.8.4",
-    "react-inspector": "3.0.2",
-    "regenerator-runtime": "0.13.3",
+    "react-inspector": "3.0.0",
     "rxjs": "6.5.2",
     "styled-components": "4.3.2"
   },

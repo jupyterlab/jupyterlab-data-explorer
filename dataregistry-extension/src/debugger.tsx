@@ -9,12 +9,6 @@ import {
   ILayoutRestorer
 } from "@jupyterlab/application";
 
-// Need to set global regenerator runtime, since react-inspector
-// is built with it.
-const regeneratorRuntime = require("regenerator-runtime");
-
-(window as any).regeneratorRuntime = regeneratorRuntime;
-
 import { Inspector } from "react-inspector";
 import {
   ReactWidget,

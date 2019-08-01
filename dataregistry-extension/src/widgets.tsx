@@ -29,7 +29,7 @@ import { RegistryToken } from "./registry";
 const tracker = new WidgetTracker({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
 
-export const widgetDataType = new DataTypeStringArg<Widget>(
+export const widgetDataType = new DataTypeStringArg<() => Widget>(
   "application/x.jupyter.widget",
   "label"
 );
@@ -63,7 +63,7 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
   url: URL_;
 }
 
-const wrappedWidgetDataType = new DataTypeStringArg<DataWidget>(
+const wrappedWidgetDataType = new DataTypeStringArg<() => DataWidget>(
   "application/x.jupyter.wrapped-widget",
   "label"
 );
@@ -94,25 +94,27 @@ function activate(
       { from: widgetDataType, to: wrappedWidgetDataType },
       ({ type, url, data }) => ({
         type,
-        data: new DataWidget(data, url.toString(), type)
+        data: () => new DataWidget(data(), url.toString(), type)
       })
     ),
     createConverter(
       { from: reactDataType, to: widgetDataType },
-      ({ data, type }) => ({ type, data: ReactWidget.create(data) })
+      ({ data, type }) => ({ type, data: () => ReactWidget.create(data) })
     ),
     createConverter(
       { from: wrappedWidgetDataType, to: viewerDataType },
       ({ data, type }) => ({
         type,
         data: () => {
-          if (!tracker.has(data)) {
-            tracker.add(data);
+          const widget = data()
+          if (!tracker.has(widget)) {
+            tracker.add(widget);
           }
-          if (!data.isAttached) {
-            labShell.add(data, "main");
+          if (!widget.isAttached) {
+            labShell.add(widget, "main");
           }
-          app.shell.activateById(data.id);
+          widget.content.update();
+          app.shell.activateById(widget.id);
         }
       })
     )

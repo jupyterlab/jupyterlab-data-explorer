@@ -18,9 +18,12 @@ import foldersPlugin from "./folders";
 import notebooksPlugin from "./notebooks";
 import debuggerPlugin from "./debugger";
 import rendermimePlugin from "./rendermime";
+import browserPlugin from "./browser";
+
 export default [
   activePlugin,
   csvViewerPlugin,
+  browserPlugin,
   dataExplorerPlugin,
   dataRegistryPlugin,
   filesPlugin,

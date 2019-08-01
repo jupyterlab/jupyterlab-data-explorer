@@ -136,7 +136,7 @@ function activate(
   palette.addItem({ command, category: "Data Registry" });
 
   // Track and restore the widget state
-  let tracker = new WidgetTracker<MainAreaWidget<ReactWidget>>({
+  const tracker = new WidgetTracker<MainAreaWidget<ReactWidget>>({
     namespace: "dataregistry-debugger"
   });
   restorer.restore(tracker, {

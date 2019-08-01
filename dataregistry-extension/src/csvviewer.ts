@@ -51,7 +51,7 @@ function activate(app: JupyterFrontEnd, registry: Registry): void {
   registry.addConverter(
     createConverter({ from: CSVDataType, to: widgetDataType }, ({ data }) => ({
       type: "Grid",
-      data: new MyDataGrid(data)
+      data: () => new MyDataGrid(data)
     }))
   );
 }

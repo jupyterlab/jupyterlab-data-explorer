@@ -2,6 +2,8 @@ import * as React from "react";
 
 import { Observable, Subscription, BehaviorSubject } from "rxjs";
 
+import { Widget } from "@phosphor/widgets";
+
 interface IUseBehaviorSubjectProps<T> {
   subject: BehaviorSubject<T>;
   children: (value: T) => React.ReactNode;
@@ -46,4 +48,15 @@ export class UseObservable<T, U> extends React.Component<
   render() {
     return this.props.children(this.state.value);
   }
+}
+
+export function PhosphorWidget({ widget }: { widget: Widget }) {
+  const el = React.useRef<HTMLDivElement>(null);
+
+  React.useEffect(() => {
+    Widget.attach(widget, el.current!);
+    return () => Widget.detach(widget);
+  }, [widget]);
+
+  return <div style={{ height: "100%" }} ref={el} />;
 }

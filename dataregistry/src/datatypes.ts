@@ -14,7 +14,7 @@ import {
   createDataset
 } from "./datasets";
 import { Observable } from "rxjs";
-import { CachedObservable } from "./utils";
+import { CachedObservable } from "./cachedObservable";
 
 export const INVALID = Symbol("INVALID");
 

@@ -9,7 +9,7 @@ import { resolveMimetypeDataType } from "./resolvers";
  * Type where data is a HTTP URL_ pointing to the data. It should be downloaded as a string and that
  * string will end up as the nested mimeType
  */
-export const URLDataType = new DataTypeStringArg<Observable<URL_>>(
+export const URLDataType = new DataTypeStringArg<URL_>(
   "application/x.jupyter.url",
   "mimeType"
 );
@@ -31,21 +31,21 @@ export const resolverURLConverter = createConverter(
 /**
  * Download URLs and put in their string mimetypes
  */
-export const URLStringConverter = createConverter<
-  Observable<string>,
-  Observable<string>
->({ from: URLDataType }, ({ type, data }) => ({
-  type,
-  data: data.pipe(
-    distinct(),
-    switchMap(url => fromFetch(url)),
-    switchMap(r => {
-      if (r.ok) {
-        return from(r.text());
-      } else {
-        console.warn(r);
-        return throwError(new Error(`Bad response ${r}`));
-      }
-    })
-  )
-}));
+export const URLStringConverter = createConverter<string, string>(
+  { from: URLDataType },
+  ({ type, data }) => ({
+    type,
+    data: data.pipe(
+      distinct(),
+      switchMap(url => fromFetch(url)),
+      switchMap(r => {
+        if (r.ok) {
+          return from(r.text());
+        } else {
+          console.warn(r);
+          return throwError(new Error(`Bad response ${r}`));
+        }
+      })
+    )
+  })
+);

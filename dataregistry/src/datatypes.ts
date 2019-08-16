@@ -38,10 +38,13 @@ export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
   abstract createMimeType(typeData: T): MimeType_;
 
-  createDataset(data: U, typeData: T) {
-    return createDataset(this.createMimeType(typeData), data);
+  createDataset(data: Observable<U>, typeData: T) {
+    return createDataset(
+      this.createMimeType(typeData),
+      CachedObservable.from(data)
+    );
   }
-  createDatasets(url: URL_, data: U, typeData: T) {
+  createDatasets(url: URL_, data: Observable<U>, typeData: T) {
     return createDatasets(url, this.createMimeType(typeData), data);
   }
 
@@ -88,7 +91,7 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
     to?: DataType<toT, toD>;
   },
   fn: (_: {
-    data: fromD;
+    data: Observable<fromD>;
     url: URL;
     type: fromT;
   }) =>
@@ -107,10 +110,7 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
     }
     const arrayRes = Array.isArray(res) ? res : [res];
     return arrayRes.map(({ data: newData, type: newType }) => ({
-      data:
-        newData instanceof Observable
-          ? ((new CachedObservable(newData) as any) as toD)
-          : newData,
+      data: newData,
       mimeType: to.createMimeType(newType),
       cost: cost + 1
     }));

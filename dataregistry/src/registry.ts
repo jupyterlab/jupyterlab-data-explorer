@@ -5,7 +5,7 @@ import {
   applyConverterDataset
 } from "./converters";
 import { resolveDataType } from "./resolvers";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, of } from "rxjs";
 
 export class Registry {
   /**
@@ -24,7 +24,7 @@ export class Registry {
     }
     const dataset = applyConverterDataset(
       url,
-      resolveDataType.createDataset(),
+      resolveDataType.createDataset(of(undefined)),
       this._converter
     );
     this._datasets.set(url, dataset);

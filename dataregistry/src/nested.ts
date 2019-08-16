@@ -29,14 +29,14 @@ import { map } from "rxjs/operators";
  *
  * Uses an array instead of a set and ends in +json for notebook mimetype compatability
  */
-export const relativeNestedDataType = new DataTypeNoArgs<
-  Observable<Array<string>>
->("application/x.jupyter.relative-dataset-urls+json");
+export const relativeNestedDataType = new DataTypeNoArgs<Array<string>>(
+  "application/x.jupyter.relative-dataset-urls+json"
+);
 
 /**
  * A nested data type has datasets inside of it.
  */
-export const nestedDataType = new DataTypeNoArgs<Observable<Set<URL_>>>(
+export const nestedDataType = new DataTypeNoArgs<Set<URL_>>(
   "application/x.jupyter.dataset-urls"
 );
 

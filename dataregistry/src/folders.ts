@@ -3,12 +3,12 @@ import { nestedDataType } from "./nested";
 
 import { map } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
-import { Observable, defer } from "rxjs";
+import { defer } from "rxjs";
 import { join } from "path";
 /**
  * A folder is a list paths in it as strings
  */
-export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
+export const folderDataType = new DataTypeNoArgs<Set<string>>(
   "application/x.jupyter.folder"
 );
 

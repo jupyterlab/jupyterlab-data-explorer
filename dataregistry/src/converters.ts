@@ -1,4 +1,6 @@
 import { Cost, Dataset, MimeType_, URL_ } from "./datasets";
+import { CachedObservable } from "./cachedObservable";
+import { Observable } from "rxjs";
 
 /**
  * Function that can possibly convert between data type T to
@@ -12,8 +14,8 @@ export type Converter<T, U> = (dataset: {
   url: URL_;
   mimeType: MimeType_;
   cost: Cost;
-  data: T;
-}) => Array<{ mimeType: MimeType_; cost: Cost; data: U }>;
+  data: CachedObservable<T>;
+}) => Array<{ mimeType: MimeType_; cost: Cost; data: Observable<U> }>;
 
 /**
  * Applies the converter to a dataset iteratively until all mimetypes are filled out.
@@ -26,9 +28,15 @@ export function applyConverterDataset<T>(
   converter: Converter<T, T>
 ): Dataset<T> {
   // mimeTypes that we still need to convert
-  let toProcess: Array<{ mimeType: MimeType_; cost: Cost; data: T }> = [
-    ...dataset
-  ].map(([mimeType, [cost, data]]) => ({ mimeType, cost, data }));
+  let toProcess: Array<{
+    mimeType: MimeType_;
+    cost: Cost;
+    data: CachedObservable<T>;
+  }> = [...dataset].map(([mimeType, [cost, data]]) => ({
+    mimeType,
+    cost,
+    data
+  }));
   // processed mimetypes
   const processed: Dataset<T> = new Map();
   // We should only process each mimeType once. They will start on the toProcess map
@@ -43,8 +51,16 @@ export function applyConverterDataset<T>(
     // Otherwise, add it to the processed map
     processed.set(mimeType, [cost, data]);
 
-    // Iterate through its possible conversions and add
-    toProcess = toProcess.concat(converter({ cost, data, mimeType, url }));
+    // Iterate through its possible conversions and add, caching results
+    toProcess = toProcess.concat(
+      converter({ cost, data, mimeType, url }).map(
+        ({ cost, mimeType, data }) => ({
+          cost,
+          mimeType,
+          data: CachedObservable.from(data)
+        })
+      )
+    );
   }
   return processed;
 }

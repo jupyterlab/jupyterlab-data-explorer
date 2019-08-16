@@ -1,3 +1,6 @@
+import { CachedObservable } from "./cachedObservable";
+import { Observable } from "rxjs";
+
 /**
  * A dataset is the core concept in the data registry. Conceptually,
  * it is a tuple of (URL, MimeType, Cost, Data). Here are some examples:
@@ -43,22 +46,22 @@ export type MimeType_ = string;
  */
 export type Cost = number;
 
-export type DataValue<T> = [Cost, T];
+export type DataValue<T> = [Cost, CachedObservable<T>];
 export type Dataset<T> = Map<MimeType_, DataValue<T>>;
 
 export type Datasets<T> = Map<URL_, Dataset<T>>;
 
 
-export function createDataset<T>(mimeType: MimeType_, data: T): Dataset<T> {
-  return new Map([[mimeType, [0, data]]]);
+export function createDataset<T>(mimeType: MimeType_, data: Observable<T>): Dataset<T> {
+  return new Map([[mimeType, [0, CachedObservable.from(data)]]]);
 }
 
 export function createDatasets<T>(
   url: URL_,
   mimeType: MimeType_,
-  data: T
+  data: Observable<T>
 ): Datasets<T> {
-  return new Map([[url, createDataset(mimeType, data)]]);
+  return new Map([[url, createDataset(mimeType, CachedObservable.from(data))]]);
 }
 
 export function getURLs(datasets: Datasets<any>): Set<URL_> {
@@ -77,7 +80,7 @@ export function getData<T>(
   datasets: Datasets<T>,
   url: URL_,
   mimeType: MimeType_
-): T | null {
+): CachedObservable<T> | null {
   const dataset = datasets.get(url);
   if (!dataset) {
     return null;

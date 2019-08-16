@@ -10,8 +10,9 @@ import {
   createConverter
 } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
-import { defer } from "rxjs";
+import { of } from "rxjs";
 import { URL_ } from "./datasets";
+import { switchMap } from "rxjs/operators";
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(
@@ -36,7 +37,7 @@ export const resolveFileConverter = createConverter(
     if (url.protocol !== "file:") {
       return null;
     }
-    return { type, data: url.pathname };
+    return { type, data: of(url.pathname) };
   }
 );
 
@@ -50,7 +51,7 @@ export function fileURLConverter(
     { from: fileDataType, to: URLDataType },
     ({ type, data }) => ({
       type,
-      data: defer(() => getDownloadURL(data))
+      data: data.pipe(switchMap(url => getDownloadURL(url)))
     })
   );
 }

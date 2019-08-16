@@ -91,7 +91,10 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
     data: fromD;
     url: URL;
     type: fromT;
-  }) => { data: toD; type: toT } | null
+  }) =>
+    | null
+    | { data: toD; type: toT }
+    | Array<{ data: toD; type: toT }>
 ): Converter<fromD, toD> {
   return ({ url, mimeType, cost, data }) => {
     const type = from.parseMimeType(mimeType);
@@ -102,17 +105,15 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
     if (res === null) {
       return [];
     }
-    const { data: newData, type: newType } = res;
-    return [
-      {
-        data:
-          newData instanceof Observable
-            ? ((new CachedObservable(newData) as any) as toD)
-            : newData,
-        mimeType: to.createMimeType(newType),
-        cost: cost + 1
-      }
-    ];
+    const arrayRes = Array.isArray(res) ? res : [res];
+    return arrayRes.map(({ data: newData, type: newType }) => ({
+      data:
+        newData instanceof Observable
+          ? ((CachedObservable.from(newData) as any) as toD)
+          : newData,
+      mimeType: to.createMimeType(newType),
+      cost: cost + 1
+    }));
   };
 }
 

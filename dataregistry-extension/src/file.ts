@@ -28,10 +28,16 @@ import { RegistryToken } from "./registry";
 import { map } from "rxjs/operators";
 import * as yaml from "js-yaml";
 import { snippedDataType } from "./snippets";
+import * as Ajv from 'ajv';
+
+const datasetSchema = require('./datasets-file.schema.json');
+
+const ajv = new Ajv();
+var validate = ajv.compile(datasetSchema);
 
 const datasetsFileMimeType = "application/x.jupyterlab.datasets-file";
 
-type datasetsObjecType = {
+export type datasetsObjectType = {
   children?: Array<string>;
   datasets?: Array<{
     url: string;
@@ -41,7 +47,7 @@ type datasetsObjecType = {
 };
 
 export const datasetsFileDataType = new DataTypeNoArgs<
-  Observable<datasetsObjecType>
+  Observable<datasetsObjectType>
 >(datasetsFileMimeType);
 
 function activate(app: JupyterFrontEnd, registry: Registry) {
@@ -54,7 +60,13 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
         type === datasetsFileMimeType
           ? {
               type: undefined,
-              data: data.pipe(map(text => yaml.safeLoad(text)))
+              data: data.pipe(map(text => {
+                const res = yaml.safeLoad(text);
+                if (!validate(res)) {
+                  throw validate.errors![0]!
+                };
+                return res;
+              }))
             }
           : null
     ),

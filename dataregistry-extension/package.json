@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "description": "Datasets as first class entities in Juptyerlab.",
   "keywords": [
     "jupyter",
@@ -28,7 +28,7 @@
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && yarn run generateSchema",
     "clean": "rm tsconfig.tsbuildinfo && rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "watch": "tsc -w --listEmittedFiles",

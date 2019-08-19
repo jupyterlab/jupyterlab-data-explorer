@@ -35,7 +35,6 @@ function activate(
   // Add default converters
   registry.addConverter(
     resolveFileConverter,
-    resolveExtensionConverter(".csv", "text/csv"),
     resolveExtensionConverter(".png", "image/png"),
     createConverter(
       { from: URLDataType, to: reactDataType },

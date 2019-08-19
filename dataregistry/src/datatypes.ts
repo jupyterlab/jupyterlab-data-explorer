@@ -3,6 +3,8 @@
  * the underlying data and parameters set in the mimetype.
  *
  * The use case is to be able to create converters in a type safe manner.
+ * 
+ * TODO: could `to` be just a function instead of a paramater to createConverter?
  */
 
 import { Converter } from "./converters";

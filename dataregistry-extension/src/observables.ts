@@ -1,10 +1,25 @@
 import { Observable } from "rxjs";
-import { IObservableList } from "@jupyterlab/observables";
+import { IObservableList, IObservableString } from "@jupyterlab/observables";
 import { toArray } from "@phosphor/algorithm";
 import { IOutputAreaModel } from "@jupyterlab/outputarea";
 import { IOutputModel } from "@jupyterlab/rendermime";
 
 
+
+export function observableStringToObservable(
+  l: IObservableString
+): Observable<string> {
+  return new Observable(subscriber => {
+    subscriber.next(l.text);
+
+    function slot() {
+      subscriber.next(l.text);
+    }
+
+    l.changed.connect(slot);
+    return () => l.changed.disconnect(slot);
+  });
+}
 export function observableListToObservable<T>(
   l: IObservableList<T>
 ): Observable<Array<T>> {

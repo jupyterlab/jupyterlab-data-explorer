@@ -7,7 +7,9 @@ import {
 import {
   Registry,
   DataTypeNoArgs,
-  createConverter
+  createConverter,
+  textDataType,
+  resolveExtensionConverter
 } from "@jupyterlab/dataregistry";
 import { widgetDataType } from "./widgets";
 import { Observable, Subscription } from "rxjs";
@@ -49,6 +51,16 @@ export default {
 
 function activate(app: JupyterFrontEnd, registry: Registry): void {
   registry.addConverter(
+    resolveExtensionConverter(".csv", "text/csv"),
+    createConverter(
+      { from: textDataType, to: CSVDataType },
+      ({ data, type }) => {
+        if (type === "text/csv") {
+          return { data, type: undefined };
+        }
+        return null;
+      }
+    ),
     createConverter({ from: CSVDataType, to: widgetDataType }, ({ data }) => ({
       type: "Grid",
       data: () => new MyDataGrid(data)

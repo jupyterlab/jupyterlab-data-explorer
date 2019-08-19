@@ -16,3 +16,4 @@ export * from "./registry";
 export * from "./resolvers";
 export * from "./urls";
 export * from "./utils";
+export * from './cachedObservable';

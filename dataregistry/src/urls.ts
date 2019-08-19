@@ -28,13 +28,22 @@ export const resolverURLConverter = createConverter(
     return null;
   }
 );
+
+// TODO: Change from text/plain to other mimetypes, if they  are valid
+// text mimetypes.
+export const textDataType = new DataTypeStringArg<Observable<string>>(
+  "text/plain",
+  "mimeType"
+);
+
+
 /**
  * Download URLs and put in their string mimetypes
  */
 export const URLStringConverter = createConverter<
   Observable<string>,
   Observable<string>
->({ from: URLDataType }, ({ type, data }) => ({
+>({ from: URLDataType, to: textDataType }, ({ type, data }) => ({
   type,
   data: data.pipe(
     distinct(),

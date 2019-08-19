@@ -1,0 +1,12 @@
+children:
+  - "test:///hi"
+datasets:
+  - url: "test:///hi"
+    snippets:
+      some code: "It's code!"
+      other code: "It's code!"
+    children:
+      - "test:///other"
+  - url: "test:///other"
+    snippets:
+      more code: "another code"

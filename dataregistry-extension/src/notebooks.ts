@@ -10,11 +10,8 @@ import {
   Registry,
   resolveDataType,
   TypedConverter,
-  createConverter
+  createConverter,
 } from "@jupyterlab/dataregistry";
-import { IDocumentManager } from "@jupyterlab/docmanager";
-import { Context } from "@jupyterlab/docregistry";
-import { INotebookModel } from "@jupyterlab/notebook";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
 import { defer, Observable, of } from "rxjs";
@@ -24,60 +21,15 @@ import {
   outputAreaModelToObservable
 } from "./observables";
 import { RegistryToken } from "./registry";
+import { notebookContextDataType } from "./documents";
+
 
 /**
  * This defines a nested data type for notebooks, so that a notebook
  * `file:///notebook.ipynb` will have children `file:///notebook.ipynb#/cells/0/outputs/0`,etc
  */
 
-const notebookContextDataType = new DataTypeNoArgs<
-  Observable<Context<INotebookModel>>
->("application/x.jupyterlab.notebook-context");
-
 // 'file:///{path}.ipynb/#/cells/{cellid}/outputs/{outputid}/data/{mimetype}'
-
-/**
- * Convert from notebook files to their model context
- */
-function createNotebookContextConverter(
-  docmanager: any
-): TypedConverter<typeof resolveDataType, typeof notebookContextDataType> {
-  async function getNotebookContext(
-    path: string
-  ): Promise<Context<INotebookModel>> {
-    // The doc manager doesn't expose a way to get a context without also opening a widget, so we have to duplicate some
-    // logic from `_createOrOpenDocument` and use private methods.
-    let context: Context<INotebookModel> = docmanager._findContext(
-      path,
-      "notebook"
-    );
-    if (!context) {
-      context = docmanager._createContext(
-        path,
-        docmanager.registry.getModelFactory("notebook"),
-        docmanager.registry.getKernelPreference(path, "Kernel")
-      );
-      await context.initialize(false);
-    }
-    return context;
-  }
-  return createConverter(
-    { from: resolveDataType, to: notebookContextDataType },
-    ({ url }) => {
-      if (
-        url.protocol !== "file:" ||
-        !url.pathname.endsWith(".ipynb") ||
-        url.hash !== ""
-      ) {
-        return null;
-      }
-      return {
-        data: defer(() => getNotebookContext(url.pathname)),
-        type: undefined
-      };
-    }
-  );
-}
 
 const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
   "application/x.jupyterlab.notebook-cells"
@@ -300,9 +252,7 @@ const mimeBundleDataConverter = createConverter(
 function activate(
   app: JupyterFrontEnd,
   registry: Registry,
-  docmanager: IDocumentManager
 ) {
-  registry.addConverter(createNotebookContextConverter(docmanager));
   registry.addConverter(notebookContextToCells);
   registry.addConverter(notebookCellsToNested);
   registry.addConverter(createResolveCellModelConverter(registry));
@@ -316,7 +266,7 @@ function activate(
 
 export default {
   id: "@jupyterlab/dataregistry-extension:notebooks",
-  requires: [RegistryToken, IDocumentManager],
+  requires: [RegistryToken],
   activate,
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

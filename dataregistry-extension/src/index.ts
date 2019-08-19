@@ -19,9 +19,13 @@ import notebooksPlugin from "./notebooks";
 import debuggerPlugin from "./debugger";
 import rendermimePlugin from "./rendermime";
 import browserPlugin from "./browser";
+import documentsPlugin from "./documents";
+import filePlugin from "./file";
 
 export default [
   activePlugin,
+  documentsPlugin,
+  filePlugin,
   csvViewerPlugin,
   browserPlugin,
   dataExplorerPlugin,

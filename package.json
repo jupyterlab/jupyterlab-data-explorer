@@ -5,7 +5,7 @@
     "dataregistry-extension"
   ],
   "scripts": {
-    "build": "tsc --build dataregistry dataregistry-extension",
+    "build": "tsc --build dataregistry dataregistry-extension && yarn workspace @jupyterlab/dataregistry-extension run generateSchema",
     "build:dev": "jlpm install && jlpm run build && jlpm run link",
     "build:watch": "jlpm run build --watch",
     "link": "jupyter labextension link dataregistry --no-build && jupyter labextension link dataregistry-extension",

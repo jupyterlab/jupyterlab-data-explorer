@@ -32,7 +32,8 @@
     "clean": "rm tsconfig.tsbuildinfo && rimraf lib",
     "prepublishOnly": "yarn run clean && yarn run build",
     "watch": "tsc -w --listEmittedFiles",
-    "lint": "eslint src/*"
+    "lint": "eslint src/*",
+    "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
   },
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
@@ -49,6 +50,7 @@
     "@phosphor/datagrid": "^0.1.10",
     "@phosphor/messaging": "^1.2.3",
     "@phosphor/widgets": "^1.8.0",
+    "ajv": "6.10.2",
     "js-yaml": "3.13.1",
     "path": "0.12.7",
     "react": "16.8.4",
@@ -57,6 +59,7 @@
     "styled-components": "4.3.2"
   },
   "devDependencies": {
+    "@types/js-yaml": "3.12.1",
     "@typescript-eslint/eslint-plugin": "1.13.0",
     "@typescript-eslint/parser": "1.13.0",
     "eslint": "6.1.0",
@@ -64,6 +67,7 @@
     "eslint-plugin-react": "7.14.3",
     "eslint-plugin-react-hooks": "1.6.1",
     "rimraf": "~2.6.2",
+    "ts-json-schema-generator": "0.52.14",
     "typescript": "3.5.3"
   },
   "publishConfig": {

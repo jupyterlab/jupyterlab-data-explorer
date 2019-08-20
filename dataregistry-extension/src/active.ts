@@ -48,9 +48,9 @@ function activate(
 ): IActiveDataset {
   const active = new BehaviorSubject<URL_ | null>(null);
 
-  // Show active datasets in explorerr
+  // Show active datasets in explorer
   registry.addConverter(
-    createConverter({ from: resolveDataType }, ({ url }) => {
+    createConverter<void, any, void, string>({ from: resolveDataType }, ({ url }) => {
       if (url.toString() !== ACTIVE_URL) {
         return null;
       }

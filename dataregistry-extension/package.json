@@ -29,7 +29,7 @@
   },
   "scripts": {
     "build": "tsc && yarn run generateSchema",
-    "clean": "rm tsconfig.tsbuildinfo && rimraf lib",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
     "prepublishOnly": "yarn run clean && yarn run build",
     "watch": "tsc -w --listEmittedFiles",
     "lint": "eslint src/*",

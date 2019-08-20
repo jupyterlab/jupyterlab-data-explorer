@@ -90,7 +90,7 @@ function createResolveCellModelConverter(
       const notebookURL = url.toString();
       return defer(() =>
         notebookCellsDataType
-          .getDataset(registry.getURL(notebookURL))
+          .getDataset(registry.getURL(notebookURL))!
           .pipe(map(cells => cells[cellID]))
       );
     }
@@ -160,7 +160,7 @@ function createOutputConverter(
 
       return defer(() =>
         outputsDataType
-          .getDataset(registry.getURL(cellURL))
+          .getDataset(registry.getURL(cellURL))!
           .pipe(map(outputs => outputs[outputID].data))
       );
     }
@@ -218,7 +218,7 @@ function createMimeDataConverter(
 
       const data = defer(() =>
         mimeBundleDataType
-          .getDataset(registry.getURL(outputURL))
+          .getDataset(registry.getURL(outputURL))!
           .pipe(map(mimeBundle => mimeBundle[type]))
       );
       return { type, data };
@@ -229,10 +229,12 @@ function createMimeDataConverter(
 /**
  * Create the right mime type for for mime bundle data.
  */
-const mimeBundleDataConverter = createConverter(
-  { from: mimeDataDataType },
-  ({ type, data }) => ({ type, data })
-);
+const mimeBundleDataConverter = createConverter<
+  Observable<ReadonlyJSONValue>,
+  Observable<ReadonlyJSONValue>,
+  string,
+  string
+>({ from: mimeDataDataType }, ({ type, data }) => ({ type, data }));
 
 function activate(app: JupyterFrontEnd, registry: Registry) {
   registry.addConverter(notebookContextToCells);

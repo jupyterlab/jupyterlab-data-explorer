@@ -22,7 +22,7 @@
   },
   "scripts": {
     "build": "tsc",
-    "clean": "rm tsconfig.tsbuildinfo && rimraf lib",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
     "test": "jest lib",
     "test:watch": "yarn run test --watch",
     "prepublishOnly": "yarn run clean && yarn run build",

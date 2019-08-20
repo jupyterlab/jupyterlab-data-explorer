@@ -24,9 +24,14 @@ import {
   Registry,
   URL_,
   ObservableSet,
-  nestedDataType
+  nestedDataType,
+  DataTypeNoArgs
 } from "@jupyterlab/dataregistry";
-import { Observable } from "rxjs";
+import { Observable, of } from "rxjs";
+
+export const labelDataType = new DataTypeNoArgs<Observable<string>>(
+  "application/x.jupyterlab.label"
+);
 
 const buttonClassName = style({
   color: "#2196F3",
@@ -159,6 +164,14 @@ export function DatasetCompononent({
         if (active === url) {
           classNames.push(activeDatasetClassName);
         }
+        // Use label if it exists
+        let label = labelDataType.getDataset(registry.getURL(url));
+        // otherwise use url
+        if (!label) {
+          label = of(
+            url.startsWith(parentURL) ? url.slice(parentURL.length) : url
+          );
+        }
         return (
           <div
             className={classes(...classNames)}
@@ -177,7 +190,9 @@ export function DatasetCompononent({
                 textAlign: "left"
               }}
             >
-              {url.startsWith(parentURL) ? url.slice(parentURL.length) : url}
+              <UseObservable observable={label} initial="">
+                {label_ => label_}
+              </UseObservable>
             </h3>
             <span>
               {viewers.map(([label, view]) => (
@@ -356,7 +371,7 @@ function activate(
 ): IDataExplorer {
   const displayedURLs = new ObservableSet<string>();
   displayedURLs.add(ACTIVE_URL);
-  displayedURLs.add((new URL("file:")).toString());
+  displayedURLs.add(new URL("file:").toString());
 
   // Create a dataset with this URL
   const widget = ReactWidget.create(

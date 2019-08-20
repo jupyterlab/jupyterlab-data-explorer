@@ -2,6 +2,7 @@ children:
   - "test:///hi"
 datasets:
   - url: "test:///hi"
+    label: "Custom label!"
     snippets:
       some code: "It's code!"
       other code: "It's code!"

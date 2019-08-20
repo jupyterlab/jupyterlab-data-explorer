@@ -29,6 +29,7 @@ import { map } from "rxjs/operators";
 import * as yaml from "js-yaml";
 import { snippedDataType } from "./snippets";
 import * as Ajv from "ajv";
+import { labelDataType } from "./explorer";
 
 const datasetSchema = require("./datasets-file.schema.json");
 
@@ -42,6 +43,7 @@ export type datasetsObjectType = {
   datasets?: Array<{
     url: string;
     children?: Array<string>;
+    label?: string;
     snippets?: { [key: string]: string };
   }>;
 };
@@ -101,6 +103,16 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
                       {
                         mimeType: relativeNestedDataType.createMimeType(),
                         data: of(dataset.children),
+                        cost: 1
+                      }
+                    ]
+                  : []),
+                // label data
+                ...(dataset.label
+                  ? [
+                      {
+                        mimeType: labelDataType.createMimeType(),
+                        data: of(dataset.label),
                         cost: 1
                       }
                     ]

@@ -141,7 +141,11 @@ export class DataTypeNoArgs<T> extends DataType<void, T> {
     return this.mimeType;
   }
 
-  getDataset(d: Dataset<any>): T {
+  getDataset(d: Dataset<any>): T | undefined {
+    const filtered = this.filterDataset(d);
+    if (filtered.size == 0) {
+      return;
+    }
     return this.filterDataset(d)
       .values()
       .next().value;

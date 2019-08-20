@@ -10,7 +10,7 @@ import {
   Registry,
   resolveDataType,
   TypedConverter,
-  createConverter,
+  createConverter
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
@@ -22,7 +22,6 @@ import {
 } from "./observables";
 import { IRegistry } from "./registry";
 import { notebookContextDataType } from "./documents";
-
 
 /**
  * This defines a nested data type for notebooks, so that a notebook
@@ -40,19 +39,16 @@ const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
  */
 const notebookContextToCells = createConverter(
   { from: notebookContextDataType, to: notebookCellsDataType },
-  ({ data }) => ({
-    data: data.pipe(
+  ({ data }) =>
+    data.pipe(
       switchMap(context => observableListToObservable(context.model.cells))
-    ),
-    type: undefined
-  })
+    )
 );
 
 const notebookCellsToNested = createConverter(
   { from: notebookCellsDataType, to: nestedDataType },
-  ({ url, data }) => ({
-    type: undefined,
-    data: data.pipe(
+  ({ url, data }) =>
+    data.pipe(
       map(
         cells =>
           new Set(
@@ -64,7 +60,6 @@ const notebookCellsToNested = createConverter(
           )
       )
     )
-  })
 );
 
 const cellModelDataType = new DataTypeNoArgs<Observable<ICellModel>>(
@@ -93,14 +88,11 @@ function createResolveCellModelConverter(
       // Create the original notebook URL and get the cells from it
       url.hash = "";
       const notebookURL = url.toString();
-      return {
-        type: undefined,
-        data: defer(() =>
-          notebookCellsDataType
-            .getDataset(registry.getURL(notebookURL))
-            .pipe(map(cells => cells[cellID]))
-        )
-      };
+      return defer(() =>
+        notebookCellsDataType
+          .getDataset(registry.getURL(notebookURL))
+          .pipe(map(cells => cells[cellID]))
+      );
     }
   );
 }
@@ -114,9 +106,8 @@ const outputsDataType = new DataTypeNoArgs<Observable<Array<IOutputModel>>>(
  */
 const cellToOutputs = createConverter(
   { from: cellModelDataType, to: outputsDataType },
-  ({ data }) => ({
-    type: undefined,
-    data: data.pipe(
+  ({ data }) =>
+    data.pipe(
       switchMap(cellModel => {
         if (isCodeCellModel(cellModel)) {
           return outputAreaModelToObservable(cellModel.outputs);
@@ -124,7 +115,6 @@ const cellToOutputs = createConverter(
         return of([]);
       })
     )
-  })
 );
 
 /**
@@ -132,12 +122,10 @@ const cellToOutputs = createConverter(
  */
 const outputsToNested = createConverter(
   { from: outputsDataType, to: nestedDataType },
-  ({ url, data }) => ({
-    type: undefined,
-    data: data.pipe(
+  ({ url, data }) =>
+    data.pipe(
       map(outputs => new Set(outputs.map((_, i) => `${url}/outputs/${i}`)))
     )
-  })
 );
 
 // The data in the mimebundle of an output cell
@@ -170,12 +158,11 @@ function createOutputConverter(
       url.hash = cellHash;
       const cellURL = url.toString();
 
-      const data = defer(() =>
+      return defer(() =>
         outputsDataType
           .getDataset(registry.getURL(cellURL))
           .pipe(map(outputs => outputs[outputID].data))
       );
-      return { data, type: undefined };
     }
   );
 }
@@ -192,9 +179,8 @@ const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
  */
 const mimeBundleNested = createConverter(
   { from: mimeBundleDataType, to: nestedDataType },
-  ({ url, data }) => ({
-    type: undefined,
-    data: data.pipe(
+  ({ url, data }) =>
+    data.pipe(
       map(
         mimeData =>
           new Set(
@@ -202,7 +188,6 @@ const mimeBundleNested = createConverter(
           )
       )
     )
-  })
 );
 
 /**
@@ -249,10 +234,7 @@ const mimeBundleDataConverter = createConverter(
   ({ type, data }) => ({ type, data })
 );
 
-function activate(
-  app: JupyterFrontEnd,
-  registry: Registry,
-) {
+function activate(app: JupyterFrontEnd, registry: Registry) {
   registry.addConverter(notebookContextToCells);
   registry.addConverter(notebookCellsToNested);
   registry.addConverter(createResolveCellModelConverter(registry));

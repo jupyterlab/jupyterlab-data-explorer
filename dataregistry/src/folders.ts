@@ -23,7 +23,7 @@ export function createFolderConverter(
     { from: resolveDataType, to: folderDataType },
     ({ url }) => {
       return url.protocol === "file:" && url.pathname.endsWith("/")
-        ? { data: defer(() => folderContents(url.pathname)), type: undefined }
+        ? defer(() => folderContents(url.pathname))
         : null;
     }
   );
@@ -33,9 +33,8 @@ export function createFolderConverter(
  */
 export const folderDatasetsConverter = createConverter(
   { from: folderDataType, to: nestedDataType },
-  ({ url, data }) => ({
-    type: undefined,
-    data: data.pipe(
+  ({ url, data }) =>
+    data.pipe(
       map(
         paths =>
           new Set(
@@ -47,5 +46,4 @@ export const folderDatasetsConverter = createConverter(
           )
       )
     )
-  })
 );

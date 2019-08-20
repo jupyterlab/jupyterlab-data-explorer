@@ -3,7 +3,7 @@
  * the underlying data and parameters set in the mimetype.
  *
  * The use case is to be able to create converters in a type safe manner.
- * 
+ *
  * TODO: could `to` be just a function instead of a paramater to createConverter?
  */
 
@@ -15,11 +15,14 @@ import {
   createDatasets,
   createDataset
 } from "./datasets";
-import { Observable } from "rxjs";
+import { Observable, never } from "rxjs";
 import { CachedObservable } from "./cachedObservable";
 
 export const INVALID = Symbol("INVALID");
 
+function isTypeData(o: unknown): o is { data: unknown; type: unknown } {
+  return o instanceof Object && "data" in o && "type" in o;
+}
 /**
  * TypedConverter gives you the Converter type between two types. If either is a TypedConverter,
  * uses the inner data type. I.e:
@@ -75,7 +78,7 @@ class MimeTypeDataType<T> extends DataType<MimeType_, T> {
 }
 
 /**
- * Createa a new converter, assuming:
+ * Create a a new converter, assuming:
  *
  * * returns either a single value or nothing
  * * Cost is one more than the input
@@ -95,6 +98,8 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
     type: fromT;
   }) =>
     | null
+    | undefined
+    | (toT extends void ? toD : never)
     | { data: toD; type: toT }
     | Array<{ data: toD; type: toT }>
 ): Converter<fromD, toD> {
@@ -104,10 +109,14 @@ export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
       return [];
     }
     const res = fn({ url: new URL(url), data, type });
-    if (res === null) {
+    if (!res) {
       return [];
     }
-    const arrayRes = Array.isArray(res) ? res : [res];
+    const arrayRes = isTypeData(res)
+      ? [res]
+      : Array.isArray(res)
+      ? res
+      : [{ type: (undefined as any) as toT, data: res }];
     return arrayRes.map(({ data: newData, type: newType }) => ({
       data:
         newData instanceof Observable

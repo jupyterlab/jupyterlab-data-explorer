@@ -27,7 +27,6 @@ export const notebookContextDataType = new DataTypeNoArgs<
   Observable<Context<INotebookModel>>
 >("application/x.jupyterlab.notebook-context");
 
-
 async function getContext(
   docmanager: any,
   path: string,
@@ -69,10 +68,7 @@ function activate(
       { from: fileDataType, to: notebookContextDataType },
       ({ data, type }) =>
         type === notebookMimeType
-          ? {
-              type: undefined,
-              data: defer(() => getContext(docmanager, data, "notebook"))
-            }
+          ? defer(() => getContext(docmanager, data, "notebook"))
           : null
     ),
     createConverter(

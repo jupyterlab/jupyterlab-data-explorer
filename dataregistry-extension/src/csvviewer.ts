@@ -56,7 +56,7 @@ function activate(app: JupyterFrontEnd, registry: Registry): void {
       { from: textDataType, to: CSVDataType },
       ({ data, type }) => {
         if (type === "text/csv") {
-          return { data, type: undefined };
+          return data
         }
         return null;
       }

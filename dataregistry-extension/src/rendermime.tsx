@@ -15,7 +15,7 @@ import { relativeNestedDataType, Registry } from "@jupyterlab/dataregistry";
 import { IActiveDataset } from "./active";
 import { IRenderMimeRegistry, IRenderMime } from "@jupyterlab/rendermime";
 import { ReactWidget } from "@jupyterlab/apputils";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import * as React from "react";
 import { OutputArea } from "@jupyterlab/outputarea";
 import { PanelLayout, Panel } from "@phosphor/widgets";
@@ -84,6 +84,6 @@ function activate(
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:rendermime",
-  requires: [IRenderMimeRegistry, IActiveDataset, RegistryToken],
+  requires: [IRenderMimeRegistry, IActiveDataset, IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

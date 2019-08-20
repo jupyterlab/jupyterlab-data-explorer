@@ -24,7 +24,7 @@ import {
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { viewerDataType } from "./viewers";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 
 const tracker = new WidgetTracker({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
@@ -79,7 +79,7 @@ export const reactDataType: DataType<
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:widgets",
-  requires: [ILabShell, RegistryToken, ILayoutRestorer],
+  requires: [ILabShell, IRegistry, ILayoutRestorer],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

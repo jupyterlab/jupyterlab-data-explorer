@@ -21,7 +21,7 @@ import {
   Registry
 } from "@jupyterlab/dataregistry";
 import { viewerDataType } from "./viewers";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 
 type SnippetContext = {
   path: string;
@@ -90,7 +90,7 @@ export function URLSnippetConverter({
 
 export default {
   id: "@jupyterlab/dataregistry-extension:snippets",
-  requires: [RegistryToken, INotebookTracker],
+  requires: [IRegistry, INotebookTracker],
   activate: (
     app: JupyterFrontEnd,
     registry: Registry,

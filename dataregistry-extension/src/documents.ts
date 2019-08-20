@@ -1,5 +1,5 @@
 import { IDocumentManager } from "@jupyterlab/docmanager";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
@@ -91,7 +91,7 @@ function activate(
 
 export default {
   id: "@jupyterlab/dataregistry-extension:documents",
-  requires: [RegistryToken, IDocumentManager],
+  requires: [IRegistry, IDocumentManager],
   activate,
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

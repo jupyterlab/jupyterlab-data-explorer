@@ -13,7 +13,7 @@ import {
 } from "@jupyterlab/dataregistry";
 import { widgetDataType } from "./widgets";
 import { Observable, Subscription } from "rxjs";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { Message } from "@phosphor/messaging";
 
 export const CSVDataType = new DataTypeNoArgs<Observable<string>>("text/csv");
@@ -45,7 +45,7 @@ const id = "@jupyterlab/dataregistry-extension:csv-viewer";
 export default {
   activate,
   id,
-  requires: [RegistryToken],
+  requires: [IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

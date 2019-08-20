@@ -12,7 +12,7 @@ import {
 import { Registry } from "@jupyterlab/dataregistry";
 
 import * as React from "react";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { widgetDataType } from "./widgets";
 import { IActiveDataset } from ".";
 import { Widget } from "@phosphor/widgets";
@@ -107,7 +107,7 @@ function Browser({
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:browser",
-  requires: [RegistryToken, ILayoutRestorer, ICommandPalette, IActiveDataset],
+  requires: [IRegistry, ILayoutRestorer, ICommandPalette, IActiveDataset],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

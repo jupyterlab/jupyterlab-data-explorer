@@ -20,7 +20,7 @@ import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { hasURL_ } from "./widgets";
 
 export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
@@ -35,7 +35,7 @@ export const ACTIVE_URL = new URL("active:").toString();
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:active-dataset",
-  requires: [ILabShell, RegistryToken, IDocumentManager],
+  requires: [ILabShell, IRegistry, IDocumentManager],
   provides: IActiveDataset,
   autoStart: true
 } as JupyterFrontEndPlugin<IActiveDataset>;

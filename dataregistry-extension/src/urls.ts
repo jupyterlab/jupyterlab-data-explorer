@@ -12,12 +12,12 @@ import {
   resolverURLConverter,
   Registry
 } from "@jupyterlab/dataregistry";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:urls",
-  requires: [RegistryToken],
+  requires: [IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

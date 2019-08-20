@@ -15,7 +15,7 @@ import * as React from "react";
 import "react-table/react-table.css";
 import { reactDataType } from "./widgets";
 import { Observable } from "rxjs";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { UseObservable } from "./utils";
 
 /**
@@ -59,6 +59,6 @@ export default {
     registry.addConverter(nteractDataExplorerConverter);
   },
   id: "@jupyterlab/dataregistry-extension:table-data",
-  requires: [RegistryToken],
+  requires: [IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

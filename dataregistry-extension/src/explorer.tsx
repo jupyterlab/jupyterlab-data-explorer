@@ -19,7 +19,7 @@ import { classes, style } from "typestyle";
 import { IActiveDataset, ACTIVE_URL } from "./active";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import {
   Registry,
   URL_,
@@ -342,7 +342,7 @@ const id = "@jupyterlab/dataregistry-extension:data-explorer";
 export default {
   activate,
   id,
-  requires: [ILabShell, RegistryToken, ILayoutRestorer, IActiveDataset],
+  requires: [ILabShell, IRegistry, ILayoutRestorer, IActiveDataset],
   provides: IDataExplorer,
   autoStart: true
 } as JupyterFrontEndPlugin<IDataExplorer>;

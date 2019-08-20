@@ -20,7 +20,7 @@ import {
   observableListToObservable,
   outputAreaModelToObservable
 } from "./observables";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { notebookContextDataType } from "./documents";
 
 
@@ -266,7 +266,7 @@ function activate(
 
 export default {
   id: "@jupyterlab/dataregistry-extension:notebooks",
-  requires: [RegistryToken],
+  requires: [IRegistry],
   activate,
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

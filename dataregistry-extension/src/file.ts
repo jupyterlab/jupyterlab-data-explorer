@@ -24,7 +24,7 @@ import {
   textDataType
 } from "@jupyterlab/dataregistry";
 import { Observable, of } from "rxjs";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { map } from "rxjs/operators";
 import * as yaml from "js-yaml";
 import { snippedDataType } from "./snippets";
@@ -130,7 +130,7 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
 
 export default {
   id: "@jupyterlab/dataregistry-extension:file",
-  requires: [RegistryToken],
+  requires: [IRegistry],
   activate,
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

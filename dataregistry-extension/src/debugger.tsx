@@ -18,7 +18,7 @@ import {
 } from "@jupyterlab/apputils";
 
 import * as React from "react";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { Registry, CachedObservable } from "@jupyterlab/dataregistry";
 import { UseBehaviorSubject } from "./utils";
 
@@ -90,7 +90,7 @@ function Debugger({ registry }: { registry: Registry }) {
 export default {
   activate,
   id,
-  requires: [RegistryToken, ILayoutRestorer, ICommandPalette],
+  requires: [IRegistry, ILayoutRestorer, ICommandPalette],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

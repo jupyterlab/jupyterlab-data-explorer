@@ -9,13 +9,13 @@ import {
   createFolderConverter
 } from "@jupyterlab/dataregistry";
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { Contents } from "@jupyterlab/services";
 
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:folders",
-  requires: [RegistryToken, IFileBrowserFactory],
+  requires: [IRegistry, IFileBrowserFactory],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

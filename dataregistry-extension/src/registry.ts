@@ -6,7 +6,9 @@
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import { Token } from "@phosphor/coreutils";
 import { Registry, relativeNestedURLConverter } from "@jupyterlab/dataregistry";
-export const RegistryToken = new Token<Registry>(
+
+export interface IRegistry extends Registry {}
+export const IRegistry = new Token<IRegistry>(
   "@jupyterlab/dataregistry:Registry"
 );
 
@@ -17,7 +19,7 @@ export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:data-registry",
   requires: [],
-  provides: RegistryToken,
+  provides: IRegistry,
   autoStart: true
 } as JupyterFrontEndPlugin<Registry>;
 

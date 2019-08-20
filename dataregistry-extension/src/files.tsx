@@ -13,7 +13,7 @@ import {
 } from "@jupyterlab/dataregistry";
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
 import * as React from "react";
-import { RegistryToken } from "./registry";
+import { IRegistry } from "./registry";
 import { UseObservable } from "./utils";
 import { reactDataType } from "./widgets";
 
@@ -23,7 +23,7 @@ import { reactDataType } from "./widgets";
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:files",
-  requires: [RegistryToken, IFileBrowserFactory],
+  requires: [IRegistry, IFileBrowserFactory],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 

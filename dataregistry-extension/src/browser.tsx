@@ -1,7 +1,8 @@
 import {
   ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
+  ILabShell
 } from "@jupyterlab/application";
 import {
   ICommandPalette,
@@ -32,14 +33,14 @@ function Browser({
   const [follow, setFollow] = React.useState(true);
   const [widget, setWidget] = React.useState<Widget | undefined>(undefined);
 
+  const widgets =
+    submittedURL && widgetDataType.filterDataset(registry.getURL(submittedURL));
   React.useEffect(() => {
-    if (!submittedURL || !submittdLabel) {
+    if (!widgets || !submittdLabel) {
       setWidget(undefined);
       return;
     }
-    const widgetCreator = widgetDataType
-      .filterDataset(registry.getURL(submittedURL))
-      .get(submittdLabel);
+    const widgetCreator = widgets.get(submittdLabel);
     if (widgetCreator) {
       setWidget(widgetCreator());
       return;
@@ -60,7 +61,7 @@ function Browser({
   }, [active, follow]);
 
   return (
-    <div style={{height: "100%"}}>
+    <div style={{ height: "100%" }}>
       <form
         onSubmit={event => {
           setSubmittedLabel(label);
@@ -68,22 +69,23 @@ function Browser({
           event.preventDefault();
         }}
       >
-        <label>
-          View:
-          <input
-            type="text"
-            value={label}
-            onChange={event => setLabel(event.target.value)}
-          />
-        </label>
-        <label>
-          URL:
-          <input
-            type="text"
-            value={url}
-            onChange={event => setURL(event.target.value)}
-          />
-        </label>
+        <select value={label} onChange={event => setLabel(event.target.value)}>
+          {widgets ? (
+            [...widgets.keys()].map(label => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))
+          ) : (
+            <></>
+          )}
+        </select>
+        <input
+          type="text"
+          value={url}
+          placeholder="file:///data.csv"
+          onChange={event => setURL(event.target.value)}
+        />
         <input type="submit" value="Submit" />
       </form>
       <label>
@@ -107,60 +109,24 @@ function Browser({
 export default {
   activate,
   id: "@jupyterlab/dataregistry-extension:browser",
-  requires: [IRegistry, ILayoutRestorer, ICommandPalette, IActiveDataset],
+  requires: [ILabShell, IRegistry, ILayoutRestorer, IActiveDataset],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
 
 function activate(
   app: JupyterFrontEnd,
+  labShell: ILabShell,
   registry: Registry,
   restorer: ILayoutRestorer,
-  palette: ICommandPalette,
   active: IActiveDataset
 ): void {
-  // Declare a widget variable
-  let widget: MainAreaWidget<ReactWidget>;
+  const content = ReactWidget.create(
+    <Browser registry={registry} active={active} />
+  );
+  content.id = "@jupyterlab-dataregistry/browser";
+  content.title.iconClass = "jp-SpreadsheetIcon jp-SideBar-tabIcon";
+  content.title.caption = "Data Browser";
 
-  // Add an application command
-  const command: string = "dataregistry-browser:open";
-  app.commands.addCommand(command, {
-    label: "Data Browser",
-    execute: () => {
-      if (!widget) {
-        // Create a new widget if one does not exist
-        const content = ReactWidget.create(
-          <Browser registry={registry} active={active} />
-        );
-        content.addClass("scrollable");
-        widget = new MainAreaWidget({ content });
-        widget.id = "dataregistry-browser";
-        widget.title.label = "Data Browser";
-        widget.title.closable = true;
-      }
-      if (!tracker.has(widget)) {
-        // Track the state of the widget for later restoration
-        tracker.add(widget);
-      }
-      if (!widget.isAttached) {
-        // Attach the widget to the main work area if it's not there
-        app.shell.add(widget, "main");
-      }
-      widget.content.update();
-
-      // Activate the widget
-      app.shell.activateById(widget.id);
-    }
-  });
-
-  // Add the command to the palette.
-  palette.addItem({ command, category: "Data Registry" });
-
-  // Track and restore the widget state
-  const tracker = new WidgetTracker<MainAreaWidget<ReactWidget>>({
-    namespace: "dataregistry-browser"
-  });
-  restorer.restore(tracker, {
-    command,
-    name: () => "dataregistry-browser"
-  });
+  restorer.add(content, content.id);
+  labShell.add(content, "right");
 }

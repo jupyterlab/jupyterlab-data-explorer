@@ -33,14 +33,14 @@ function Browser({
   const [follow, setFollow] = React.useState(true);
   const [widget, setWidget] = React.useState<Widget | undefined>(undefined);
 
+  const widgets =
+    submittedURL && widgetDataType.filterDataset(registry.getURL(submittedURL));
   React.useEffect(() => {
-    if (!submittedURL || !submittdLabel) {
+    if (!widgets || !submittdLabel) {
       setWidget(undefined);
       return;
     }
-    const widgetCreator = widgetDataType
-      .filterDataset(registry.getURL(submittedURL))
-      .get(submittdLabel);
+    const widgetCreator = widgets.get(submittdLabel);
     if (widgetCreator) {
       setWidget(widgetCreator());
       return;
@@ -61,7 +61,7 @@ function Browser({
   }, [active, follow]);
 
   return (
-    <div style={{height: "100%"}}>
+    <div style={{ height: "100%" }}>
       <form
         onSubmit={event => {
           setSubmittedLabel(label);
@@ -69,22 +69,23 @@ function Browser({
           event.preventDefault();
         }}
       >
-        <label>
-          View:
-          <input
-            type="text"
-            value={label}
-            onChange={event => setLabel(event.target.value)}
-          />
-        </label>
-        <label>
-          URL:
-          <input
-            type="text"
-            value={url}
-            onChange={event => setURL(event.target.value)}
-          />
-        </label>
+        <select value={label} onChange={event => setLabel(event.target.value)}>
+          {widgets ? (
+            [...widgets.keys()].map(label => (
+              <option key={label} value={label}>
+                {label}
+              </option>
+            ))
+          ) : (
+            <></>
+          )}
+        </select>
+        <input
+          type="text"
+          value={url}
+          placeholder="file:///data.csv"
+          onChange={event => setURL(event.target.value)}
+        />
         <input type="submit" value="Submit" />
       </form>
       <label>
@@ -119,7 +120,6 @@ function activate(
   restorer: ILayoutRestorer,
   active: IActiveDataset
 ): void {
-
   const content = ReactWidget.create(
     <Browser registry={registry} active={active} />
   );

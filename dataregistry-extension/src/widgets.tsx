@@ -19,30 +19,21 @@ import {
   DataTypeStringArg,
   Registry,
   URL_,
-  createConverter
+  createConverter,
 } from "@jupyterlab/dataregistry";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { viewerDataType } from "./viewers";
 import { IRegistry } from "./registry";
+import { Subscription } from "rxjs";
 
-const tracker = new WidgetTracker({ namespace: "dataregistry" });
+const tracker = new WidgetTracker<DataWidget>({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
 
 export const widgetDataType = new DataTypeStringArg<() => Widget>(
   "application/x.jupyter.widget",
   "label"
 );
-
-function extractWidgetArgs(
-  widget: Widget
-): {
-  label: string;
-  url: string;
-} {
-  const [label, url] = JSON.parse(widget.id);
-  return { label, url };
-}
 
 export interface IHasURL_ {
   url: URL_;
@@ -53,14 +44,31 @@ export function hasURL_(t: any): t is IHasURL_ {
 }
 
 class DataWidget extends MainAreaWidget implements IHasURL_ {
-  constructor(content: Widget, url: URL_, label: string) {
+  constructor(
+    registry: Registry,
+    content: Widget,
+    public url: URL_,
+    public label: string
+  ) {
     super({ content });
     this.id = JSON.stringify([label, url.toString()]);
-    this.title.label = `${label}: ${url}`;
     this.title.closable = true;
-    this.url = url;
+
+    this.subscription = registry.externalURL(url).subscribe({
+      next: externalURL => {
+        this.title.label = `${label}: ${externalURL}`;
+        this.externalURL = externalURL;
+      }
+    });
   }
-  url: URL_;
+
+  dispose() {
+    this.subscription.unsubscribe();
+    super.dispose();
+  }
+
+  externalURL: URL_ | null = null;
+  subscription: Subscription;
 }
 
 const wrappedWidgetDataType = new DataTypeStringArg<() => DataWidget>(
@@ -94,7 +102,7 @@ function activate(
       { from: widgetDataType, to: wrappedWidgetDataType },
       ({ type, url, data }) => ({
         type,
-        data: () => new DataWidget(data(), url.toString(), type)
+        data: () => new DataWidget(registry, data(), url.toString(), type)
       })
     ),
     createConverter(
@@ -106,7 +114,7 @@ function activate(
       ({ data, type }) => ({
         type,
         data: () => {
-          const widget = data()
+          const widget = data();
           if (!tracker.has(widget)) {
             tracker.add(widget);
           }
@@ -121,17 +129,25 @@ function activate(
   );
 
   app.commands.addCommand(commandID, {
-    execute: args => {
+    execute: async args => {
       const url = args.url as string;
       const label = args.label as string;
-      viewerDataType.filterDataset(registry.getURL(url)).get(label)!();
-    },
-    label: args => `${args.label} ${args.url}`
+      viewerDataType
+        .filterDataset(
+          registry.getURL(await registry.internalURL(url).toPromise())
+        )
+        .get(label)!();
+    }
   });
 
   restorer.restore(tracker, {
-    name: (widget: Widget) => widget.id,
+    name: widget => JSON.stringify([widget.label, widget.externalURL]),
     command: commandID,
-    args: extractWidgetArgs
+    args: (
+      widget
+    ): {
+      label: string;
+      url: string;
+    } => ({ label: widget.label, url: widget.externalURL! })
   });
 }

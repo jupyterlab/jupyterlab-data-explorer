@@ -5,7 +5,8 @@ import {
   applyConverterDataset
 } from "./converters";
 import { resolveDataType } from "./resolvers";
-import { BehaviorSubject } from "rxjs";
+import { BehaviorSubject, Observable, of } from "rxjs";
+import { externalURLDataType, internalURLDataType } from "./external";
 
 export class Registry {
   /**
@@ -33,6 +34,20 @@ export class Registry {
     this.URLs$.next(new Set([url, ...this.URLs$.value]));
 
     return dataset;
+  }
+
+  /**
+   * Returns the external URL for a dataset or itself if it has not external pointer.
+   */
+  externalURL(url: URL_): Observable<URL_> {
+    return externalURLDataType.getDataset(this.getURL(url)) || of(url);
+  }
+
+  /**
+   * Returns the internal URL for a dataset or itself if it has not external pointer.
+   */
+  internalURL(url: URL_): Observable<URL_> {
+    return internalURLDataType.getDataset(this.getURL(url)) || of(url);
   }
 
   /**

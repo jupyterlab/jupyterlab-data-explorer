@@ -34,7 +34,7 @@ import { labelDataType } from "./explorer";
 const datasetSchema = require("./datasets-file.schema.json");
 
 const ajv = new Ajv();
-var validate = ajv.compile(datasetSchema);
+const validate = ajv.compile(datasetSchema);
 
 const datasetsFileMimeType = "application/x.jupyterlab.datasets-file";
 

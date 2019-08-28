@@ -4,12 +4,7 @@ import {
   JupyterFrontEndPlugin,
   ILabShell
 } from "@jupyterlab/application";
-import {
-  ICommandPalette,
-  MainAreaWidget,
-  ReactWidget,
-  WidgetTracker
-} from "@jupyterlab/apputils";
+import { ReactWidget } from "@jupyterlab/apputils";
 import { Registry } from "@jupyterlab/dataregistry";
 
 import * as React from "react";
@@ -29,24 +24,32 @@ function Browser({
   const [url, setURL] = React.useState(active.value || "");
   const [label, setLabel] = React.useState("Grid");
   const [submittedURL, setSubmittedURL] = React.useState(url);
-  const [submittdLabel, setSubmittedLabel] = React.useState(label);
   const [follow, setFollow] = React.useState(true);
   const [widget, setWidget] = React.useState<Widget | undefined>(undefined);
 
   const widgets =
     submittedURL && widgetDataType.filterDataset(registry.getURL(submittedURL));
+
+  const widgetLabels = widgets ? [...widgets.keys()] : [];
+
+  // If the current label is not in the widget labels, and there is a first widget label
+  // set the current label to that
+  if (!new Set(widgetLabels).has(label) && widgetLabels.length) {
+    setLabel(widgetLabels[0]);
+  }
+
   React.useEffect(() => {
-    if (!widgets || !submittdLabel) {
+    if (!widgets || !label) {
       setWidget(undefined);
       return;
     }
-    const widgetCreator = widgets.get(submittdLabel);
+    const widgetCreator = widgets.get(label);
     if (widgetCreator) {
       setWidget(widgetCreator());
       return;
     }
     setWidget(undefined);
-  }, [submittedURL, submittdLabel, registry]);
+  }, [submittedURL, label, registry]);
 
   React.useEffect(() => {
     if (follow) {
@@ -62,24 +65,19 @@ function Browser({
 
   return (
     <div style={{ height: "100%" }}>
+      <select value={label} onChange={event => setLabel(event.target.value)}>
+        {widgetLabels.map(label => (
+          <option key={label} value={label}>
+            {label}
+          </option>
+        ))}
+      </select>
       <form
         onSubmit={event => {
-          setSubmittedLabel(label);
           setSubmittedURL(url);
           event.preventDefault();
         }}
       >
-        <select value={label} onChange={event => setLabel(event.target.value)}>
-          {widgets ? (
-            [...widgets.keys()].map(label => (
-              <option key={label} value={label}>
-                {label}
-              </option>
-            ))
-          ) : (
-            <></>
-          )}
-        </select>
         <input
           type="text"
           value={url}

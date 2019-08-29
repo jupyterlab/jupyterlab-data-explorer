@@ -64,7 +64,7 @@ function Browser({
   }, [active, follow]);
 
   return (
-    <div style={{ height: "100%" }}>
+    <div style={{ height: "100%", display: "flex", flexFlow: "column" }}>
       <select value={label} onChange={event => setLabel(event.target.value)}>
         {widgetLabels.map(label => (
           <option key={label} value={label}>

@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "2.2.0",
+  "version": "2.2.2",
   "description": "Datasets as first class entities in Juptyerlab.",
   "keywords": [
     "jupyter",

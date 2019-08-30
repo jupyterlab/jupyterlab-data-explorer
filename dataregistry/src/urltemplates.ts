@@ -11,7 +11,6 @@ import { TypedURL } from "./createConverter";
  * new URLTemplate('http://www.example.com/foo{?query,number}', {query: URLTemplate.string, number: URLTemplate.number})
  * ```
  */
-
 export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   /**
    * Creates a URL template, based on a string of a URL  template and a mapping of

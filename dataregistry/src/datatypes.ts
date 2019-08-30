@@ -15,14 +15,9 @@ import {
   createDatasets,
   createDataset
 } from "./datasets";
-import { Observable, never } from "rxjs";
-import { CachedObservable } from "./cachedObservable";
 
 export const INVALID = Symbol("INVALID");
 
-function isTypeData(o: unknown): o is { data: unknown; type: unknown } {
-  return o instanceof Object && "data" in o && "type" in o;
-}
 /**
  * TypedConverter gives you the Converter type between two types. If either is a TypedConverter,
  * uses the inner data type. I.e:
@@ -68,64 +63,13 @@ export abstract class DataType<T, U> {
 /**
  * Dummy mime type data type, that accepts any mimetype.
  */
-class MimeTypeDataType<T> extends DataType<MimeType_, T> {
+export class MimeTypeDataType<T> extends DataType<MimeType_, T> {
   parseMimeType(mimeType: MimeType_): MimeType_ | typeof INVALID {
     return mimeType;
   }
   createMimeType(typeData: MimeType_): MimeType_ {
     return typeData;
   }
-}
-
-/**
- * Create a a new converter, assuming:
- *
- * * returns either a single value or nothing
- * * Cost is one more than the input
- * * if it returns an observable, we should cache this observable
- */
-export function createConverter<fromD, toD, fromT = MimeType_, toT = MimeType_>(
-  {
-    from = new MimeTypeDataType<fromD>() as any,
-    to = new MimeTypeDataType<toD>() as any
-  }: {
-    from?: DataType<fromT, fromD>;
-    to?: DataType<toT, toD>;
-  },
-  fn: (_: {
-    data: fromD;
-    url: URL;
-    type: fromT;
-  }) =>
-    | null
-    | undefined
-    | (toT extends void ? toD : never)
-    | { data: toD; type: toT }
-    | Array<{ data: toD; type: toT }>
-): Converter<fromD, toD> {
-  return ({ url, mimeType, cost, data }) => {
-    const type = from.parseMimeType(mimeType);
-    if (type === INVALID) {
-      return [];
-    }
-    const res = fn({ url: new URL(url), data, type });
-    if (!res) {
-      return [];
-    }
-    const arrayRes = isTypeData(res)
-      ? [res]
-      : Array.isArray(res)
-      ? res
-      : [{ type: (undefined as any) as toT, data: res }];
-    return arrayRes.map(({ data: newData, type: newType }) => ({
-      data:
-        newData instanceof Observable
-          ? ((CachedObservable.from(newData) as any) as toD)
-          : newData,
-      mimeType: to.createMimeType(newType),
-      cost: cost + 1
-    }));
-  };
 }
 
 export class DataTypeNoArgs<T> extends DataType<void, T> {

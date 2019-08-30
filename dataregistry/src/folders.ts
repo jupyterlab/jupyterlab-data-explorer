@@ -1,10 +1,11 @@
-import { DataTypeNoArgs, TypedConverter, createConverter } from "./datatypes";
+import { DataTypeNoArgs, TypedConverter } from "./datatypes";
 import { nestedDataType } from "./nested";
 
 import { map } from "rxjs/operators";
 import { resolveDataType } from "./resolvers";
 import { Observable, defer } from "rxjs";
 import { join } from "path";
+import { createConverter } from "./createConverter";
 /**
  * A folder is a list paths in it as strings
  */

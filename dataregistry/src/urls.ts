@@ -2,8 +2,9 @@ import { from, Observable, throwError, of } from "rxjs";
 import { fromFetch } from "rxjs/fetch";
 import { distinct, switchMap } from "rxjs/operators";
 import { URL_ } from "./datasets";
-import { DataTypeStringArg, createConverter } from "./datatypes";
+import { DataTypeStringArg } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
+import { createConverter } from "./createConverter";
 
 /**
  * Type where data is a HTTP URL_ pointing to the data. It should be downloaded as a string and that

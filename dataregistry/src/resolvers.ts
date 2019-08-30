@@ -2,8 +2,9 @@ import {
   DataTypeNoArgs,
   DataTypeStringArg,
   TypedConverter,
-  createConverter
 } from "./datatypes";
+import { createConverter } from "./createConverter";
+import { Adjunction } from "./urltemplates";
 
 /**
  * Datasets without a known mimetype start as just a resolve mimetype and no data.

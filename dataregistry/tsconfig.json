@@ -10,7 +10,7 @@
     "rootDir": "src",
     "sourceMap": true,
     "strict": true,
-    "target": "es2017",
+    "target": "es2019",
     "types": ["node", "jest"],
   },
   "include": ["src/*"]

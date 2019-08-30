@@ -8,15 +8,8 @@
  */
 
 import { Converter } from "./converters";
-import {
-  MimeType_,
-  Dataset,
-  URL_,
-  createDatasets,
-  createDataset
-} from "./datasets";
-
-export const INVALID = Symbol("INVALID");
+import { MimeType_, Dataset } from "./datasets";
+import { DataType, INVALID } from "./createConverter";
 
 /**
  * TypedConverter gives you the Converter type between two types. If either is a TypedConverter,
@@ -33,44 +26,6 @@ export type TypedConverter<T, U> = T extends DataType<any, infer V>
   : U extends DataType<any, infer X>
   ? Converter<T, X>
   : Converter<T, U>;
-
-export abstract class DataType<T, U> {
-  abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
-  abstract createMimeType(typeData: T): MimeType_;
-
-  createDataset(data: U, typeData: T) {
-    return createDataset(this.createMimeType(typeData), data);
-  }
-  createDatasets(url: URL_, data: U, typeData: T) {
-    return createDatasets(url, this.createMimeType(typeData), data);
-  }
-
-  /**
-   * Filer dataset for mimetypes of this type.
-   */
-  filterDataset(dataset: Dataset<any>): Map<T, U> {
-    const res = new Map<T, U>();
-    for (const [mimeType, [, data]] of dataset) {
-      const typeData_ = this.parseMimeType(mimeType);
-      if (typeData_ !== INVALID) {
-        res.set(typeData_, data as any);
-      }
-    }
-    return res;
-  }
-}
-
-/**
- * Dummy mime type data type, that accepts any mimetype.
- */
-export class MimeTypeDataType<T> extends DataType<MimeType_, T> {
-  parseMimeType(mimeType: MimeType_): MimeType_ | typeof INVALID {
-    return mimeType;
-  }
-  createMimeType(typeData: MimeType_): MimeType_ {
-    return typeData;
-  }
-}
 
 export class DataTypeNoArgs<T> extends DataType<void, T> {
   constructor(public mimeType: MimeType_) {

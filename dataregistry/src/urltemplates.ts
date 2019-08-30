@@ -1,22 +1,8 @@
 import * as uriTemplates from "uri-templates";
 
 import { URL_ } from "./datasets";
+import { TypedURL } from "./createConverter";
 
-export abstract class TypedURL<T> {
-  abstract parse(url: URL_): T | null | undefined;
-
-  abstract create(args: T): URL_;
-}
-
-export class DefaultTypedURL extends TypedURL<URL> {
-  parse(url: URL_) {
-    return new URL(url);
-  }
-
-  create(url: URL) {
-    return url.toString();
-  }
-}
 
 /**
  * Type safe URL / URI Templates from RFC 6570

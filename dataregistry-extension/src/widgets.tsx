@@ -19,7 +19,7 @@ import {
   DataTypeStringArg,
   Registry,
   URL_,
-  createConverter,
+  createConverter
 } from "@jupyterlab/dataregistry";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
@@ -53,10 +53,14 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
     super({ content });
     this.id = JSON.stringify([label, url.toString()]);
     this.title.closable = true;
+    this.title.label = `${label}: ${url}`;
 
     this.subscription = registry.externalURL(url).subscribe({
       next: externalURL => {
-        this.title.label = `${label}: ${externalURL}`;
+        this.title.label =
+          externalURL === url
+            ? `${label}: ${url}`
+            : `${label}: ${url} (${externalURL})`;
         this.externalURL = externalURL;
       }
     });

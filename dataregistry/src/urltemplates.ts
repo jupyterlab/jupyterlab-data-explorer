@@ -28,8 +28,12 @@ export class DefaultTypedURL extends TypedURL<URL> {
 
 export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   /**
-   * Pass in the URL template as well an optional filter parameter that is called
-   * when parsing to further validate the args.
+   * Creates a URL template, based on a string of a URL  template and a mapping of
+   * variable names to pairs of inverse functions (adjunctions) which handle mapping to/from
+   * that variable and a string.
+   * 
+   * You can  use these to also filter variables, by returning null from these funcitons. We provide
+   * a couple of common adjuncions on this class, like `string` and `number`.
    */
   constructor(
     private readonly template: string,
@@ -39,12 +43,16 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
     this._template = uriTemplates(template);
   }
 
-  // These are some common types:
-
+  /**
+   * Identity adjunction for strings
+   */
   static get string(): Adjunction<string, string> {
     return [s => s, s => s];
   }
 
+  /**
+   * Adjunction for parsing strings as numbers.
+   */
   static get number(): Adjunction<string, number> {
     return [
       s => {
@@ -55,10 +63,17 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
     ];
   }
 
+  /**
+   * Adjunction for verifying that a string, commonly a path, ends in a certain extension.
+   */
   static extension(extension: string): Adjunction<string, string> {
     return [s => (s.endsWith(extension) ? s : null), s => s];
   }
 
+  /**
+   * Parses this URL using the template and specified adjunctions. Returns null or undefined if 
+   * the URL cannot  be parsed with this template or if any of the adjunctions return null. 
+   */
   parse(url: URL_): T | null | undefined {
     const args = (this._template.fromUri(url) as any) as
       | {
@@ -77,6 +92,9 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
     }
   }
 
+  /**
+   * Create a URL give the args. It fills in the template afer calling the mapping functions on each arg.
+   */
   create(args: T): URL_ {
     return this._template.fill(
       Object.fromEntries(

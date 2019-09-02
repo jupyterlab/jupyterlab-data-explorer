@@ -17,8 +17,6 @@ jupyter labextension install @jupyterlab/dataregistry-extension
 
 ![](https://user-images.githubusercontent.com/1186124/59360085-85becf80-8cfd-11e9-8fc8-98d8a7b83934.png)
 
-
-
 ## Core concepts
 
 The data registry is a global collection of datasets. Each dataset is conceptually a tuple of `(URL, MimeType, cost, data)`; however, we store them in nested maps of `Map<URL, Map<MimeType, [cost, data]>>` so that, for every unique pair of URL and MimeType, we only have one dataset ([`./dataregistry/src/datasets.ts`](./dataregistry/src/datasets.ts)).
@@ -78,7 +76,6 @@ jlpm build:dev
 jupyter lab
 ```
 
-
 ## Contributing
 
 This repo is in active development, and we welcome any collaboration. If you have ideas or questions, feel free to open an issue. From there, we could setup a call to chat more in depth about how to work together. Please don't hesitate to reach out.
@@ -86,4 +83,3 @@ This repo is in active development, and we welcome any collaboration. If you hav
 Or, feel free to tackle an existing issue or contribute a PR that you think improves things. We try to keep the current issues relevant and matched to relevant milestones to give a sense on where this is going.
 
 If the community grows around this, we can adopt a more regular public meeting.
-

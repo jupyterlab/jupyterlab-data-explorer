@@ -47,7 +47,7 @@ made up the `application/x.jupyter.resolve` mime type for this. All datasets sta
 ### Explore my data in JupyterLab:
 
 1. Install JupyterLab >= 1.0
-2. `jupyter labextension install @jupyterlab/dataregistry`
+2. `jupyter labextension install @jupyterlab/dataregistry-extension`
 3. Browse available datasets in the data explorer left side pane. We include support for viewing a few datasets. We plan on expanding this list and third party extension can extend it:
    1. Opening CSV files in the data grid and adding a snippet to open them with Pandas
    2. Opening PNG images in an image viewer

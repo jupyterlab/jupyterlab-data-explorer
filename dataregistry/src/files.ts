@@ -7,11 +7,11 @@ import { URLDataType } from "./urls";
 import {
   DataTypeStringArg,
   TypedConverter,
-  createConverter
 } from "./datatypes";
 import { resolveMimetypeDataType } from "./resolvers";
 import { defer } from "rxjs";
 import { URL_ } from "./datasets";
+import { createConverter } from "./createConverter";
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(

@@ -20,9 +20,10 @@
  */
 
 import { URL_ } from "./datasets";
-import { DataTypeNoArgs, createConverter } from "./datatypes";
+import { DataTypeNoArgs } from "./datatypes";
 import { Observable } from "rxjs";
 import { map } from "rxjs/operators";
+import { createConverter } from "./createConverter";
 
 /**
  * a list of relative URLs to resolve against the current URL.

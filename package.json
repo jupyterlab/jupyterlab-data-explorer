@@ -6,7 +6,7 @@
   ],
   "scripts": {
     "build": "tsc --build dataregistry dataregistry-extension && jlpm workspace @jupyterlab/dataregistry-extension run generateSchema",
-    "build:dev": "jlpm install && jlpm clean jlpm run build && jlpm run link",
+    "build:dev": "jlpm install && jlpm clean && jlpm run build && jlpm run link",
     "lint":  "jlpm workspace @jupyterlab/dataregistry-extension lint",
     "clean": "jlpm workspace @jupyterlab/dataregistry run clean && jlpm workspace @jupyterlab/dataregistry-extension run clean",
     "build:watch": "tsc --build --watch  dataregistry dataregistry-extension",

@@ -1,0 +1,69 @@
+.jp-linkedData-window {
+  color: "#000000";
+  height: "100%";
+  display: "flex";
+  flex-direction: "column";
+  background: var(--jp-layout-color1);
+  font-family: var(--jp-content-font-family);
+}
+
+.jp-button {
+  color: "#2196F3";
+  border-radius: 2;
+  background: "#FFFFFF";
+  font-size: 10;
+  border-width: 0;
+  margin-right: 12;
+  padding: "2px 4px";
+}
+
+.jp-button.active {
+  background: "#BDBDBD"
+}
+
+.jp-button.active:hover {
+  background: "#BDBDBD"
+}
+
+.jp-button.hover {
+  background: "#E0E0E0"
+}
+
+.jp-dataset {
+  border-bottom: "1px solid #E0E0E0";
+  color: "#333333";
+  padding: 4;
+  padding-right: 12;
+  padding-left: 12;
+  border-left-width: 8;
+  border-left-color: "white";
+  border-left-style: "solid";
+}
+
+.jp-dataset.hover {
+  border-left-color: "#E0E0E0"
+}
+
+.jp-dataset.active {
+  border-left-color: "#BDBDBD"
+}
+
+.jp-dataset.active:hover {
+  border-left-color: "#BDBDBD"
+}
+
+.jp-active-dataset {
+  border-left-color: "var(--jp-brand-color1)";
+}
+
+.jp-active-dataset.hover {
+  border-left-color: "var(--jp-brand-color1)"
+}
+
+.jp-active-dataset.active {
+  border-left-color: "var(--jp-brand-color1)"
+}
+
+.jp-active-dataset.active:hover {
+  border-left-color: "var(--jp-brand-color1)"
+}

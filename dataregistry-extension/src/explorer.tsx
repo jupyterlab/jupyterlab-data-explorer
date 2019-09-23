@@ -29,35 +29,16 @@ import {
 } from "@jupyterlab/dataregistry";
 import { Observable, of } from "rxjs";
 
+import '../style/index.css';
+
 export const labelDataType = new DataTypeNoArgs<Observable<string>>(
   "application/x.jupyterlab.label"
 );
 
-const buttonClassName = style({
-  color: "#2196F3",
-  borderRadius: 2,
-  background: "#FFFFFF",
-  fontSize: 10,
-  borderWidth: 0,
-  marginRight: 12, // 2 + 10 spacer between
-  padding: "2px 4px",
-  $nest: {
-    "&:active": {
-      background: "#BDBDBD"
-    },
-    "&:active:hover": {
-      background: "#BDBDBD"
-    },
-    "&:hover": {
-      background: "#E0E0E0"
-    }
-  }
-});
-
 function Button({ onClick, text }: { onClick: () => void; text: string }) {
   return (
     <button
-      className={buttonClassName}
+      className={'jp-button'}
       onClick={e => {
         e.stopPropagation();
         onClick();
@@ -67,28 +48,6 @@ function Button({ onClick, text }: { onClick: () => void; text: string }) {
     </button>
   );
 }
-
-const datasetClassName = style({
-  borderBottom: "1px solid #E0E0E0",
-  color: "#333333",
-  padding: 4,
-  paddingRight: 12,
-  paddingLeft: 12,
-  borderLeftWidth: 8,
-  borderLeftColor: "white",
-  borderLeftStyle: "solid",
-  $nest: {
-    "&:hover": {
-      borderLeftColor: "#E0E0E0"
-    },
-    "&:active": {
-      borderLeftColor: "#BDBDBD"
-    },
-    "&:active:hover": {
-      borderLeftColor: "#BDBDBD"
-    }
-  }
-});
 
 const activeDatasetClassName = style({
   borderLeftColor: "var(--jp-brand-color1)",
@@ -160,9 +119,9 @@ export function DatasetCompononent({
   return (
     <UseObservable observable={active$} initial={null}>
       {active => {
-        const classNames = [datasetClassName];
+        const classNames = ['jp-dataset'];
         if (active === url) {
-          classNames.push(activeDatasetClassName);
+          classNames.push('jp-active-dataset');
         }
         // Use label if it exists
         let label = labelDataType.getDataset(registry.getURL(url));
@@ -305,14 +264,7 @@ class DataExplorer extends React.Component<
   render() {
     return (
       <div
-        style={{
-          background: "#FFFFFF",
-          color: "#000000",
-          fontFamily: "Helvetica",
-          height: "100%",
-          display: "flex",
-          flexDirection: "column"
-        }}
+        className={'jp-linkedData-window'}
       >
         <Heading
           search={this.state.search}

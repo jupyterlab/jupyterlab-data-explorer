@@ -5,6 +5,11 @@ import { TypedURL } from "./createConverter";
 
 
 /**
+ * https://stackoverflow.com/a/6640851/907060
+ */
+const UUID_TEST = /^\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b$/
+
+/**
  * Type safe URL / URI Templates from RFC 6570
  * 
  * ```
@@ -33,6 +38,10 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    */
   static get string(): Adjunction<string, string> {
     return [s => s, s => s];
+  }
+
+  static get uuid(): Adjunction<string, string> {
+    return [s => UUID_TEST.test(s) ? s : null, s => s]
   }
 
   /**

@@ -1,4 +1,11 @@
 /**
+ * @license BSD-3-Clause
+ *
+ * Copyright (c) 2019 Project Jupyter Contributors.
+ * Distributed under the terms of the 3-Clause BSD License.
+ */
+
+/**
  * * Switch data to not have to be observable.
  * * In registry just have an observable of adding and removing lists of
  *

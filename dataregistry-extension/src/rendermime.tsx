@@ -1,11 +1,13 @@
-/*-----------------------------------------------------------------------------
-| Copyright (c) Jupyter Development Team.
-| Distributed under the terms of the Modified BSD License.
-|----------------------------------------------------------------------------
+/**
+ * @license BSD-3-Clause
+ *
+ * Copyright (c) 2019 Project Jupyter Contributors.
+ * Distributed under the terms of the 3-Clause BSD License.
+ */
 
-This module creates a rendermime factory for `x.jupyter.relative-dataset-urls+json` outputs
-to show them in a list.
-*/
+/*
+ * This module creates a rendermime factory for `x.jupyter.relative-dataset-urls+json` outputs to show them in a list.
+ */
 
 import {
   JupyterFrontEnd,

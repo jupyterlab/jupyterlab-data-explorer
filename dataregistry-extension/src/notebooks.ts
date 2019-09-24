@@ -10,13 +10,15 @@ import {
   nestedDataType,
   Registry,
   resolveDataType,
-  TypedConverter,
-  URLTemplate
+  URLTemplate,
+  internalURLDataType,
+  externalURLDataType,
+  Converter
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { defer, Observable, of } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { defer, Observable, of, combineLatest } from "rxjs";
+import { map, switchMap, flatMap } from "rxjs/operators";
 import { notebookContextDataType } from "./documents";
 import {
   observableListToObservable,
@@ -24,131 +26,71 @@ import {
 } from "./observables";
 import { IRegistry } from "./registry";
 
+/**
+ * URLS
+ */
+
 const notebookURL = new URLTemplate("file://{+path}", {
   path: URLTemplate.extension(".ipynb")
 });
 
-const notebookCellURL = notebookURL.extend("#/cells/{cellID}", {
-  cellID: URLTemplate.number
+const notebookCellURL = notebookURL.extend("#/cell-model/{cellID}", {
+  cellID: URLTemplate.uuid
+});
+
+const notebookCellExternalURL = notebookURL.extend("#/cells/{cellIndex}", {
+  cellIndex: URLTemplate.number
 });
 
 const notebookOutputURL = notebookCellURL.extend("/outputs/{outputID}", {
   outputID: URLTemplate.number
 });
 
+const notebookOutputExternalURL = notebookCellExternalURL.extend(
+  "/outputs/{outputID}",
+  {
+    outputID: URLTemplate.number
+  }
+);
+
 const notebookMimeDataURL = notebookOutputURL.extend("/data/{mimeType}", {
   mimeType: URLTemplate.string
 });
 
-const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
-  "application/x.jupyterlab.notebook-cells"
+const notebookMimeDataExternalURL = notebookOutputExternalURL.extend(
+  "/data/{mimeType}",
+  {
+    mimeType: URLTemplate.string
+  }
 );
 
 /**
- * Convert from notebook context to a list of cells within the model
+ * Mimetypes
  */
-const notebookContextToCells = createConverter(
-  { from: notebookContextDataType, to: notebookCellsDataType },
-  ({ data }) =>
-    data.pipe(
-      switchMap(context => observableListToObservable(context.model.cells))
-    )
-);
 
-const notebookCellsToNested = createConverter(
-  { from: notebookCellsDataType, to: nestedDataType, url: notebookURL },
-  ({ url: { path }, data }) =>
-    data.pipe(
-      map(
-        cells =>
-          new Set(
-            cells.map((_, cellID) => notebookCellURL.create({ path, cellID }))
-          )
-      )
-    )
+const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
+  "application/x.jupyterlab.notebook-cells"
 );
 
 const cellModelDataType = new DataTypeNoArgs<Observable<ICellModel>>(
   "application/x.jupyterlab.cell-model"
 );
 
-/**
- * Converts from a URL like `file:///notebook.ipynb#/cells/0` to the cell model.
- */
-function createResolveCellModelConverter(
-  registry: Registry
-): TypedConverter<typeof resolveDataType, typeof cellModelDataType> {
-  return createConverter(
-    { from: resolveDataType, to: cellModelDataType, url: notebookCellURL },
-    ({ url: { cellID, ...rest } }) =>
-      defer(() =>
-        notebookCellsDataType
-          .getDataset(registry.getURL(notebookURL.create(rest)))!
-          .pipe(map(cells => cells[cellID]))
-      )
-  );
-}
+const cellIndexDataType = new DataTypeNoArgs<Observable<number>>(
+  "application/x.jupyterlab.cell-index"
+);
+const cellIDDataType = new DataTypeNoArgs<Observable<string>>(
+  "application/x.jupyterlab.cell-id"
+);
 
 const outputsDataType = new DataTypeNoArgs<Observable<Array<IOutputModel>>>(
   "application/x.jupyterlab.outputs"
-);
-
-/**
- * Convert from a cell model to a list of output models. If the cell is not a code cell, the list is empty.
- */
-const cellToOutputs = createConverter(
-  { from: cellModelDataType, to: outputsDataType },
-  ({ data }) =>
-    data.pipe(
-      switchMap(cellModel => {
-        if (isCodeCellModel(cellModel)) {
-          return outputAreaModelToObservable(cellModel.outputs);
-        }
-        return of([]);
-      })
-    )
-);
-
-/**
- * Converts from a list of outputs to the resulting URLs
- */
-const outputsToNested = createConverter(
-  { from: outputsDataType, to: nestedDataType, url: notebookCellURL },
-  ({ url, data }) =>
-    data.pipe(
-      map(
-        outputs =>
-          new Set(
-            outputs.map((_, outputID) =>
-              notebookOutputURL.create({ outputID, ...url })
-            )
-          )
-      )
-    )
 );
 
 // The data in the mimebundle of an output cell
 const mimeBundleDataType = new DataTypeNoArgs<Observable<ReadonlyJSONObject>>(
   "application/x.jupyterlab.mime-bundle"
 );
-
-/**
- * Register a conversion from a URL like `file:///notebook.ipynb#/cells/0/output/0` to
- * the mimebundle for the output.
- */
-function createOutputConverter(
-  registry: Registry
-): TypedConverter<typeof resolveDataType, typeof mimeBundleDataType> {
-  return createConverter(
-    { from: resolveDataType, to: mimeBundleDataType, url: notebookOutputURL },
-    ({ url: { outputID, ...rest } }) =>
-      defer(() =>
-        outputsDataType
-          .getDataset(registry.getURL(notebookCellURL.create(rest)))!
-          .pipe(map(outputs => outputs[outputID].data))
-      )
-  );
-}
 
 // The data for a certain mimetype in an output.
 const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
@@ -157,64 +99,292 @@ const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
 );
 
 /**
- * Converts from a URL with a mimebundle, which is the output, to one with the mimeType
- * added.
+ * Converters
  */
-const mimeBundleNested = createConverter(
-  { from: mimeBundleDataType, to: nestedDataType, url: notebookOutputURL },
-  ({ url, data }) =>
-    data.pipe(
-      map(
-        mimeData =>
-          new Set(
-            Object.keys(mimeData).map(mimeType =>
-              notebookMimeDataURL.create({ ...url, mimeType })
-            )
-          )
-      )
-    )
-);
 
-/**
- * Create a conversion a mimebundle data `file:///notebook.ipynb#/cells/0/output/0/data/text/csv` to
- * that mimedata.
- */
-function createMimeDataConverter(
+export function createConverters(
   registry: Registry
-): TypedConverter<typeof resolveDataType, typeof mimeDataDataType> {
-  return createConverter(
-    { from: resolveDataType, to: mimeDataDataType, url: notebookMimeDataURL },
-    ({ url: { mimeType, ...rest } }) => ({
-      type: mimeType,
-      data: defer(() =>
-        mimeBundleDataType
-          .getDataset(registry.getURL(notebookOutputURL.create(rest)))!
-          .pipe(map(mimeBundle => mimeBundle[mimeType]))
-      )
-    })
-  );
+): Array<Converter<any, any>> {
+  return [
+    /**
+     * Notebook
+     */
+    createConverter(
+      { from: notebookContextDataType, to: notebookCellsDataType },
+      ({ data }) =>
+        data.pipe(
+          switchMap(context => observableListToObservable(context.model.cells))
+        )
+    ),
+    createConverter(
+      { from: notebookCellsDataType, to: nestedDataType, url: notebookURL },
+      ({ url: { path }, data }) =>
+        data.pipe(
+          map(
+            cells =>
+              new Set(
+                cells.map(arg =>
+                  notebookCellURL.create({ path, cellID: arg.id })
+                )
+              )
+          )
+        )
+    ),
+
+    /**
+     * Cell
+     */
+    createConverter(
+      {
+        from: resolveDataType,
+        to: cellIndexDataType,
+        url: notebookCellURL
+      },
+      ({ url: { cellID, ...rest } }) =>
+        defer(() =>
+          notebookCellsDataType
+            .getDataset(registry.getURL(notebookURL.create(rest)))!
+            .pipe(map(cells => cells.findIndex(cell => cell.id === cellID)))
+        )
+    ),
+    createConverter(
+      {
+        from: cellIndexDataType,
+        to: cellModelDataType,
+        url: notebookCellURL
+      },
+      ({ data, url: { cellID, ...rest } }) =>
+        defer(() =>
+          combineLatest(
+            data,
+            notebookCellsDataType.getDataset(
+              registry.getURL(notebookURL.create(rest))
+            )!
+          ).pipe(map(([index, cells]) => cells[index]))
+        )
+    ),
+    createConverter(
+      { from: cellModelDataType, to: outputsDataType },
+      ({ data }) =>
+        data.pipe(
+          switchMap(cellModel => {
+            if (isCodeCellModel(cellModel)) {
+              return outputAreaModelToObservable(cellModel.outputs);
+            }
+            return of([]);
+          })
+        )
+    ),
+    createConverter(
+      { from: outputsDataType, to: nestedDataType, url: notebookCellURL },
+      ({ url, data }) =>
+        data.pipe(
+          map(
+            outputs =>
+              new Set(
+                outputs.map((_, outputID) =>
+                  notebookOutputURL.create({ outputID, ...url })
+                )
+              )
+          )
+        )
+    ),
+    createConverter(
+      {
+        from: cellIndexDataType,
+        to: externalURLDataType,
+        url: notebookCellURL
+      },
+      ({ data, url: { cellID, ...rest } }) =>
+        data.pipe(
+          map(cellIndex =>
+            notebookCellExternalURL.create({
+              ...rest,
+              cellIndex
+            })
+          )
+        )
+    ),
+    createConverter(
+      {
+        from: resolveDataType,
+        to: cellIDDataType,
+        url: notebookCellExternalURL
+      },
+      ({ url: { cellIndex, ...rest } }) =>
+        defer(() =>
+          notebookCellsDataType
+            .getDataset(registry.getURL(notebookURL.create(rest)))!
+            .pipe(map(cells => cells[cellIndex].id))
+        )
+    ),
+    createConverter(
+      {
+        from: cellIDDataType,
+        to: internalURLDataType,
+        url: notebookCellExternalURL
+      },
+      ({ url: { path }, data }) =>
+        data.pipe(
+          map(cellID =>
+            notebookCellURL.create({
+              path,
+              cellID
+            })
+          )
+        )
+    ),
+
+    /**
+     * Output
+     */
+    createConverter(
+      { from: resolveDataType, to: mimeBundleDataType, url: notebookOutputURL },
+      ({ url: { outputID, ...rest } }) =>
+        defer(() =>
+          outputsDataType
+            .getDataset(registry.getURL(notebookCellURL.create(rest)))!
+            .pipe(map(outputs => outputs[outputID].data))
+        )
+    ),
+    createConverter(
+      { from: mimeBundleDataType, to: nestedDataType, url: notebookOutputURL },
+      ({ url, data }) =>
+        data.pipe(
+          map(
+            mimeData =>
+              new Set(
+                Object.keys(mimeData).map(mimeType =>
+                  notebookMimeDataURL.create({ ...url, mimeType })
+                )
+              )
+          )
+        )
+    ),
+    createConverter(
+      {
+        from: resolveDataType,
+        to: externalURLDataType,
+        url: notebookOutputURL
+      },
+      ({ url: { outputID, cellID, path } }) =>
+        defer(() =>
+          cellIndexDataType
+            .getDataset(
+              registry.getURL(notebookCellURL.create({ path, cellID }))
+            )!
+            .pipe(
+              map(cellIndex =>
+                notebookOutputExternalURL.create({
+                  path,
+                  cellIndex,
+                  outputID
+                })
+              )
+            )
+        )
+    ),
+    createConverter(
+      {
+        from: resolveDataType,
+        to: internalURLDataType,
+        url: notebookOutputExternalURL
+      },
+      ({ url: { outputID, cellIndex, path } }) =>
+        defer(() =>
+          cellIDDataType
+            .getDataset(
+              registry.getURL(
+                notebookCellExternalURL.create({ path, cellIndex })
+              )
+            )!
+            .pipe(
+              map(cellID =>
+                notebookOutputURL.create({
+                  path,
+                  cellID,
+                  outputID
+                })
+              )
+            )
+        )
+    ),
+
+    /**
+     * MimeData
+     */
+    createConverter(
+      { from: resolveDataType, to: mimeDataDataType, url: notebookMimeDataURL },
+      ({ url: { mimeType, ...rest } }) => ({
+        type: mimeType,
+        data: defer(() =>
+          mimeBundleDataType
+            .getDataset(registry.getURL(notebookOutputURL.create(rest)))!
+            .pipe(map(mimeBundle => mimeBundle[mimeType]))
+        )
+      })
+    ),
+    createConverter(
+      {
+        from: resolveDataType,
+        to: externalURLDataType,
+        url: notebookMimeDataURL
+      },
+      ({ url: { path, cellID, outputID, mimeType } }) =>
+        defer(() =>
+          cellIndexDataType
+            .getDataset(
+              registry.getURL(notebookCellURL.create({ path, cellID }))
+            )!
+            .pipe(
+              map(cellIndex =>
+                notebookMimeDataExternalURL.create({
+                  path,
+                  cellIndex,
+                  outputID,
+                  mimeType
+                })
+              )
+            )
+        )
+    ),
+    createConverter(
+      {
+        from: resolveDataType,
+        to: internalURLDataType,
+        url: notebookMimeDataExternalURL
+      },
+      ({ url: { outputID, cellIndex, path, mimeType } }) =>
+        defer(() =>
+          cellIDDataType
+            .getDataset(
+              registry.getURL(
+                notebookCellExternalURL.create({ path, cellIndex })
+              )
+            )!
+            .pipe(
+              map(cellID =>
+                notebookMimeDataURL.create({
+                  path,
+                  cellID,
+                  mimeType,
+                  outputID
+                })
+              )
+            )
+        )
+    ),
+    createConverter<
+      Observable<ReadonlyJSONValue>,
+      Observable<ReadonlyJSONValue>,
+      string,
+      string
+    >({ from: mimeDataDataType }, ({ type, data }) => ({ type, data }))
+  ];
 }
 
-/**
- * Create the right mime type for for mime bundle data.
- */
-const mimeBundleDataConverter = createConverter<
-  Observable<ReadonlyJSONValue>,
-  Observable<ReadonlyJSONValue>,
-  string,
-  string
->({ from: mimeDataDataType }, ({ type, data }) => ({ type, data }));
-
 function activate(app: JupyterFrontEnd, registry: Registry) {
-  registry.addConverter(notebookContextToCells);
-  registry.addConverter(notebookCellsToNested);
-  registry.addConverter(createResolveCellModelConverter(registry));
-  registry.addConverter(cellToOutputs);
-  registry.addConverter(outputsToNested);
-  registry.addConverter(createOutputConverter(registry));
-  registry.addConverter(mimeBundleNested);
-  registry.addConverter(createMimeDataConverter(registry));
-  registry.addConverter(mimeBundleDataConverter);
+  registry.addConverter(...createConverters(registry));
 }
 
 export default {

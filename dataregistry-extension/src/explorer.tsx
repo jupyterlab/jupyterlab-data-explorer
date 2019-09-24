@@ -25,9 +25,11 @@ import {
   URL_,
   ObservableSet,
   nestedDataType,
-  DataTypeNoArgs
+  DataTypeNoArgs,
+  externalURLDataType
 } from "@jupyterlab/dataregistry";
-import { Observable, of } from "rxjs";
+import { Observable, of, combineLatest } from "rxjs";
+import { map } from "rxjs/operators";
 
 export const labelDataType = new DataTypeNoArgs<Observable<string>>(
   "application/x.jupyterlab.label"
@@ -144,7 +146,7 @@ export function DatasetCompononent({
   registry
 }: {
   url: URL_;
-  parentURL: URL_;
+  parentURL: Observable<URL_>;
   registry: Registry;
   active$: IActiveDataset;
 }) {
@@ -164,12 +166,17 @@ export function DatasetCompononent({
         if (active === url) {
           classNames.push(activeDatasetClassName);
         }
+
+        const dataset = registry.getURL(url);
         // Use label if it exists
-        let label = labelDataType.getDataset(registry.getURL(url));
+        let label = labelDataType.getDataset(dataset);
+        const displayURL = externalURLDataType.getDataset(dataset) || of(url);
         // otherwise use url
         if (!label) {
-          label = of(
-            url.startsWith(parentURL) ? url.slice(parentURL.length) : url
+          label = combineLatest(displayURL, parentURL).pipe(
+            map(([u, parentU]) =>
+              u.startsWith(parentU) ? u.slice(parentU.length) : u
+            )
           );
         }
         return (
@@ -202,7 +209,7 @@ export function DatasetCompononent({
             {nestedURLs ? (
               <Collapsable>
                 <DatasetsComponent
-                  url={url}
+                  url={displayURL}
                   active={active$}
                   registry={registry}
                   urls$={nestedURLs}
@@ -227,7 +234,7 @@ function DatasetsComponent({
   active: IActiveDataset;
   registry: Registry;
   urls$: Observable<Set<URL_>>;
-  url: URL_;
+  url: Observable<URL_>;
 }) {
   return (
     <UseObservable observable={urls$} initial={undefined}>
@@ -320,7 +327,7 @@ class DataExplorer extends React.Component<
         />
         <div style={{ overflow: "auto" }}>
           <DatasetsComponent
-            url=""
+            url={of("")}
             registry={this.props.registry}
             active={this.props.active}
             urls$={this.props.urls$}

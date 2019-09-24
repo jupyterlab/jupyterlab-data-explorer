@@ -1,4 +1,11 @@
 /**
+ * @license BSD-3-Clause
+ *
+ * Copyright (c) 2019 Project Jupyter Contributors.
+ * Distributed under the terms of the 3-Clause BSD License.
+ */
+
+/**
  * * `datasets.ts`: The core data structure of datasets.
  * * `converters.ts`: Defines a way to convert between some mimetype to another.
  * * `datatypes.ts`: Allows defining a MimeType alongside a TypeScript type, so that conversions with it can be type safe.

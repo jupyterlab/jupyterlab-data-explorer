@@ -11,7 +11,7 @@ import { Message } from "@phosphor/messaging";
 import { DSVModel } from "@jupyterlab/csvviewer";
 
 /**
- * Class to support the conversion from CSV data to `DataGrid` data.
+ * Class to support the conversion from CSV data to data grid widget data.
  *
  * @private
  */

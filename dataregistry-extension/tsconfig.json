@@ -14,7 +14,7 @@
     "target": "es2019",
     "types": ["node"]
   },
-  "include": ["src/*"],
+  "include": ["src/*", "src/**/*"],
   "references": [
     {
       "path": "../dataregistry"

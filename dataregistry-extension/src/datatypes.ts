@@ -10,7 +10,7 @@ import { INotebookModel } from "@jupyterlab/notebook";
 import { DocumentRegistry, Context } from "@jupyterlab/docregistry";
 import { Widget } from "@phosphor/widgets";
 import { Observable } from "rxjs";
-import { mimetypes }  from "./mimetypes"
+import { mimetypes }  from "./mimetypes";
 
 /**
  * Custom type for storing datasets.

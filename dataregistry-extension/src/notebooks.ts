@@ -4,21 +4,21 @@ import {
 } from "@jupyterlab/application";
 import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
 import {
+  Converter,
   createConverter,
   DataTypeNoArgs,
   DataTypeStringArg,
+  externalURLDataType,
+  internalURLDataType,
   nestedDataType,
   Registry,
   resolveDataType,
-  URLTemplate,
-  internalURLDataType,
-  externalURLDataType,
-  Converter
+  URLTemplate
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { defer, Observable, of, combineLatest } from "rxjs";
-import { map, switchMap, flatMap } from "rxjs/operators";
+import { combineLatest, defer, Observable, of } from "rxjs";
+import { map, switchMap } from "rxjs/operators";
 import { notebookContextDataType } from "./documents";
 import {
   observableListToObservable,

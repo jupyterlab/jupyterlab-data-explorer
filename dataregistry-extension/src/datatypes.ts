@@ -71,8 +71,8 @@ const datatypes = {
 };
 
 /**
-* Exports.
-*/
+ * Exports.
+ */
 export { datatypes };
 export { Datasets };
 export default datatypes;

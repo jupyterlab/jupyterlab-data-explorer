@@ -22,7 +22,7 @@ const mimetypes = {
 };
 
 /**
-* Exports.
-*/
+ * Exports.
+ */
 export { mimetypes };
 export default mimetypes;

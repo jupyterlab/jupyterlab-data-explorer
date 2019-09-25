@@ -26,6 +26,7 @@ import * as React from "react";
 import { viewerDataType } from "./viewers";
 import { IRegistry } from "./registry";
 import { Subscription } from "rxjs";
+import { first } from "rxjs/operators";
 
 const tracker = new WidgetTracker<DataWidget>({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
@@ -139,7 +140,12 @@ function activate(
       const label = args.label as string;
       viewerDataType
         .filterDataset(
-          registry.getURL(await registry.internalURL(url).toPromise())
+          registry.getURL(
+            await registry
+              .internalURL(url)
+              .pipe(first())
+              .toPromise()
+          )
         )
         .get(label)!();
     }

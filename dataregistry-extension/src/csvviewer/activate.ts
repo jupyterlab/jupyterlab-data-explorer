@@ -6,7 +6,7 @@
  */
 
 import { JupyterFrontEnd } from "@jupyterlab/application";
-import { Registry, DataTypeNoArgs, createConverter, resolveExtensionConverter } from "@jupyterlab/dataregistry";
+import { Registry, createConverter, resolveExtensionConverter } from "@jupyterlab/dataregistry";
 import { datatypes } from "./../datatypes";
 import { mimetypes } from "./../mimetypes";
 import { CSVDataGrid } from "./data_grid";

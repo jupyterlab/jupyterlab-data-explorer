@@ -7,7 +7,8 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
+  ILabShell
 } from "@jupyterlab/application";
 import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
 import {
@@ -24,7 +25,7 @@ import {
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { combineLatest, defer, Observable, of } from "rxjs";
+import { combineLatest, defer, Observable, of, from } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
 import { notebookContextDataType } from "./documents";
 import {
@@ -32,6 +33,9 @@ import {
   outputAreaModelToObservable
 } from "./observables";
 import { IRegistry } from "./registry";
+import { IActiveDataset } from "./active";
+import { NotebookPanel } from "@jupyterlab/notebook";
+import { signalToObservable } from "./utils";
 
 /**
  * URLS
@@ -390,13 +394,40 @@ export function createConverters(
   ];
 }
 
-function activate(app: JupyterFrontEnd, registry: Registry) {
+function activate(
+  app: JupyterFrontEnd,
+  labShell: ILabShell,
+  registry: Registry,
+  active: IActiveDataset
+) {
+  // get the url of all active  cells, and set the active url to them
+  signalToObservable(labShell.currentChanged)
+    .pipe(
+      switchMap(([_, { newValue }]) => {
+        if (newValue instanceof NotebookPanel) {
+          return signalToObservable(newValue.content.activeCellChanged).pipe(
+            map(([notebook, cell]) =>
+              notebookCellURL.create({
+                path: `/${newValue.context.path}`,
+                cellID: cell.model.id
+              })
+            )
+          );
+        }
+        return from([]);
+      })
+    )
+    .subscribe({
+      next: url => {
+        active.next(url);
+      }
+    });
   registry.addConverter(...createConverters(registry));
 }
 
 export default {
   id: "@jupyterlab/dataregistry-extension:notebooks",
-  requires: [IRegistry],
+  requires: [ILabShell, IRegistry, IActiveDataset],
   activate,
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

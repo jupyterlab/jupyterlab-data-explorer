@@ -13,6 +13,8 @@ import { CSVDataGrid } from "./data_grid";
 
 /**
  * Interface describing an object containing data to convert.
+ *
+ * @private
  */
 interface Data {
   /**

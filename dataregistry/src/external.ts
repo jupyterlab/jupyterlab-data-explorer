@@ -17,6 +17,9 @@
 import { Observable } from "rxjs";
 import { URL_ } from "./datasets";
 import { DataTypeNoArgs } from "./datatypes";
+import { nestedDataType } from "./nested";
+import { createConverter } from "./createConverter";
+import { map } from "rxjs/operators";
 
 /**
  * URL that is safe for outside system to store long term to identify this dataset.
@@ -31,4 +34,9 @@ export const externalURLDataType = new DataTypeNoArgs<Observable<URL_>>(
  */
 export const internalURLDataType = new DataTypeNoArgs<Observable<URL_>>(
   "application/x.jupyter.internal-url"
+);
+
+export const internalURLNested = createConverter(
+  { from: internalURLDataType, to: nestedDataType },
+  ({ data }) => data.pipe(map(url => new Set([url])))
 );

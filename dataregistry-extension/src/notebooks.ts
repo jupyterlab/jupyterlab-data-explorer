@@ -26,7 +26,7 @@ import {
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
 import { combineLatest, defer, Observable, of, from } from "rxjs";
-import { map, switchMap } from "rxjs/operators";
+import { map, switchMap, filter } from "rxjs/operators";
 import { notebookContextDataType } from "./documents";
 import {
   observableListToObservable,
@@ -406,6 +406,8 @@ function activate(
       switchMap(([_, { newValue }]) => {
         if (newValue instanceof NotebookPanel) {
           return signalToObservable(newValue.content.activeCellChanged).pipe(
+            // filter for unselected cells
+            filter(([notebook, cell]) => !!cell),
             map(([notebook, cell]) =>
               notebookCellURL.create({
                 path: `/${newValue.context.path}`,

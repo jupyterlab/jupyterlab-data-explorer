@@ -44,7 +44,7 @@ interface Dataset {
  *
  * -   A dataset may consist of (and link to) other datasets.
  */
-type Datasets = {
+interface Datasets {
   /**
    * List of child dataset identifiers.
    */

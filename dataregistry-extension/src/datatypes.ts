@@ -38,11 +38,11 @@ interface Dataset {
 }
 
 /**
- * Custom type for storing datasets.
+ * Interface for describing datasets.
  *
  * ## Notes
  *
- * -   A dataset may consist of (and link to) other datasets.
+ * -   Each dataset may consist of (and link to) other datasets.
  */
 interface Datasets {
   /**

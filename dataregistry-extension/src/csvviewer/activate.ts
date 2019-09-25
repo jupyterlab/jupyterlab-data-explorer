@@ -7,10 +7,21 @@
 
 import { JupyterFrontEnd } from "@jupyterlab/application";
 import { Registry, DataTypeNoArgs, createConverter, resolveExtensionConverter } from "@jupyterlab/dataregistry";
-import { IRegistry } from "./../registry";
 import { datatypes } from "./../datatypes";
 import { mimetypes } from "./../mimetypes";
 import { CSVDataGrid } from "./data_grid";
+
+interface Data {
+  /**
+   * Data to convert.
+   */
+  data: any;
+
+  /**
+   * Desired data type.
+   */
+  type: string;
+}
 
 /**
  * Returns a converter for converting from a resolver MIME type to a file MIME type.
@@ -41,9 +52,11 @@ function text2csv() {
    *
    * @private
    * @param obj - data object
+   * @param obj.data - data to convert
+   * @param obj.type - desired type
    * @returns converted data
    */
-  function convert(obj) {
+  function convert(obj: Data) {
     if (obj.type === mimetypes.csv) {
       return obj.data;
     }
@@ -70,9 +83,10 @@ function csv2datagrid() {
    *
    * @private
    * @param obj - data object
+   * @param obj.data - data to convert
    * @returns converted data
    */
-  function convert(obj) {
+  function convert(obj: Data) {
     return {
       "type": "Grid",
       "data": getData

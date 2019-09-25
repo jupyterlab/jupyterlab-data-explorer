@@ -33,12 +33,12 @@ type Datasets = {
  * Table of data registry data types.
  */
 const datatypes = {
-	"csv": new DataTypeNoArgs<Observable<string>>(mimetypes.csv),
+	"csv": new DataTypeStringArg<Observable<string>>(mimetypes.csv, "mimeType"), // FIXME
 	"datagrid": new DataTypeNoArgs<Observable<string>>(mimetypes.datagrid),
 	"datasetsFile": new DataTypeNoArgs<Observable<Datasets>>(mimetypes.datasetsFile),
 	"label": new DataTypeNoArgs<Observable<string>>(mimetypes.label),
 	"notebookContext": new DataTypeNoArgs<Observable<Context<INotebookModel>>>(mimetypes.notebookContext),
-	"text": new DataTypeStringArg<Observable<string>>("text/plain","mimeType"),
+	"text": new DataTypeStringArg<Observable<string>>("text/plain", "mimeType"),
 	"textContext": new DataTypeStringArg<Observable<Context<DocumentRegistry.ICodeModel>>>(mimetypes.textContext, "mimeType"),
 	"widget": new DataTypeStringArg<() => Widget>(mimetypes.widget, "label")
 };

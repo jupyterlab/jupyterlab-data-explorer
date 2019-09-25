@@ -45,7 +45,7 @@ class CSVDataGrid extends DataGrid {
      * @private
      * @param data - CSV data
      */
-    function onData(data) {
+    function onData(data: string) {
       if (self.model) {
         (self.model as DSVModel).dispose();
       }

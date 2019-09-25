@@ -12,6 +12,8 @@ import { DSVModel } from "@jupyterlab/csvviewer";
 
 /**
  * Class to support the conversion from CSV data to `DataGrid` data.
+ *
+ * @private
  */
 class CSVDataGrid extends DataGrid {
   private _data: Observable<string>;

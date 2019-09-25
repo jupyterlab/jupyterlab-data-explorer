@@ -125,4 +125,5 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
 /**
  * Exports.
  */
+export { activate };
 export default activate;

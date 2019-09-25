@@ -9,7 +9,7 @@ import { JupyterFrontEnd } from "@jupyterlab/application";
 import { Registry, createConverter, resolveExtensionConverter } from "@jupyterlab/dataregistry";
 import { datatypes } from "./../datatypes";
 import { mimetypes } from "./../mimetypes";
-import { CSVDataGrid } from "./data_grid";
+import { DataGrid } from "./data_grid";
 
 /**
  * Interface describing an object containing data to convert.
@@ -104,7 +104,7 @@ function csv2datagrid() {
      * @returns data grid
      */
     function getData() {
-      return new CSVDataGrid(obj.data);
+      return new DataGrid(obj.data);
     }
   }
 }

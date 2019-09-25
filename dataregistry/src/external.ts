@@ -23,5 +23,5 @@ export const externalURLDataType = new DataTypeNoArgs<Observable<URL_>>(
  * you should use that to lookup data instead of its external URL.
  */
 export const internalURLDataType = new DataTypeNoArgs<Observable<URL_>>(
-  "application/x.jupyter.external-url"
+  "application/x.jupyter.internal-url"
 );

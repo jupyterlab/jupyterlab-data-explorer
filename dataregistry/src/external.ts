@@ -1,4 +1,11 @@
 /**
+ * @license BSD-3-Clause
+ *
+ * Copyright (c) 2019 Project Jupyter Contributors.
+ * Distributed under the terms of the 3-Clause BSD License.
+ */
+
+/**
  * External URLs are useful so that if you store a reference to a dataset, it can still be accurate
  * after the JupyterLab session has ended. For example, some URLs refer to internal UUIDs for a resource
  * that are generated when JupyterLab  starts, which are not stable accross sessions.

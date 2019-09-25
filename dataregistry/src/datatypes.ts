@@ -1,4 +1,11 @@
 /**
+ * @license BSD-3-Clause
+ *
+ * Copyright (c) 2019 Project Jupyter Contributors.
+ * Distributed under the terms of the 3-Clause BSD License.
+ */
+
+ /**
  * Typed datasets allow us to associate mimetypes with different types of the
  * the underlying data and parameters set in the mimetype.
  *

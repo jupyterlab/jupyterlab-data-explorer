@@ -13,6 +13,31 @@ import { Observable } from "rxjs";
 import { mimetypes }  from "./mimetypes";
 
 /**
+ * Interface describing a dataset.
+ */
+interface Dataset {
+  /**
+   * Dataset URL.
+   */
+  url: string;
+
+  /**
+   * List of child dataset identifiers.
+   */
+  children?: Array<string>;
+
+  /**
+   * Dataset label.
+   */
+  label?: string;
+
+  /**
+   * Code snippets.
+   */
+  snippets?: { [key: string]: string };
+}
+
+/**
  * Custom type for storing datasets.
  *
  * ## Notes
@@ -20,13 +45,15 @@ import { mimetypes }  from "./mimetypes";
  * -   A dataset may consist of (and link to) other datasets.
  */
 type Datasets = {
+  /**
+   * List of child dataset identifiers.
+   */
   children?: Array<string>;
-  datasets?: Array<{
-    url: string;
-    children?: Array<string>;
-    label?: string;
-    snippets?: { [key: string]: string };
-  }>;
+
+  /**
+   * List of datasets.
+   */
+  datasets?: Array<Dataset>;
 };
 
 /**

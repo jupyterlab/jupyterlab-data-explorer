@@ -26,17 +26,25 @@ function Browser({
   const [submittedURL, setSubmittedURL] = React.useState(url);
   const [follow, setFollow] = React.useState(true);
   const [widget, setWidget] = React.useState<Widget | undefined>(undefined);
+  const [widgets, setWidgets] = React.useState(new Map<string, () => Widget>());
 
-  const widgets =
-    submittedURL && widgetDataType.filterDataset(registry.getURL(submittedURL));
+  React.useEffect(() => {
+    setWidgets(
+      submittedURL
+        ? widgetDataType.filterDataset(registry.getURL(submittedURL))
+        : new Map<string, () => Widget>()
+    );
+  }, [submittedURL, registry]);
 
-  const widgetLabels = widgets ? [...widgets.keys()] : [];
+  const widgetLabels = [...widgets.keys()];
 
-  // If the current label is not in the widget labels, and there is a first widget label
-  // set the current label to that
-  if (!new Set(widgetLabels).has(label) && widgetLabels.length) {
-    setLabel(widgetLabels[0]);
-  }
+  React.useEffect(() => {
+    // If the current label is not in the widget labels, and there is a first widget label
+    // set the current label to that
+    if (!new Set(widgetLabels).has(label) && widgetLabels.length) {
+      setLabel(widgetLabels[0]);
+    }
+  }, [widgets, label]);
 
   React.useEffect(() => {
     if (!widgets || !label) {

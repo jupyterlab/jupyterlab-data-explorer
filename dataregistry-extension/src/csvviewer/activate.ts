@@ -11,6 +11,9 @@ import { datatypes } from "./../datatypes";
 import { mimetypes } from "./../mimetypes";
 import { CSVDataGrid } from "./data_grid";
 
+/**
+ * Interface describing an object containing data to convert.
+ */
 interface Data {
   /**
    * Data to convert.

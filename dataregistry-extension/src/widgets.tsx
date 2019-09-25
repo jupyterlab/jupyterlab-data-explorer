@@ -62,6 +62,7 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
             ? `${label}: ${url}`
             : `${label}: ${url} (${externalURL})`;
         this.externalURL = externalURL;
+        tracker.save(this);
       }
     });
   }

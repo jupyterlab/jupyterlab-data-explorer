@@ -12,7 +12,7 @@ import activate from "./activate";
 /**
  * Plugin registration data.
  */
-const extension: JupypterFrontEndPlugin<void> = {
+const extension: JupyterFrontEndPlugin<void> = {
   "id": "@jupyterlab/dataregistry-extension:csv-viewer",
   "activate": activate,
   "autoStart": true,

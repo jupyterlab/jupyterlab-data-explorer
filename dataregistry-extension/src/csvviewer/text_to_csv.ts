@@ -6,8 +6,7 @@
  */
 
 import { createConverter } from "@jupyterlab/dataregistry";
-import { datatypes } from "./../datatypes";
-import { mimetypes } from "./../mimetypes";
+import datatypes from "./../datatypes";
 
 /**
  * Interface describing an object containing data to convert.
@@ -50,7 +49,7 @@ function text2csv() {
    * @returns converted data
    */
   function convert(obj: Data) {
-    if (obj.type === mimetypes.csv) {
+    if (obj.type === datatypes.csv.createMimeType()) {
       return obj.data;
     }
     return null;

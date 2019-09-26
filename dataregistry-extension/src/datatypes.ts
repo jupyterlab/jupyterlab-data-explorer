@@ -10,7 +10,6 @@ import { INotebookModel } from "@jupyterlab/notebook";
 import { DocumentRegistry, Context } from "@jupyterlab/docregistry";
 import { Widget } from "@phosphor/widgets";
 import { Observable } from "rxjs";
-import { mimetypes }  from "./mimetypes";
 
 /**
  * Interface describing a dataset.
@@ -58,21 +57,26 @@ interface Datasets {
 
 /**
  * Table of data registry data types.
+ *
+ * ## Notes
+ *
+ * -  See [MDN][1] for MIME type information.
+ *
+ * [1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
  */
 const datatypes = {
-  "csv": new DataTypeStringArg<Observable<string>>(mimetypes.csv, "mimeType"), // FIXME
-  "datagrid": new DataTypeNoArgs<Observable<string>>(mimetypes.datagrid),
-  "datasetsFile": new DataTypeNoArgs<Observable<Datasets>>(mimetypes.datasetsFile),
-  "label": new DataTypeNoArgs<Observable<string>>(mimetypes.label),
-  "notebookContext": new DataTypeNoArgs<Observable<Context<INotebookModel>>>(mimetypes.notebookContext),
+  "csv": new DataTypeNoArgs<Observable<string>>("text/csv"),
+  "datagrid": new DataTypeNoArgs<Observable<string>>("application/x.phosphor.datagrid"),
+  "datasetsFile": new DataTypeNoArgs<Observable<Datasets>>("application/x.jupyterlab.datasets-file"),
+  "label": new DataTypeNoArgs<Observable<string>>("application/x.jupyterlab.label"),
+  "notebookContext": new DataTypeNoArgs<Observable<Context<INotebookModel>>>("application/x.jupyterlab.notebook-context"),
   "text": new DataTypeStringArg<Observable<string>>("text/plain", "mimeType"),
-  "textContext": new DataTypeStringArg<Observable<Context<DocumentRegistry.ICodeModel>>>(mimetypes.textContext, "mimeType"),
-  "widget": new DataTypeStringArg<() => Widget>(mimetypes.widget, "label")
+  "textContext": new DataTypeStringArg<Observable<Context<DocumentRegistry.ICodeModel>>>("application/x.jupyterlab.text-context", "mimeType"),
+  "widget": new DataTypeStringArg<() => Widget>("application/x.jupyter.widget", "label")
 };
 
 /**
  * Exports.
  */
-export { datatypes };
 export { Datasets };
 export default datatypes;

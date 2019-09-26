@@ -6,7 +6,7 @@
  */
 
 import { resolveExtensionConverter } from "@jupyterlab/dataregistry";
-import { mimetypes } from "./../mimetypes";
+import datatypes from "./../datatypes";
 
 /**
  * Returns a converter for converting from a resolver MIME type to a file MIME type.
@@ -15,7 +15,7 @@ import { mimetypes } from "./../mimetypes";
  * @returns data type converter
  */
 function extension2mimetype() {
-  return resolveExtensionConverter(".csv", mimetypes.csv);
+  return resolveExtensionConverter(".csv", datatypes.csv.createMimeType());
 }
 
 /**

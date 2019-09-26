@@ -6,7 +6,7 @@
  */
 
 import { createConverter } from "@jupyterlab/dataregistry";
-import { datatypes } from "./../datatypes";
+import datatypes from "./../datatypes";
 import DataGrid from "./data_grid";
 
 /**

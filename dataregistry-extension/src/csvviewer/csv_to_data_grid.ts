@@ -7,7 +7,7 @@
 
 import { createConverter } from "@jupyterlab/dataregistry";
 import { datatypes } from "./../datatypes";
-import { DataGrid } from "./data_grid";
+import DataGrid from "./data_grid";
 
 /**
  * Interface describing an object containing data to convert.
@@ -64,5 +64,4 @@ function csv2datagrid() {
 /**
  * Exports.
  */
-export { csv2datagrid };
 export default csv2datagrid;

@@ -60,5 +60,4 @@ function text2csv() {
 /**
  * Exports.
  */
-export { text2csv };
 export default text2csv;

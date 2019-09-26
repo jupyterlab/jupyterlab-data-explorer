@@ -7,9 +7,9 @@
 
 import { JupyterFrontEnd } from "@jupyterlab/application";
 import { Registry } from "@jupyterlab/dataregistry";
-import { extension2mimetype } from "./extension_to_mimetype";
-import { text2csv } from "./text_to_csv";
-import { csv2datagrid } from "./csv_to_data_grid";
+import extension2mimetype from "./extension_to_mimetype";
+import text2csv from "./text_to_csv";
+import csv2datagrid from "./csv_to_data_grid";
 
 /**
  * Activates the plugin.
@@ -27,5 +27,4 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
 /**
  * Exports.
  */
-export { activate };
 export default activate;

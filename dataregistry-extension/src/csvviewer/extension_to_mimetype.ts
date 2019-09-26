@@ -21,5 +21,4 @@ function extension2mimetype() {
 /**
  * Exports
  */
-export { extension2mimetype };
 export default extension2mimetype;

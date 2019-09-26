@@ -72,5 +72,4 @@ class CSVDataGrid extends DataGrid {
 /**
  * Exports.
  */
-export { CSVDataGrid as DataGrid };
 export default CSVDataGrid;

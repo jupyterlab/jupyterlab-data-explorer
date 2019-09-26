@@ -169,12 +169,14 @@ function Browser({
           setSubmittedURL(url);
           event.preventDefault();
         }}
+        style={{display: "flex"}}
       >
         <input
           type="text"
           value={url}
           placeholder="file:///data.csv"
           onChange={event => setURL(event.target.value)}
+          style={{flex: "auto"}}
         />
         <input type="submit" value="Submit" />
       </form>

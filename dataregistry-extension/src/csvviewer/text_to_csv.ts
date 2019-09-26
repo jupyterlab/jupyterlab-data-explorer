@@ -8,6 +8,8 @@
 import { createConverter } from "@jupyterlab/dataregistry";
 import datatypes from "./../datatypes";
 
+const CSV_MIME_TYPE: string = datatypes.csv.createMimeType();
+
 /**
  * Interface describing an object containing data to convert.
  *
@@ -49,7 +51,7 @@ function text2csv() {
    * @returns converted data
    */
   function convert(obj: Data) {
-    if (obj.type === datatypes.csv.createMimeType()) {
+    if (obj.type === CSV_MIME_TYPE) {
       return obj.data;
     }
     return null;

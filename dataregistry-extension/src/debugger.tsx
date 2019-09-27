@@ -20,7 +20,7 @@ import {
 } from "@jupyterlab/apputils";
 
 import * as React from "react";
-import { IRegistry } from "./registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { Registry, CachedObservable } from "@jupyterlab/dataregistry";
 import { UseBehaviorSubject } from "./utils";
 

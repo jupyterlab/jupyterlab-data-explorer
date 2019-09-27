@@ -12,7 +12,7 @@ import {
   createFolderConverter
 } from "@jupyterlab/dataregistry";
 import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
-import { IRegistry } from "./registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { Contents } from "@jupyterlab/services";
 
 export default {

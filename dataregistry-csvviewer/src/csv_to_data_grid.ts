@@ -6,9 +6,8 @@
  */
 
 import { createConverter } from "@jupyterlab/dataregistry";
-import datatypes from "./../datatypes";
-
-const CSV_MIME_TYPE: string = datatypes.csv.createMimeType();
+import datatypes from "./datatypes"; // FIXME
+import DataGrid from "./data_grid";
 
 /**
  * Interface describing an object containing data to convert.
@@ -20,45 +19,49 @@ interface Data {
    * Data to convert.
    */
   data: any;
-
-  /**
-   * Desired data type.
-   */
-  type: string;
 }
 
 /**
- * Returns a converter for converting text data to CSV.
+ * Returns a converter for converting CSV data to a data grid.
  *
  * @private
  * @returns data type converter
  */
-function text2csv() {
+function csv2datagrid() {
   const conversion = {
-    "from": datatypes.text,
-    "to": datatypes.csv
+    "from": datatypes.csv,
+    "to": datatypes.widget
   };
 
   return createConverter(conversion, convert);
 
   /**
-   * Converts from text data to CSV.
+   * Converts CSV data to a data grid.
    *
    * @private
    * @param obj - data object
    * @param obj.data - data to convert
-   * @param obj.type - desired type
    * @returns converted data
    */
   function convert(obj: Data) {
-    if (obj.type === CSV_MIME_TYPE) {
-      return obj.data;
+    return {
+      "type": "Grid",
+      "data": getData
+    };
+
+    /**
+     * Returns a data grid.
+     *
+     * @private
+     * @returns data grid
+     */
+    function getData() {
+      return new DataGrid(obj.data);
     }
-    return null;
   }
 }
 
 /**
  * Exports.
  */
-export default text2csv;
+export default csv2datagrid;

@@ -17,7 +17,7 @@ import { relativeNestedDataType, Registry } from "@jupyterlab/dataregistry";
 import { IActiveDataset } from "./active";
 import { IRenderMimeRegistry, IRenderMime } from "@jupyterlab/rendermime";
 import { ReactWidget } from "@jupyterlab/apputils";
-import { IRegistry } from "./registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import * as React from "react";
 import { OutputArea } from "@jupyterlab/outputarea";
 import { PanelLayout, Panel } from "@phosphor/widgets";

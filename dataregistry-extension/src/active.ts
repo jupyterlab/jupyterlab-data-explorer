@@ -17,12 +17,12 @@ import {
   resolveDataType,
   URL_
 } from "@jupyterlab/dataregistry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { IDocumentManager } from "@jupyterlab/docmanager";
 import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import { BehaviorSubject } from "rxjs";
 import { map } from "rxjs/operators";
-import { IRegistry } from "./registry";
 import { hasURL_ } from "./widgets";
 
 export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}

@@ -13,9 +13,9 @@ import {
 } from "@jupyterlab/application";
 import { ReactWidget } from "@jupyterlab/apputils";
 import { Registry } from "@jupyterlab/dataregistry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 
 import * as React from "react";
-import { IRegistry } from "./registry";
 import { widgetDataType } from "./widgets";
 import { IActiveDataset } from ".";
 import { Widget } from "@phosphor/widgets";

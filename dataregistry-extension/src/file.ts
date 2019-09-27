@@ -31,7 +31,7 @@ import {
   textDataType
 } from "@jupyterlab/dataregistry";
 import { Observable, of } from "rxjs";
-import { IRegistry } from "./registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { map } from "rxjs/operators";
 import * as yaml from "js-yaml";
 import { snippedDataType } from "./snippets";

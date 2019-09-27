@@ -6,7 +6,7 @@
  */
 
 import { resolveExtensionConverter } from "@jupyterlab/dataregistry";
-import datatypes from "./../datatypes";
+import datatypes from "./datatypes"; // FIXME
 
 /**
  * Returns a converter for converting from a resolver MIME type to a file MIME type.

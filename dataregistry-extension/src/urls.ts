@@ -14,7 +14,7 @@ import {
   resolverURLConverter,
   Registry
 } from "@jupyterlab/dataregistry";
-import { IRegistry } from "./registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 
 export default {
   activate,

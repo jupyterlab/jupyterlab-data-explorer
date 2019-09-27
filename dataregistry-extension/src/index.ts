@@ -8,10 +8,10 @@
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
 export * from "./active";
-import csvViewerPlugin from "./csvviewer";
-export * from "./csvviewer";
-import dataRegistryPlugin from "./registry";
-export * from "./registry";
+import csvViewerPlugin from "@jupyterlab/dataregistry-csvviewer";
+export * from "@jupyterlab/dataregistry-csvviewer";
+import dataRegistryPlugin from "@jupyterlab/dataregistry-registry";
+export * from "@jupyterlab/dataregistry-registry";
 import dataExplorerPlugin from "./explorer";
 export * from "./explorer";
 import filesPlugin from "./files";

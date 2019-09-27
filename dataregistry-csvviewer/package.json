@@ -1,7 +1,7 @@
 {
-  "name": "@jupyterlab/dataregistry-extension",
-  "version": "2.2.2",
-  "description": "Datasets as first class entities in Juptyerlab.",
+  "name": "@jupyterlab/dataregistry-csvviewer",
+  "version": "0.0.0",
+  "description": "CSV viewer data converter.",
   "keywords": [
     "jupyter",
     "jupyterlab",
@@ -33,35 +33,18 @@
     "prepublishOnly": "yarn run clean && yarn run build",
     "watch": "tsc -w --listEmittedFiles",
     "lint": "eslint src/*",
-    "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
+    "generateSchema": "ts-json-schema-generator --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
   },
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
-    "@jupyterlab/apputils": "^1.0.0",
-    "@jupyterlab/coreutils": "^3.0.0",
     "@jupyterlab/csvviewer": "^1.0.0",
     "@jupyterlab/dataregistry": "^2.0.0",
-    "@jupyterlab/docmanager": "^1.0.0",
-    "@jupyterlab/docregistry": "^1.0.4",
-    "@jupyterlab/filebrowser": "^1.0.0",
-    "@jupyterlab/notebook": "^1.0.0",
-    "@jupyterlab/rendermime": "^1.0.0",
-    "@nteract/data-explorer": "7.0.1",
     "@phosphor/datagrid": "^0.1.10",
     "@phosphor/messaging": "^1.2.3",
-    "@phosphor/widgets": "^1.8.0",
-    "ajv": "6.10.2",
-    "js-yaml": "3.13.1",
-    "path": "0.12.7",
-    "react": "16.8.4",
-    "react-inspector": "3.0.0",
     "rxjs": "6.5.2",
-    "styled-components": "4.3.2",
-    "@jupyterlab/dataregistry-csvviewer": "file:../dataregistry-csvviewer",
     "@jupyterlab/dataregistry-registry": "file:../dataregistry-registry"
   },
   "devDependencies": {
-    "@types/js-yaml": "3.12.1",
     "@typescript-eslint/eslint-plugin": "1.13.0",
     "@typescript-eslint/parser": "1.13.0",
     "eslint": "6.1.0",

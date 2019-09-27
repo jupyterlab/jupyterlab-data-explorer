@@ -18,10 +18,10 @@ import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { classes, style } from "typestyle";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { IActiveDataset, ACTIVE_URL } from "./active";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";
-import { IRegistry } from "./registry";
 import {
   Registry,
   URL_,

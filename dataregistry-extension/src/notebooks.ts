@@ -21,6 +21,7 @@ import {
   URLTemplate
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
 import { defer, Observable, of } from "rxjs";
 import { map, switchMap } from "rxjs/operators";
@@ -29,7 +30,6 @@ import {
   observableListToObservable,
   outputAreaModelToObservable
 } from "./observables";
-import { IRegistry } from "./registry";
 
 const notebookURL = new URLTemplate("file://{+path}", {
   path: URLTemplate.extension(".ipynb")

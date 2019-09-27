@@ -25,8 +25,8 @@ import {
 } from "@jupyterlab/dataregistry";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { viewerDataType } from "./viewers";
-import { IRegistry } from "./registry";
 import { Subscription } from "rxjs";
 
 const tracker = new WidgetTracker<DataWidget>({ namespace: "dataregistry" });

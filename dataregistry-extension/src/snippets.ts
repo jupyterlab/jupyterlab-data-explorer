@@ -22,8 +22,8 @@ import {
   createConverter,
   Registry
 } from "@jupyterlab/dataregistry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry";
 import { viewerDataType } from "./viewers";
-import { IRegistry } from "./registry";
 
 type SnippetContext = {
   path: string;

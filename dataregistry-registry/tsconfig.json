@@ -18,12 +18,6 @@
   "references": [
     {
       "path": "../dataregistry"
-    },
-    {
-      "path": "../dataregistry-csvviewer"
-    },
-    {
-      "path": "../dataregistry-registry"
     }
   ]
 }

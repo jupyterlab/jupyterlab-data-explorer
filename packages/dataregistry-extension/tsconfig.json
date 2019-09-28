@@ -1,17 +1,8 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "composite": true,
-    "declaration": true,
-    "jsx": "react",
-    "module": "esnext",
-    "moduleResolution": "node",
-    "noEmitOnError": true,
     "outDir": "lib",
     "rootDir": "src",
-    "skipLibCheck": true,
-    "sourceMap": true,
-    "strict": true,
-    "target": "es2019",
     "types": ["node"]
   },
   "include": ["src/*"],

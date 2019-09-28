@@ -28,12 +28,10 @@
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "scripts": {
-    "build": "tsc && yarn run generateSchema",
+    "build": "tsc -b",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "prepublishOnly": "yarn run clean && yarn run build",
-    "watch": "tsc -w --listEmittedFiles",
-    "lint": "eslint src/*",
-    "generateSchema": "ts-json-schema-generator --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
+    "prepublishOnly": "npm run clean && npm run build",
+    "watch": "tsc -b --watch --listEmittedFiles"
   },
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
@@ -45,12 +43,6 @@
     "@jupyterlab/dataregistry-registry": "file:../dataregistry-registry"
   },
   "devDependencies": {
-    "@typescript-eslint/eslint-plugin": "1.13.0",
-    "@typescript-eslint/parser": "1.13.0",
-    "eslint": "6.1.0",
-    "eslint-config-prettier": "6.0.0",
-    "eslint-plugin-react": "7.14.3",
-    "eslint-plugin-react-hooks": "1.6.1",
     "rimraf": "~2.6.2",
     "ts-json-schema-generator": "0.52.14",
     "typescript": "3.5.3"

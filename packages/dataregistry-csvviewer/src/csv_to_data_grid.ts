@@ -27,7 +27,7 @@ interface Data {
  * @private
  * @returns data type converter
  */
-function csv2datagrid() {
+function csv2datagrid(): any {
   const conversion = {
     "from": datatypes.csv,
     "to": datatypes.widget

@@ -33,7 +33,7 @@ interface Data {
  * @private
  * @returns data type converter
  */
-function text2csv() {
+function text2csv(): any {
   const conversion = {
     "from": datatypes.text,
     "to": datatypes.csv

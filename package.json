@@ -6,13 +6,15 @@
     ]
   },
   "scripts": {
-    "build": "tsc --build dataregistry dataregistry-registry dataregistry-csvviewer dataregistry-extension && jlpm workspace @jupyterlab/dataregistry-extension run generateSchema && jlpm workspace @jupyterlab/dataregistry-csvviewer run generateSchema",
-    "build:dev": "jlpm install && jlpm clean && jlpm run build && jlpm run link",
-    "lint": "jlpm workspace @jupyterlab/dataregistry-extension lint && jlpm workspace @jupyterlab/dataregistry-csvviewer lint && jlpm workspace @jupyterlab/dataregistry-registry lint",
-    "clean": "jlpm workspace @jupyterlab/dataregistry run clean && jlpm workspace @jupyterlab/dataregistry-extension run clean && jlpm workspace @jupyterlab/dataregistry-csvviewer run clean && jlpm workspace @jupyterlab/dataregistry-registry run clean",
-    "build:watch": "tsc --build --watch  dataregistry dataregistry-registry dataregistry-csvviewer dataregistry-extension",
-    "link": "jupyter labextension link dataregistry --no-build && jupyter labextension link dataregistry-registry && jupyter labextension link dataregistry-csvviewer && jupyter labextension link dataregistry-extension",
-    "unlink": "jupyter labextension unlink dataregistry --no-build && jupyter labextension unlink dataregistry-extension && jupyter labextension unlink dataregistry-csvviewer && jupyter labextension unlink dataregistry-registry"
+    "build": "jlpm run build:dev",
+    "build:dev": "jlpm install && jlpm clean && jlpm run build:packages && jlpm run link",
+    "build:packages": "cd packages/dataregistry-metapackage && jlpm run build",
+    "build:watch": "tsc --build --watch packages/dataregistry-metapackage packages/dataregistry packages/dataregistry-csvviewer packages/dataregistry-registry packages/dataregistry-extension",
+    "lint": "echo 'TODO\n'",
+    "clean": "jlpm run clean:packages",
+    "clean:packages": "rimraf packages/*/lib packages/*/tsconfig.tsbuildinfo",
+    "link": "jupyter labextension link packages/dataregistry --no-build && jupyter labextension link packages/dataregistry-registry && jupyter labextension link packages/dataregistry-csvviewer && jupyter labextension link packages/dataregistry-extension",
+    "unlink": "jupyter labextension unlink packages/dataregistry --no-build && jupyter labextension unlink packages/dataregistry-extension && jupyter labextension unlink packages/dataregistry-csvviewer && jupyter labextension unlink packages/dataregistry-registry"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "1.13.0",

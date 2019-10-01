@@ -21,12 +21,12 @@
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "jest lib",
     "test:watch": "npm run test --watch",
-    "watch": "tsc -b --watch --listEmittedFiles"
+    "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {
     "rxjs": "6.5.2",

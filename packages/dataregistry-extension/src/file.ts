@@ -18,8 +18,7 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin,
-  JupyterLab
+  JupyterFrontEndPlugin
 } from "@jupyterlab/application";
 import {
   DataTypeNoArgs,

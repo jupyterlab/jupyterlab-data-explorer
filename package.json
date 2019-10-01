@@ -6,15 +6,15 @@
     ]
   },
   "scripts": {
-    "build": "jlpm run build:dev",
-    "build:dev": "jlpm install && jlpm clean && jlpm run build:packages && jlpm run link",
-    "build:packages": "cd packages/dataregistry-metapackage && jlpm run build",
-    "build:watch": "tsc --build --watch packages/dataregistry-metapackage packages/dataregistry packages/dataregistry-csvviewer packages/dataregistry-registry packages/dataregistry-extension",
-    "lint": "echo 'TODO\n'",
-    "clean": "jlpm run clean:packages",
-    "clean:packages": "rimraf packages/*/lib packages/*/tsconfig.tsbuildinfo",
-    "link": "jupyter labextension link packages/dataregistry --no-build && jupyter labextension link packages/dataregistry-registry && jupyter labextension link packages/dataregistry-csvviewer && jupyter labextension link packages/dataregistry-extension",
-    "unlink": "jupyter labextension unlink packages/dataregistry --no-build && jupyter labextension unlink packages/dataregistry-extension && jupyter labextension unlink packages/dataregistry-csvviewer && jupyter labextension unlink packages/dataregistry-registry"
+    "build": "npm run build:dev",
+    "build:dev": "npm install && npm run clean:packages && lerna bootstrap && npm run build:packages && npm run link:packages",
+    "build:packages": "lerna run build",
+    "build:watch": "lerna run watch",
+    "lint": "echo 'TODO'",
+    "clean:node": "lerna clean && rimraf node_modules",
+    "clean:packages": "lerna run clean",
+    "link:packages": "lerna run link",
+    "unlink:packages": "lerna run unlink"
   },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "1.13.0",
@@ -23,6 +23,7 @@
     "eslint-config-prettier": "6.0.0",
     "eslint-plugin-react": "7.14.3",
     "eslint-plugin-react-hooks": "1.6.1",
-    "lerna": "^3.16.4"
+    "lerna": "^3.16.4",
+    "rimraf": "~2.6.2"
   }
 }

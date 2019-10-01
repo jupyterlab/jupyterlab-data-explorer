@@ -39,13 +39,13 @@
     "@jupyterlab/dataregistry": "^2.0.0",
     "@phosphor/datagrid": "^0.1.10",
     "@phosphor/messaging": "^1.2.3",
-    "rxjs": "6.5.2",
+    "rxjs": "^6.5.2",
     "@jupyterlab/dataregistry-registry": "0.0.0"
   },
   "devDependencies": {
-    "rimraf": "~2.6.2",
+    "rimraf": "^2.6.2",
     "ts-json-schema-generator": "0.52.14",
-    "typescript": "3.5.3"
+    "typescript": "^3.5.3"
   },
   "publishConfig": {
     "access": "public"

@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "lib",
+    "rootDir": "src"
+  },
+  "include": [
+  	"src/*"
+  ],
+  "references": [
+  	{
+  		"path": "../dataregistry"
+  	},
+  	{
+  		"path": "../dataregistry-csvviewer"
+  	},
+  	{
+  		"path": "../dataregistry-extension"
+  	},
+  	{
+  		"path": "../dataregistry-registry"
+  	}
+  ]
+}

@@ -1,0 +1,47 @@
+{
+  "name": "@jupyterlab/dataregistry-metapackage",
+  "version": "0.0.0",
+  "description": "Meta package consisting of all data registry packages.",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/jupyterlab/jupyterlab-data-explorer",
+  "bugs": {
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Project Jupyter",
+  "files": [
+    "lib/**"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "directories": {
+    "lib": "lib/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "prepublishOnly": "npm run clean && npm run build",
+    "watch": "tsc -b --watch --listEmittedFiles"
+  },
+  "dependencies": {
+    "@jupyterlab/dataregistry": "file:../dataregistry",
+    "@jupyterlab/dataregistry-csvviewer": "file:../dataregistry-csvviewer",
+    "@jupyterlab/dataregistry-extension": "file:../dataregistry-extension",
+    "@jupyterlab/dataregistry-registry": "file:../dataregistry-registry"
+  },
+  "devDependencies": {
+    "rimraf": "~2.6.2",
+    "typescript": "3.5.3"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

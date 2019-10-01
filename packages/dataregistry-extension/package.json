@@ -17,11 +17,11 @@
     "lib/**",
     "style.css"
   ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "style": "style.css",
+  "main": "./lib",
+  "types": "./lib/index.d.ts",
+  "style": "./style.css",
   "directories": {
-    "lib": "lib/"
+    "lib": "./lib"
   },
   "repository": {
     "type": "git",
@@ -30,7 +30,9 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "link": "jupyter labextension link ./",
     "prepublishOnly": "npm run clean && npm run build",
+    "unlink": "jupyter labextension unlink ./",
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {
@@ -55,8 +57,8 @@
     "react-inspector": "3.0.0",
     "rxjs": "6.5.2",
     "styled-components": "4.3.2",
-    "@jupyterlab/dataregistry-csvviewer": "file:../dataregistry-csvviewer",
-    "@jupyterlab/dataregistry-registry": "file:../dataregistry-registry"
+    "@jupyterlab/dataregistry-csvviewer": "0.0.0",
+    "@jupyterlab/dataregistry-registry": "0.0.0"
   },
   "devDependencies": {
     "@types/js-yaml": "3.12.1",

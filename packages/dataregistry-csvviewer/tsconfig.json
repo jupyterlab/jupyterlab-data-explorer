@@ -1,15 +1,17 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "lib",
-    "rootDir": "src",
-    "skipLibCheck": true,
+    "outDir": "./lib",
+    "rootDir": "./src",
     "types": [
       "node"
     ]
   },
   "include": [
     "src/*"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "references": [
     {

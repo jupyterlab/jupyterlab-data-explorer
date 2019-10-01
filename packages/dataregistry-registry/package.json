@@ -16,11 +16,10 @@
   "files": [
     "lib/**"
   ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
-  "style": "style.css",
+  "main": "./lib",
+  "types": "./lib/index.d.ts",
   "directories": {
-    "lib": "lib/"
+    "lib": "./lib"
   },
   "repository": {
     "type": "git",
@@ -29,7 +28,9 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "link": "jupyter labextension link ./",
     "prepublishOnly": "npm run clean && npm run build",
+    "unlink": "jupyter labextension unlink ./",
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {

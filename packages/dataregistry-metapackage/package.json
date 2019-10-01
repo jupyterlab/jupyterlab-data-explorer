@@ -16,10 +16,10 @@
   "files": [
     "lib/**"
   ],
-  "main": "lib/index.js",
-  "types": "lib/index.d.ts",
+  "main": "./lib",
+  "types": "./lib/index.d.ts",
   "directories": {
-    "lib": "lib/"
+    "lib": "./lib"
   },
   "repository": {
     "type": "git",
@@ -32,10 +32,10 @@
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {
-    "@jupyterlab/dataregistry": "file:../dataregistry",
-    "@jupyterlab/dataregistry-csvviewer": "file:../dataregistry-csvviewer",
-    "@jupyterlab/dataregistry-extension": "file:../dataregistry-extension",
-    "@jupyterlab/dataregistry-registry": "file:../dataregistry-registry"
+    "@jupyterlab/dataregistry": "^2.0.0",
+    "@jupyterlab/dataregistry-csvviewer": "0.0.0",
+    "@jupyterlab/dataregistry-extension": "^2.2.2",
+    "@jupyterlab/dataregistry-registry": "0.0.0"
   },
   "devDependencies": {
     "rimraf": "~2.6.2",

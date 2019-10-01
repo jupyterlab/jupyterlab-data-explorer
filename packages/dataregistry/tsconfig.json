@@ -1,8 +1,8 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "outDir": "lib",
-    "rootDir": "src",
+    "outDir": "./lib",
+    "rootDir": "./src",
     "types": [
     	"node",
     	"jest"
@@ -10,5 +10,8 @@
   },
   "include": [
   	"src/*"
+  ],
+  "exclude": [
+    "node_modules"
   ]
 }

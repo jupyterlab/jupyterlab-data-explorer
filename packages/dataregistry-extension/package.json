@@ -17,7 +17,7 @@
     "lib/**",
     "style.css"
   ],
-  "main": "./lib",
+  "main": "./lib/index.js",
   "types": "./lib/index.d.ts",
   "style": "./style.css",
   "directories": {
@@ -30,7 +30,7 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "link": "jupyter labextension link ./",
+    "link": "jupyter labextension link ./ --no-build",
     "prepublishOnly": "npm run clean && npm run build",
     "unlink": "jupyter labextension unlink ./",
     "watch": "tsc --build --watch --listEmittedFiles"

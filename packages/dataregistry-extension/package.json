@@ -17,7 +17,7 @@
     "lib/**",
     "style.css"
   ],
-  "main": "./lib/index.js",
+  "main": "lib/index.js",
   "types": "./lib/index.d.ts",
   "style": "./style.css",
   "directories": {
@@ -28,8 +28,9 @@
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && jlpm run generateSchema",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json",
     "link": "jupyter labextension link ./ --no-build",
     "prepublishOnly": "npm run clean && npm run build",
     "unlink": "jupyter labextension unlink ./ --no-build",
@@ -56,9 +57,7 @@
     "react": "^16.8.4",
     "react-inspector": "^3.0.0",
     "rxjs": "^6.5.2",
-    "styled-components": "^4.3.2",
-    "@jupyterlab/dataregistry-csvviewer": "0.0.0",
-    "@jupyterlab/dataregistry-registry": "0.0.0"
+    "styled-components": "^4.3.2"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",

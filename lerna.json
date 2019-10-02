@@ -1,11 +1,11 @@
 {
 	"version": "independent",
-	"npmClient": "npm",
+	"npmClient": "jlpm",
 	"npmClientArgs": [
-		"--no-shrinkwrap",
-		"--no-package-lock"
+		"--no-lockfile"
 	],
 	"packages": [
 		"packages/*"
-	]
+	],
+	"useWorkspaces": true
 }

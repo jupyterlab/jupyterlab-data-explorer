@@ -146,7 +146,7 @@ function Browser({
   const [url, setURL] = React.useState(active.value || "");
   // Last url we have submitted
   const [submittedURL, setSubmittedURL] = React.useState(url);
-  // Whether to update both urls whwnever the active dataset changes
+  // Whether to update both urls whenever the active dataset changes
   const [follow, setFollow] = React.useState(true);
 
   // Update the URL when the active changes

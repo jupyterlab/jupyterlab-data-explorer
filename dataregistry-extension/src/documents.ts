@@ -75,7 +75,12 @@ function activate(
       { from: fileDataType, to: notebookContextDataType },
       ({ data, type }) =>
         type === notebookMimeType
-          ? defer(() => getContext(docmanager, data, "notebook"))
+          ? defer(
+              () =>
+                getContext(docmanager, data, "notebook") as Promise<
+                  Context<INotebookModel>
+                >
+            )
           : null
     ),
     createConverter(

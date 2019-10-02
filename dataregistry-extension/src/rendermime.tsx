@@ -24,6 +24,7 @@ import { PanelLayout, Panel } from "@phosphor/widgets";
 import { CodeCell } from "@jupyterlab/cells";
 import { Notebook, NotebookPanel } from "@jupyterlab/notebook";
 import { DatasetCompononent } from "./explorer";
+import { of } from "rxjs";
 
 const mimeType = relativeNestedDataType.createMimeType();
 
@@ -58,7 +59,7 @@ class Renderer extends ReactWidget implements IRenderMime.IRenderer {
   render() {
     return (
       <DatasetCompononent
-        parentURL={""}
+        parentURL={of("")}
         url={this._url!.toString()}
         active$={this._active}
         registry={this._registry}

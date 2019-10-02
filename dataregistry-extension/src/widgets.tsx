@@ -21,13 +21,14 @@ import {
   DataTypeStringArg,
   Registry,
   URL_,
-  createConverter,
+  createConverter
 } from "@jupyterlab/dataregistry";
 import { Widget } from "@phosphor/widgets";
 import * as React from "react";
 import { viewerDataType } from "./viewers";
 import { IRegistry } from "./registry";
 import { Subscription } from "rxjs";
+import { first } from "rxjs/operators";
 
 const tracker = new WidgetTracker<DataWidget>({ namespace: "dataregistry" });
 const commandID = "dataregistry:view-url";
@@ -55,11 +56,16 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
     super({ content });
     this.id = JSON.stringify([label, url.toString()]);
     this.title.closable = true;
+    this.title.label = `${label}: ${url}`;
 
     this.subscription = registry.externalURL(url).subscribe({
       next: externalURL => {
-        this.title.label = `${label}: ${externalURL}`;
+        this.title.label =
+          externalURL === url
+            ? `${label}: ${url}`
+            : `${label}: ${url} (${externalURL})`;
         this.externalURL = externalURL;
+        tracker.save(this);
       }
     });
   }
@@ -136,7 +142,12 @@ function activate(
       const label = args.label as string;
       viewerDataType
         .filterDataset(
-          registry.getURL(await registry.internalURL(url).toPromise())
+          registry.getURL(
+            await registry
+              .internalURL(url)
+              .pipe(first())
+              .toPromise()
+          )
         )
         .get(label)!();
     }

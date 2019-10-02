@@ -10,6 +10,7 @@ import * as React from "react";
 import { Observable, Subscription, BehaviorSubject } from "rxjs";
 
 import { Widget } from "@phosphor/widgets";
+import { ISignal } from "@phosphor/signaling";
 
 interface IUseBehaviorSubjectProps<T> {
   subject: BehaviorSubject<T>;
@@ -66,4 +67,16 @@ export function PhosphorWidget({ widget }: { widget: Widget }) {
   }, [widget]);
 
   return <div style={{ height: "100%" }} className="scrollable" ref={el} />;
+}
+
+export function signalToObservable<T, V>(
+  signal: ISignal<T, V>
+): Observable<[T, V]> {
+  return new Observable(subscriber => {
+    function slot(sender: T, value: V) {
+      subscriber.next([sender, value]);
+    }
+    signal.connect(slot);
+    return () => signal.disconnect(slot);
+  });
 }

@@ -8,10 +8,6 @@
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
 import activePlugin from "./active";
 export * from "./active";
-import csvViewerPlugin from "@jupyterlab/dataregistry-csvviewer";
-export * from "@jupyterlab/dataregistry-csvviewer";
-import dataRegistryPlugin from "@jupyterlab/dataregistry-registry";
-export * from "@jupyterlab/dataregistry-registry";
 import dataExplorerPlugin from "./explorer";
 export * from "./explorer";
 import filesPlugin from "./files";
@@ -28,8 +24,8 @@ import foldersPlugin from "./folders";
 export * from "./folders";
 import notebooksPlugin from "./notebooks";
 export * from "./notebooks";
-import debuggerPlugin from "./debugger";
-export * from "./debugger";
+// import debuggerPlugin from "./debugger"; // FIXME: resolve runtime issue with regeneratorRuntime
+// export * from "./debugger";
 import rendermimePlugin from "./rendermime";
 export * from "./rendermime";
 import browserPlugin from "./browser";
@@ -43,10 +39,8 @@ export default [
   activePlugin,
   documentsPlugin,
   filePlugin,
-  csvViewerPlugin,
   browserPlugin,
   dataExplorerPlugin,
-  dataRegistryPlugin,
   filesPlugin,
   snippetsPlugin,
   URLPlugin,
@@ -54,6 +48,6 @@ export default [
   tableDataPlugin,
   foldersPlugin,
   notebooksPlugin,
-  debuggerPlugin,
+  // debuggerPlugin,
   rendermimePlugin
 ] as JupyterFrontEndPlugin<any>[];

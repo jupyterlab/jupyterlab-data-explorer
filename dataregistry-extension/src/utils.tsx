@@ -66,7 +66,7 @@ export function PhosphorWidget({ widget }: { widget: Widget }) {
     return () => Widget.detach(widget);
   }, [widget]);
 
-  return <div style={{ height: "100%" }} className="scrollable" ref={el} />;
+  return <div className="scrollable jl-phosphor-widget" ref={el} />;
 }
 
 export function signalToObservable<T, V>(

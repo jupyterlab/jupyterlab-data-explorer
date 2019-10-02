@@ -53,7 +53,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     );
   }, [url, registry]);
 
-  // Set teh children to the subscribed children
+  // Set the children to the subscribed children
   React.useEffect(() => {
     if (children$) {
       const subscription = children$.subscribe({

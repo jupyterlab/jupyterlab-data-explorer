@@ -74,6 +74,8 @@ function activate(
     createConverter(
       { from: fileDataType, to: notebookContextDataType },
       ({ data, type }) =>
+        // FIXME: TypeScript complains here.
+        // @ts-ignore
         type === notebookMimeType
           ? defer(() => getContext(docmanager, data, "notebook"))
           : null

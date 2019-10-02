@@ -6,12 +6,12 @@
     ]
   },
   "scripts": {
-    "build": "npm run build:dev",
-    "build:dev": "npm install && npm run clean:packages && lerna bootstrap && npm run build:packages && npm run link:packages",
+    "build": "jlpm run build:dev",
+    "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages",
     "build:packages": "lerna run build",
     "build:watch": "tsc --build --watch --listEmittedFiles packages/*",
     "lint": "echo 'TODO'",
-    "clean:node": "lerna clean && rimraf node_modules",
+    "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
     "link:packages": "lerna run link",
     "unlink:packages": "lerna run unlink"

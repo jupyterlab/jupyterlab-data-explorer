@@ -42,6 +42,18 @@ export default {
   autoStart: true
 } as JupyterFrontEndPlugin<IActiveDataset>;
 
+/**
+ * If the "active" URL is an empty string or the active url
+ * itself, replace it will null. This prevens infinite recursion
+ * of the active URL and  trying to parse empty URLs.
+ */
+function processActive(url: string | null): string | null {
+  if (url === "" || url === ACTIVE_URL) {
+    return null;
+  }
+  return url;
+}
+
 function activate(
   app: JupyterFrontEnd,
   labShell: ILabShell,
@@ -52,15 +64,21 @@ function activate(
 
   // Show active datasets in explorer
   registry.addConverter(
-    createConverter<void, any, void, string>({ from: resolveDataType }, ({ url }) => {
-      if (url.toString() !== ACTIVE_URL) {
-        return null;
+    createConverter<void, any, void, string>(
+      { from: resolveDataType },
+      ({ url }) => {
+        if (url.toString() !== ACTIVE_URL) {
+          return null;
+        }
+        return {
+          type: nestedDataType.createMimeType(),
+          data: active.pipe(
+            map(processActive),
+            map(url => (url ? new Set([url]) : new Set()))
+          )
+        };
       }
-      return {
-        type: nestedDataType.createMimeType(),
-        data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
-      };
-    })
+    )
   );
 
   // Track active documents open.

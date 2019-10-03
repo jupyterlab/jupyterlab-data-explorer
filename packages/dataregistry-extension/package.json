@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "2.2.2",
+  "version": "3.0.0",
   "description": "Datasets as first class entities in Juptyerlab.",
   "keywords": [
     "jupyter",
@@ -41,7 +41,7 @@
     "@jupyterlab/apputils": "^1.0.0",
     "@jupyterlab/coreutils": "^3.0.0",
     "@jupyterlab/csvviewer": "^1.0.0",
-    "@jupyterlab/dataregistry": "^2.0.0",
+    "@jupyterlab/dataregistry": "^3.0.0",
     "@jupyterlab/docmanager": "^1.0.0",
     "@jupyterlab/docregistry": "^1.0.4",
     "@jupyterlab/filebrowser": "^1.0.0",

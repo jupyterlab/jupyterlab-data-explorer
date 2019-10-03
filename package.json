@@ -19,7 +19,9 @@
     "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
     "link:packages": "lerna run link",
-    "lint": "echo 'TODO'",
+    "lint": "jlpm run lint:css && jlpm run lint:typescript",
+    "lint:css": "stylelint packages/**/*.css",
+    "lint:typescript": "eslint packages/*/src/*",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
     "registry:init": "npm adduser --registry http://localhost:4873 && lerna exec --scope dataregistry-csvviewer --scope dataregistry-registry -- npm publish --registry http://localhost:4873",
@@ -35,6 +37,9 @@
     "eslint-plugin-react-hooks": "^1.6.1",
     "lerna": "^3.16.4",
     "rimraf": "^2.6.2",
+    "stylelint": "^11.0.0",
+    "stylelint-config-prettier": "^6.0.0",
+    "stylelint-config-standard": "^19.0.0",
     "typescript": "^3.5.3",
     "verdaccio": "^4.3.2"
   }

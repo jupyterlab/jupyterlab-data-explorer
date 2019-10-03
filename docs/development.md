@@ -124,7 +124,7 @@ $ jlpm run build
 
 If your environment has been configured correctly, the previous command should complete without errors.
 
-To build the [JupyterLab][jupyterlab] extension and launch the [JupyterLab][jupyterlab] environment,
+To build the [JupyterLab][jupyterlab] extensions found in this repository and launch the [JupyterLab][jupyterlab] environment,
 
 ```bash
 $ jlpm run build:jupyter

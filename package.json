@@ -24,7 +24,9 @@
     "lint:typescript": "eslint packages/**/src/*.ts",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
-    "registry:init": "npm adduser --registry http://localhost:4873 && lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
+    "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
+    "registry:adduser": "npm adduser --registry http://localhost:4873",
+    "registry:register": "lerna exec --scope @jupyterlab/dataregistry-csvviewer --scope @jupyterlab/dataregistry-registry -- npm publish --registry http://localhost:4873",
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },

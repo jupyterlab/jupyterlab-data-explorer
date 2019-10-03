@@ -213,15 +213,17 @@ A "converter" takes in a dataset and returns several other datasets that all hav
 
 Conceptually, each Mime Type should correspond to some defined runtime type of data. For example `text/csv` corresponds to an `Observable<string>` which is the contents of CSV file. We need to be able to agree about these definitions so that, if create a converter to produce a `text/csv` mime type and you create one that takes in that mime type and creates some visualization, we know we are dealing with the same type. A "data type" helps us here because we map a set of mime types to a TypeScript type. For example, we could define the CSV mime type as `new DataTypeNoArgs<Observable<string>>("text/csv")`. We provide a way to create a converter from one data type to another, which is `createConverter`. Data types abstract away the textual representation of the mime type from the consumer of a data type and provide a type safe way to convert to or from that data type. All of our core conversions use this typed API ([`./dataregistry/src/datatypes.ts`](./../packages/dataregistry/src/datatypes.ts)):
 
-* [`resolveDataType`](./../packages/dataregistry/src/resolvers.ts) `void`: Every URL starts with this data type when you ask for it. It has no actual data in it, so when you write a converter from it you will use the URL.
-* [`nestedDataType`](./../packages/dataregistry/src/nested.ts) `Observable<Set<URL_>>`: This specifies the URLs that are "nested" under a URL. Use this if your dataset has some sense of children like a folder has a number of files in it or a database has a number of tables. These are exposed in the data explorer as the children in the hierarchy.
-* [`viewerDataType`](./../packages/dataregistry-extension/src/viewers.ts) `() => void`: This is a function you can call to "view" that dataset in some way. It has a parameter as well, the "label", which is included in the mime type as an argument. This is exposed in the explorer as a button on the dataset.
+-  [`resolveDataType`](./../packages/dataregistry/src/resolvers.ts) `void`: Every URL starts with this data type when you ask for it. It has no actual data in it, so when you write a converter from it you will use the URL.
+-  [`nestedDataType`](./../packages/dataregistry/src/nested.ts) `Observable<Set<URL_>>`: This specifies the URLs that are "nested" under a URL. Use this if your dataset has some sense of children like a folder has a number of files in it or a database has a number of tables. These are exposed in the data explorer as the children in the hierarchy.
+-  [`viewerDataType`](./../packages/dataregistry-extension/src/viewers.ts) `() => void`: This is a function you can call to "view" that dataset in some way. It has a parameter as well, the "label", which is included in the mime type as an argument. This is exposed in the explorer as a button on the dataset.
 
 <!-- 
+
 So conceptually, we can see a number of datasets as a number of graphs, one for each URL. Adding a new converter can expand the possible Mime Types for each URL. In the registry we can either register a new converter, get all the mime types for an existing URL, or retrieve the list of current URLs that are registered ([`./dataregistry/src/registry.ts`])(./../packages/dataregistry/src/registry.ts)). 
 
-When we first ask for a URL, we have to create some initial mime type to describe that URL. We
-made up the `application/x.jupyter.resolve` mime type for this. All datasets start with the mime type, so to derive some other mime type you have to start from this one ([`./dataregistry/src/resolve.ts`])(./../packages/dataregistry/src/resolve.ts)). -->
+When we first ask for a URL, we have to create some initial mime type to describe that URL. We made up the `application/x.jupyter.resolve` mime type for this. All datasets start with the mime type, so to derive some other mime type you have to start from this one ([`./dataregistry/src/resolve.ts`])(./../packages/dataregistry/src/resolve.ts)).
+
+-->
 
 <!-- links -->
 

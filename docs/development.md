@@ -31,7 +31,7 @@ Development requires the following prerequisites:
 While not required, you are encouraged to create an [Anaconda][anaconda] environment.
 
 ```bash
-$ conda create -n jupyterlab-data-explorer -c conda-forge python=3.6 -c anaconda jupyterlab nodejs
+$ conda create -n jupyterlab-data-explorer -c conda-forge python=3.6 jupyterlab nodejs
 ```
 
 To activate the environment,

@@ -1,6 +1,6 @@
 # JupyterLab Data Explorer
 
-![Stability Experimental](https://img.shields.io/badge/stability-experimental-red.svg) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/a4ae231f6e1c52b5aee1dd7fad4985722d863456?urlpath=lab/tree/notebooks/Table.ipynb) [![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry-extension?label=%40jupyterlab%2Fdataregistry-extension&style=flat)](https://www.npmjs.com/package/@jupyterlab/dataregistry-extension) [![npm](https://img.shields.io/npm/v/@jupyterlab/dataregistry?label=%40jupyterlab%2Fdataregistry&style=flat)](https://www.npmjs.com/package/@jupyterlab/dataregistry)
+![Stability Experimental][badge-stability] [![Binder][badge-binder]][binder] [![npm][badge-npm-version-dataregistry-extension]][npm-package-dataregistry-extension] [![npm][badge-npm-version-dataregistry]][npm-package-dataregistry]
 
 ```bash
 jupyter labextension install @jupyterlab/dataregistry-extension
@@ -8,7 +8,7 @@ jupyter labextension install @jupyterlab/dataregistry-extension
 
 * Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 * Register **conversions** between the different data types.
-* Data changing on you? Use [`RxJS` **observables**](https://rxjs.dev/) to represent data over time.
+* Data changing on you? Use [`RxJS` **observables**][rxjs] to represent data over time.
 * Have a new way to look at your data? Create **React** or **Phosphor** components to view a certain type.
 * Built in data **explorer UI** to find and use available datasets.
 * Dataset in your dataset? Use the **nested** datatype.
@@ -26,7 +26,7 @@ jupyter labextension install @jupyterlab/dataregistry-extension
 3. Browse available datasets in the data explorer left side pane. We include support for viewing a few datasets. We plan on expanding this list and third party extension can extend it:
    1. Opening CSV files in the data grid and adding a snippet to open them with Pandas
    2. Opening PNG images in an image viewer
-   3. Opening table data outputted in a notebook with [`nteract`'s data explorer](https://github.com/nteract/nteract/tree/master/packages/data-explorer)
+   3. Opening table data outputted in a notebook with [`nteract`'s data explorer][nteract-data-explorer]
 
 ![](./images/nteract.png)
 
@@ -38,30 +38,32 @@ It might also be useful to view the existing data types by looking at the source
 
 ![](./images/debugger.png)
 
-### Develop on this repo:
-
-```bash
-git clone https://github.com/jupyterlab/jupyterlab-data-explorer.git
-cd jupyterlab-data-explorer
-
-// (optional) Create a fresh conda environment
-// conda create -n jupyterlab-data-explorer -c conda-forge python=3.6
-// conda activate jupyterlab-data-explorer
-
-// Install Jupyterlab
-pip install jupyterlab
-
-// Build and link the data explorer packages
-jlpm build:dev
-
-// Run Jupyterlab
-jupyter lab
-```
-
 ## Contributing
 
-This repo is in active development, and we welcome any collaboration. If you have ideas or questions, feel free to open an issue. From there, we could setup a call to chat more in depth about how to work together. Please don't hesitate to reach out.
+This repository is in active development, and we welcome collaboration. For development guidance, please consult the [development guide](./docs/development.md).
 
-Or, feel free to tackle an existing issue or contribute a PR that you think improves things. We try to keep the current issues relevant and matched to relevant milestones to give a sense on where this is going.
+If you have ideas or questions, feel free to open an issue, or, if you feel like getting your hands dirty, feel free to tackle an existing issue by contributing a pull request.
 
-If the community grows around this, we can adopt a more regular public meeting.
+We try to keep the current issues relevant and matched to relevant milestones.
+
+<!-- links -->
+
+[badge-stability]: https://img.shields.io/badge/stability-experimental-red.svg
+
+[badge-binder]: https://mybinder.org/badge_logo.svg
+
+[binder]: https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/a4ae231f6e1c52b5aee1dd7fad4985722d863456?urlpath=lab/tree/notebooks/Table.ipynb
+
+[badge-npm-version-dataregistry-extension]: https://img.shields.io/npm/v/@jupyterlab/dataregistry-extension?label=%40jupyterlab%2Fdataregistry-extension&style=flat
+
+[npm-package-dataregistry-extension]: https://www.npmjs.com/package/@jupyterlab/dataregistry-extension
+
+[badge-npm-version-dataregistry]: https://img.shields.io/npm/v/@jupyterlab/dataregistry?label=%40jupyterlab%2Fdataregistry&style=flat
+
+[npm-version-dataregistry]: https://www.npmjs.com/package/@jupyterlab/dataregistry
+
+[rxjs]: https://rxjs.dev/
+
+[nteract-data-explorer]: https://github.com/nteract/nteract/tree/master/packages/data-explorer
+
+<!-- /.links -->

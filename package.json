@@ -8,12 +8,18 @@
   "scripts": {
     "build": "jlpm run build:dev",
     "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages",
+    "build:jupyter": "YARN_REGISTRY=\"http://localhost:4873\" jupyter lab build",
+    "build:jupyter:watch": "YARN_REGISTRY=\"http://localhost:4873\" jupyter lab --watch",
     "build:packages": "lerna run build",
     "build:watch": "tsc --build --watch --listEmittedFiles packages/*",
-    "lint": "echo 'TODO'",
+    "clean": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...') && jlpm clean:packages && jlpm clean:node",
     "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
     "link:packages": "lerna run link",
+    "lint": "echo 'TODO'",
+    "registry": "verdaccio",
+    "registry:init": "npm adduser --registry http://localhost:4873 && npm publish packages/dataregistry-csvviewer --registry http://localhost:4873 && npm publish packages/dataregistry-registry --registry http://localhost:4873",
+    "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },
   "devDependencies": {

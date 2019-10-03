@@ -13,7 +13,7 @@ Distributed under the terms of the 3-Clause BSD License.
 
 ## Introduction
 
-Before we begin, development requires some setup and configuration. What follows is an overview of environment requirements and a sequence of steps for getting up and running. We use Git for version control, and for most tasks, we use npm scripts to help us get things done quickly and effectively. For the most part, the project is able to internally manage dependencies for testing and linting, so, once you follow the steps below, you should be ready to start developing!
+Before we begin, development requires some setup and configuration. What follows is an overview of environment requirements and a sequence of steps for getting up and running. We use [Git][git] for version control, and for most tasks, we use [npm][npm] scripts to help us get things done quickly and effectively. For the most part, the project is able to internally manage dependencies for testing and linting, so, once you follow the steps below, you should be ready to start developing!
 
 So, without further ado, let's get you started!
 

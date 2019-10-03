@@ -40,6 +40,8 @@ To activate the environment,
 $ conda activate jupyterlab-data-explorer
 ```
 
+> **NOTE**: for each new terminal, you'll need to explicitly activate the [Anaconda][anaconda] environment.
+
 ## Download
 
 To acquire the source code, first navigate to the parent directory into which you want to place the project git repository.

@@ -225,6 +225,10 @@ When we first ask for a URL, we have to create some initial mime type to describ
 
 -->
 
+## Editors
+
+-   This repository uses [EditorConfig][editorconfig] to maintain consistent coding styles between different editors and IDEs, including [browsers][editorconfig-chrome].
+
 <!-- links -->
 
 [git]: http://git-scm.com/
@@ -252,5 +256,9 @@ When we first ask for a URL, we have to create some initial mime type to describ
 [git-remotes]: https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
 
 [dijkstras-algorithm]: https://en.wikipedia.org/wiki/Dijkstra's_algorithm
+
+[editorconfig]: http://editorconfig.org/
+
+[editorconfig-chrome]: https://chrome.google.com/webstore/detail/github-editorconfig/bppnolhdpdfmmpeefopdbpmabdpoefjh?hl=en-US
 
 <!-- /.links -->

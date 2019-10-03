@@ -58,7 +58,7 @@ Next, clone the repository.
 $ git clone https://github.com/jupyterlab/jupyterlab-data-explorer.git
 ```
 
-If you are wanting to contribute this GitHub repository, first [fork][github-fork] the repository and amend the previous command.
+If you are wanting to contribute to this GitHub repository, first [fork][github-fork] the repository and amend the previous command.
 
 ```bash
 $ git clone https://github.com/<username>/jupyterlab-data-explorer.git

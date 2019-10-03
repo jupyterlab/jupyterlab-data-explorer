@@ -87,6 +87,17 @@
   border-left-style: solid;
 }
 
+.jl-explorer-dataset:hover {
+  border-left-color: #e0e0e0;
+}
+.jl-explorer-dataset:active {
+  border-left-color: #bdbdbd;
+}
+
+.jl-explorer-dataset:active:hover {
+  border-left-color: #bdbdbd;
+}
+
 .jl-explorer-active-dataset {
   border-left-color: var(--jp-brand-color1);
 }

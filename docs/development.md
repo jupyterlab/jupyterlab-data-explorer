@@ -92,7 +92,7 @@ To install development dependencies (e.g., [Node.js][node-js] module dependencie
 $ jlpm install
 ```
 
-where `jlpm` is the JupyterLab package manager which comes with [JupyterLab][jupyterlab].
+where `jlpm` is the JupyterLab package manager which is bundled with [JupyterLab][jupyterlab].
 
 During development, we need to maintain a local [npm][npm] package registry for storing unpublished data explorer packages. In a separate terminal window,
 

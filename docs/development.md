@@ -72,7 +72,7 @@ $ git clone --depth=<depth> https://github.com/<username>/jupyterlab-data-explor
 
 where `<depth>` refers to the number of commits you want to download (as few as 1 and as many as the entire project history).
 
-If you are behind a firewall, you may need to use the https protocol, rather than the git protocol.
+If you are behind a firewall, you may need to use the HTTPS protocol, rather than the [Git][git] protocol.
 
 ```bash
 $ git config --global url."https://".insteadOf git://

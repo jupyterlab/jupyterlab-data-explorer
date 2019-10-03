@@ -166,7 +166,7 @@ During development, you'll likely want data explorer extensions to automatically
 $ jlpm run build:watch
 ```
 
-which will automatically recompile upon updates to source files.
+which will automatically trigger recompilation upon updates to source files.
 
 In another terminal window,
 

@@ -6,5 +6,9 @@
 */
 
 .scrollable {
-    overflow: scroll;
+  overflow: scroll;
+}
+
+.p-DataGrid {
+  height: 100%;
 }

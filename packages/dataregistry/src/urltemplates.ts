@@ -12,6 +12,11 @@ import { TypedURL } from "./createConverter";
 
 
 /**
+ * https://stackoverflow.com/a/6640851/907060
+ */
+const UUID_TEST = /^\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b$/
+
+/**
  * Type safe URL / URI Templates from RFC 6570
  * 
  * ```
@@ -36,16 +41,20 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   /**
-   * Identity adjunction for strings
+   * Identity isomorphism for strings
    */
-  static get string(): Adjunction<string, string> {
+  static get string(): Dual<string, string> {
     return [s => s, s => s];
   }
 
+  static get uuid(): Dual<string, string> {
+    return [s => UUID_TEST.test(s) ? s : null, s => s]
+  }
+
   /**
-   * Adjunction for parsing strings as numbers.
+   * Parsing strings as numbers.
    */
-  static get number(): Adjunction<string, number> {
+  static get number(): Dual<string, number> {
     return [
       s => {
         const n = Number(s);
@@ -56,9 +65,9 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   /**
-   * Adjunction for verifying that a string, commonly a path, ends in a certain extension.
+   * Verifying that a string, commonly a path, ends in a certain extension.
    */
-  static extension(extension: string): Adjunction<string, string> {
+  static extension(extension: string): Dual<string, string> {
     return [s => (s.endsWith(extension) ? s : null), s => s];
   }
 
@@ -121,16 +130,15 @@ function nonNullableValues<T extends { [k: string]: any }>(
 }
 
 /**
- * Sort of like an Adjunction https://en.wikipedia.org/wiki/Adjoint_functors
- * in that  you specify two functions, which  should be the inverse.
- *
- * However, it's a bit different since the first one is partial.
+ * Two functions that are isomporphsisms of each other, except the first
+ * is partial. Useful for a pari of deserializing function, which can fail,
+ * and a serialize one which cannot.
  */
-export type Adjunction<T, V> = [
+export type Dual<T, V> = [
   (args: T) => V | null | undefined,
   (args: V) => T
 ];
 
 type StringMapping<T extends { [key: string]: any }> = {
-  [K in keyof T]: Adjunction<string, T[K]>;
+  [K in keyof T]: Dual<string, T[K]>;
 };

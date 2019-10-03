@@ -77,7 +77,12 @@ function activate(
         // FIXME: TypeScript complains here.
         // @ts-ignore
         type === notebookMimeType
-          ? defer(() => getContext(docmanager, data, "notebook"))
+          ? defer(
+              () =>
+                getContext(docmanager, data, "notebook") as Promise<
+                  Context<INotebookModel>
+                >
+            )
           : null
     ),
     createConverter(

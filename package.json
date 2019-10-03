@@ -20,7 +20,7 @@
     "link:packages": "lerna run link",
     "lint": "echo 'TODO'",
     "registry": "verdaccio",
-    "registry:init": "npm adduser --registry http://localhost:4873 && npm publish packages/dataregistry-csvviewer --registry http://localhost:4873 && npm publish packages/dataregistry-registry --registry http://localhost:4873",
+    "registry:init": "npm adduser --registry http://localhost:4873 && lerna exec --scope dataregistry-csvviewer --scope dataregistry-registry -- npm publish --registry http://localhost:4873",
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },

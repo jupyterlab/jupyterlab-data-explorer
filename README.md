@@ -60,7 +60,7 @@ We try to keep the current issues relevant and matched to relevant milestones.
 
 [badge-npm-version-dataregistry]: https://img.shields.io/npm/v/@jupyterlab/dataregistry?label=%40jupyterlab%2Fdataregistry&style=flat
 
-[npm-version-dataregistry]: https://www.npmjs.com/package/@jupyterlab/dataregistry
+[npm-package-dataregistry]: https://www.npmjs.com/package/@jupyterlab/dataregistry
 
 [rxjs]: https://rxjs.dev/
 

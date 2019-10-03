@@ -44,7 +44,7 @@ $ conda activate jupyterlab-data-explorer
 
 ## Download
 
-To acquire the source code, first navigate to the parent directory into which you want to place the project git repository.
+To acquire the source code, first navigate to the parent directory into which you want to place the project [Git][git] repository.
 
 > Avoid directory paths which include spaces or any other shell meta characters such as `$` or `:`, as these characters can be problematic for certain build tools.
 

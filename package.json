@@ -6,6 +6,8 @@
     ]
   },
   "scripts": {
+    "all": "jlpm run clean && jlpm run build && jlpm run build:jupyter",
+    "all:watch": "jlpm run clean && jlpm run build && jlpm run build:jupyter:watch",
     "build": "jlpm run build:dev",
     "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages",
     "build:jupyter": "YARN_REGISTRY=\"http://localhost:4873\" jupyter lab build",

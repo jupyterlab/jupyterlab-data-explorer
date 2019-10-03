@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Registry, relativeNestedURLConverter, internalULRNested } from "@jupyterlab/dataregistry";
+import { Registry, relativeNestedURLConverter, internalURLNested } from "@jupyterlab/dataregistry";
 
 /**
  * Activates the plugin.

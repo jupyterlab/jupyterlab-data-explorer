@@ -19,6 +19,6 @@ function extension2mimetype() {
 }
 
 /**
- * Exports
+ * Exports.
  */
 export default extension2mimetype;

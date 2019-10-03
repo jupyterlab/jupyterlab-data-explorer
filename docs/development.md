@@ -174,7 +174,7 @@ In another terminal window,
 $ jlpm run build:jupyter:watch
 ```
 
-which will launch the [JupyterLab][jupyterlab] environment and automatically update the running lab extension upon recompilation changes.
+which will launch the [JupyterLab][jupyterlab] environment and automatically update the running lab environment upon recompilation changes.
 
 ## Update
 

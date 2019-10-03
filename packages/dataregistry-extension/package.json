@@ -42,6 +42,7 @@
     "@jupyterlab/coreutils": "^3.0.0",
     "@jupyterlab/csvviewer": "^1.0.0",
     "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry-registry-extension": "0.0.0",
     "@jupyterlab/docmanager": "^1.0.0",
     "@jupyterlab/docregistry": "^1.0.4",
     "@jupyterlab/filebrowser": "^1.0.0",

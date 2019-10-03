@@ -43,9 +43,7 @@
     "@types/uri-templates": "0.1.30",
     "babel-jest": "^24.9.0",
     "ix": "^2.5.3",
-    "jest": "^24.8.0",
-    "rimraf": "^2.6.2",
-    "typescript": "^3.5.3"
+    "jest": "^24.8.0"
   },
   "publishConfig": {
     "access": "public"

@@ -61,9 +61,7 @@
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",
-    "rimraf": "^2.6.2",
-    "ts-json-schema-generator": "0.52.14",
-    "typescript": "^3.5.3"
+    "ts-json-schema-generator": "0.52.14"
   },
   "publishConfig": {
     "access": "public"

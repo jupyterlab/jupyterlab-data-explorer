@@ -42,11 +42,7 @@
     "rxjs": "^6.5.2",
     "@jupyterlab/dataregistry-registry": "0.0.0"
   },
-  "devDependencies": {
-    "rimraf": "^2.6.2",
-    "ts-json-schema-generator": "0.52.14",
-    "typescript": "^3.5.3"
-  },
+  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   },

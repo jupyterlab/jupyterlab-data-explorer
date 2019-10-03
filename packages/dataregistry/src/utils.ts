@@ -17,7 +17,7 @@ export function mergeMaps<K, V>(
 ): Map<K, V> {
   const res = new Map<K, V>();
   for (const x of xs) {
-    for (let [k, v] of x) {
+    for (let [k, v] of x) { // eslint-disable-line prefer-const
       const otherV = res.get(k);
       if (otherV !== undefined) {
         v = combine(otherV, v);
@@ -33,7 +33,7 @@ export function mapValues<K, V, VP>(
   fn: (key: K, value: V) => VP
 ): Map<K, VP> {
   const res = new Map<K, VP>();
-  for (let [k, v] of m) {
+  for (const [k, v] of m) {
     res.set(k, fn(k, v));
   }
   return res;

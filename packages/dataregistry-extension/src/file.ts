@@ -30,7 +30,7 @@ import {
   textDataType
 } from "@jupyterlab/dataregistry";
 import { Observable, of } from "rxjs";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { map } from "rxjs/operators";
 import * as yaml from "js-yaml";
 import { snippedDataType } from "./snippets";

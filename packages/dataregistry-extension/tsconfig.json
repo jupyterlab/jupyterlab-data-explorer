@@ -19,10 +19,7 @@
       "path": "../dataregistry"
     },
     {
-      "path": "../dataregistry-csvviewer"
-    },
-    {
-      "path": "../dataregistry-registry"
+      "path": "../dataregistry-registry-extension"
     }
   ]
 }

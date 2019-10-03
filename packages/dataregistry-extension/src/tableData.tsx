@@ -15,7 +15,7 @@ import {
 import NteractDataExplorer, { Props } from "@nteract/data-explorer";
 import * as React from "react";
 import "react-table/react-table.css";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { reactDataType } from "./widgets";
 import { Observable } from "rxjs";
 import { UseObservable } from "./utils";

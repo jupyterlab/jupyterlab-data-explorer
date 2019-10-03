@@ -24,7 +24,7 @@ import {
   URLTemplate
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { NotebookPanel } from "@jupyterlab/notebook";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
 import { combineLatest, defer, Observable, of, from } from "rxjs";

@@ -22,7 +22,7 @@ import {
   createConverter,
   Registry
 } from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { viewerDataType } from "./viewers";
 
 type SnippetContext = {

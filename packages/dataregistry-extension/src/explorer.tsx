@@ -26,7 +26,7 @@ import {
   DataTypeNoArgs,
   externalURLDataType
 } from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { IActiveDataset, ACTIVE_URL } from "./active";
 import { UseObservable } from "./utils";
 import { viewerDataType } from "./viewers";

@@ -19,7 +19,7 @@ import {
   nestedDataType,
   URL_
 } from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { Widget } from "@phosphor/widgets";
 import { widgetDataType, reactDataType } from "./widgets";
 import { IActiveDataset } from ".";

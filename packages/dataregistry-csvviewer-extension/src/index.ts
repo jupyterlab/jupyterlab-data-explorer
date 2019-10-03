@@ -6,7 +6,7 @@
  */
 
 import { JupyterFrontEndPlugin } from "@jupyterlab/application";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import activate from "./activate";
 
 /**

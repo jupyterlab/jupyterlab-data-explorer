@@ -17,7 +17,7 @@ import { relativeNestedDataType, Registry } from "@jupyterlab/dataregistry";
 import { IActiveDataset } from "./active";
 import { IRenderMimeRegistry, IRenderMime } from "@jupyterlab/rendermime";
 import { ReactWidget } from "@jupyterlab/apputils";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import * as React from "react";
 import { OutputArea } from "@jupyterlab/outputarea";
 import { PanelLayout, Panel } from "@phosphor/widgets";
@@ -30,7 +30,7 @@ const mimeType = relativeNestedDataType.createMimeType();
 
 /**
  * This is a hack to figure out the context of our rendering. It will break if not rendering in a notebook
- * 
+ *
  * https://gitter.im/jupyterlab/jupyterlab?at=5d39c1816ece3c31b3f9c9ba
  */
 function getURLOfRenderer(w: Renderer): URL {

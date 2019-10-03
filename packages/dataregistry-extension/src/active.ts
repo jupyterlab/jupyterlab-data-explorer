@@ -17,7 +17,7 @@ import {
   resolveDataType,
   URL_
 } from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import { IDocumentManager } from "@jupyterlab/docmanager";
 import { Token } from "@phosphor/coreutils";
 import { Widget } from "@phosphor/widgets";

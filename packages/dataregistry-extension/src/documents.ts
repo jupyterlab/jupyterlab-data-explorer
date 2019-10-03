@@ -6,7 +6,7 @@
  */
 
 import { IDocumentManager } from "@jupyterlab/docmanager";
-import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin

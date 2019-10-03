@@ -1,7 +1,7 @@
 {
-  "name": "@jupyterlab/dataregistry-csvviewer",
+  "name": "@jupyterlab/dataregistry-registry-extension",
   "version": "0.0.0",
-  "description": "CSV viewer data converter.",
+  "description": "Registry.",
   "keywords": [
     "jupyter",
     "jupyterlab",
@@ -35,12 +35,8 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
-    "@jupyterlab/csvviewer": "^1.0.0",
-    "@jupyterlab/dataregistry": "^2.0.0",
-    "@phosphor/datagrid": "^0.1.10",
-    "@phosphor/messaging": "^1.2.3",
-    "rxjs": "^6.5.2",
-    "@jupyterlab/dataregistry-registry": "0.0.0"
+    "@jupyterlab/coreutils": "^3.0.0",
+    "@jupyterlab/dataregistry": "^3.0.0"
   },
   "devDependencies": {},
   "publishConfig": {

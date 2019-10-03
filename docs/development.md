@@ -200,9 +200,8 @@ The repository is organized as follows:
 ```text
 binder     Binder configuration
 docs       top-level documentation
-images     image assets
 notebooks  Jupyter notebooks
-packages   data explorer packages
+packages   project packages
 ```
 
 ## Core concepts

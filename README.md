@@ -28,7 +28,7 @@ jupyter labextension install @jupyterlab/dataregistry-extension
    2. Opening PNG images in an image viewer
    3. Opening table data outputted in a notebook with [`nteract`'s data explorer][nteract-data-explorer]
 
-![](./images/nteract.png)
+![](./docs/img/nteract.png)
 
 ### Support a new data type or conversion:
 
@@ -36,7 +36,7 @@ You can either add support in this repo or by creating a new JupyterLab extensio
 
 It might also be useful to view the existing data types by looking at the source code in this repo and by using the debugger. You can open this in JupyterLab by looking for the "Data Debugger" command:
 
-![](./images/debugger.png)
+![](./docs/img/debugger.png)
 
 ## Contributing
 

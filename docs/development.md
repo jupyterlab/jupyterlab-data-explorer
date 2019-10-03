@@ -40,7 +40,7 @@ To activate the environment,
 $ conda activate jupyterlab-data-explorer
 ```
 
-> **NOTE**: for each new terminal, you'll need to explicitly activate the [Anaconda][anaconda] environment.
+> **NOTE**: for each new terminal window, you'll need to explicitly activate the [Anaconda][anaconda] environment.
 
 ## Download
 

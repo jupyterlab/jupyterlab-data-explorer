@@ -21,7 +21,7 @@
     "link:packages": "lerna run link",
     "lint": "jlpm run lint:css && jlpm run lint:typescript",
     "lint:css": "stylelint packages/**/*.css",
-    "lint:typescript": "eslint packages/*/src/*",
+    "lint:typescript": "eslint packages/**/src/*.ts",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
     "registry:init": "npm adduser --registry http://localhost:4873 && lerna exec --scope dataregistry-csvviewer --scope dataregistry-registry -- npm publish --registry http://localhost:4873",

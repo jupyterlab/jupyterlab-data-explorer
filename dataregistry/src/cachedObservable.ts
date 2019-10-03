@@ -100,24 +100,31 @@ export class CachedObservable<T> extends Observable<T> {
           });
           const subscription = from.subscribe(this.observer);
           const newState = this.state.value;
-          if (newState.state === State.waitingFirst) {
-            this.state.next({
-              ...newState,
-              state: State.waitingFirstSubs,
-              subscription
-            });
-          } else if (newState.state === State.waitingNext) {
-            this.state.next({
-              ...newState,
-              state: State.waitingNextSubs,
-              subscription
-            });
-          } else {
-            throw new Error(
-              `Cannot be in state ${newState.state} after subscribing`
-            );
+          switch (newState.state) {
+            case State.waitingFirst:
+              this.state.next({
+                ...newState,
+                state: State.waitingFirstSubs,
+                subscription
+              });
+              break;
+            case State.waitingNext:
+              this.state.next({
+                ...newState,
+                state: State.waitingNextSubs,
+                subscription
+              });
+              break;
+            // If we run the subscription and it complete or errors
+            // already, then we are done.
+            case State.complete:
+            case State.error:
+              break;
+            default:
+              throw new Error(
+                `Cannot be in state ${newState.state} after subscribing`
+              );
           }
-
           break;
         case State.waitingFirst:
         case State.waitingFirstSubs:

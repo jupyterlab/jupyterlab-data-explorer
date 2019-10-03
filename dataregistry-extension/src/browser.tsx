@@ -163,20 +163,20 @@ function Browser({
   }, [active, follow]);
 
   return (
-    <div style={{ height: "100%", display: "flex", flexFlow: "column" }}>
+    <div className="jl-dr-browser">
       <form
         onSubmit={event => {
           setSubmittedURL(url);
           event.preventDefault();
         }}
-        style={{display: "flex"}}
+        className="jl-dr-browser-url"
       >
         <input
           type="text"
           value={url}
           placeholder="file:///data.csv"
           onChange={event => setURL(event.target.value)}
-          style={{flex: "auto"}}
+          className="jl-dr-browser-url-text"
         />
         <input type="submit" value="Submit" />
       </form>

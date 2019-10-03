@@ -32,8 +32,10 @@
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "prepublishOnly": "yarn run clean && yarn run build",
     "watch": "tsc -w --listEmittedFiles",
-    "lint": "eslint src/*",
-    "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
+    "lint": "jlpm run stylelint && jlpm run eslint",
+    "stylelint": "stylelint style.css",
+    "eslint": "eslint src/*",
+   "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json"
   },
   "dependencies": {
     "@jupyterlab/application": "^1.0.0",
@@ -67,6 +69,9 @@
     "eslint-plugin-react": "7.14.3",
     "eslint-plugin-react-hooks": "1.6.1",
     "rimraf": "~2.6.2",
+    "stylelint": "11.0.0",
+    "stylelint-config-prettier": "6.0.0",
+    "stylelint-config-standard": "19.0.0",
     "ts-json-schema-generator": "0.52.14",
     "typescript": "3.5.3"
   },

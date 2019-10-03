@@ -25,6 +25,7 @@ import {
 } from "@jupyterlab/dataregistry";
 import { IOutputModel } from "@jupyterlab/rendermime";
 import { IRegistry } from "@jupyterlab/dataregistry-registry";
+import { NotebookPanel } from "@jupyterlab/notebook";
 import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
 import { combineLatest, defer, Observable, of, from } from "rxjs";
 import { map, switchMap, filter } from "rxjs/operators";
@@ -33,9 +34,7 @@ import {
   observableListToObservable,
   outputAreaModelToObservable
 } from "./observables";
-import { IRegistry } from "./registry";
 import { IActiveDataset } from "./active";
-import { NotebookPanel } from "@jupyterlab/notebook";
 import { signalToObservable } from "./utils";
 
 /**

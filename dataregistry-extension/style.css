@@ -25,6 +25,10 @@
   height: 100%;
   display: flex;
   flex-flow: column;
+  padding: 4px;
+  color: var(--jp-ui-font-color1);
+  background-color: var(--jp-layout-color1);
+  font-size: var(--jp-ui-font-size1);
 }
 
 .jl-dr-browser-url {

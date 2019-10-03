@@ -132,7 +132,7 @@ export class CachedObservable<T> extends Observable<T> {
           subscriber.next(state.value);
           return () => {};
         default:
-          const _exhaustiveCheck: never = state;
+          return;
       }
       return () => {
         const state = this.state.value;
@@ -161,7 +161,7 @@ export class CachedObservable<T> extends Observable<T> {
           case State.error:
             return;
           default:
-            const _exhaustiveCheck: never = state;
+            return;
         }
       };
     });
@@ -197,7 +197,7 @@ export class CachedObservable<T> extends Observable<T> {
           case State.error:
             throw new Error("Shouldn't be in error state on next");
           default:
-            const _exhaustiveCheck: never = state;
+            return;
         }
       },
       error: error => {
@@ -216,7 +216,7 @@ export class CachedObservable<T> extends Observable<T> {
           case State.error:
             throw new Error("Shouldn't be in error state on error");
           default:
-            const _exhaustiveCheck: never = state;
+            return;
         }
       },
       complete: () => {
@@ -236,7 +236,7 @@ export class CachedObservable<T> extends Observable<T> {
           case State.error:
             throw new Error("Shouldn't be in error state on complete");
           default:
-            const _exhaustiveCheck: never = state;
+            return;
         }
       }
     };

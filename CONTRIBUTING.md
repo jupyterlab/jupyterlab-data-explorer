@@ -206,7 +206,7 @@ Note that, during the merge process, multiple commits will often be [squashed][g
 
 ### Writing Tests
 
-> By contributing tests to the project, you are agreeing to release it under the project [license][license].
+> By contributing tests to the project, you are agreeing to release them under the project [license][license].
 
 ### Writing Documentation
 

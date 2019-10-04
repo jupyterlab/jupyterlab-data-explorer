@@ -9,13 +9,14 @@
     "all": "jlpm run clean && jlpm run build && jlpm run build:jupyter",
     "all:watch": "jlpm run clean && jlpm run build && jlpm run build:jupyter:watch",
     "build": "jlpm run build:dev",
-    "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages",
-    "build:jupyter": "YARN_REGISTRY=\"http://localhost:4873\" jupyter lab build",
-    "build:jupyter:watch": "YARN_REGISTRY=\"http://localhost:4873\" jupyter lab --watch",
+    "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages && jupyter labextension list",
+    "build:jupyter": "jupyter lab build || (jlpm run build:jupyter:remediate && jupyter lab build)",
+    "build:jupyter:remediate": "curr_dir=$PWD && (cd $(jupyter lab path | head -n1 | sed s/Application\\ directory:\\ *//)/staging && echo $PWD && echo '\"@jupyterlab:registry\" \"http://localhost:4873\"' >> .yarnrc && cat .yarnrc && YARN_REGISTRY=http://localhost:4873 node ./yarn.js install --non-interactive && cd $curr_dir) || cd $curr_dir",
+    "build:jupyter:watch": "jupyter lab --watch",
     "build:packages": "lerna run build",
     "build:watch": "tsc --build --watch --listEmittedFiles packages/*",
     "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
-    "clean:jupyter": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...')",
+    "clean:jupyter": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...') && jupyter lab clean",
     "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
     "link:packages": "lerna run link",
@@ -24,9 +25,10 @@
     "lint:typescript": "eslint packages/**/src/*.ts",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
-    "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
+    "registry:init": "jlpm run registry:adduser && jlpm run registry:register && jlpm run registry:cache",
     "registry:adduser": "npm adduser --registry http://localhost:4873",
     "registry:register": "lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
+    "registry:cache": "(jlpm add -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension || jlpm add -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension) && jlpm remove -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension && rimraf yarn.lock",
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },
@@ -44,5 +46,6 @@
     "stylelint-config-standard": "^19.0.0",
     "typescript": "^3.5.3",
     "verdaccio": "^4.3.2"
-  }
+  },
+  "dependencies": {}
 }

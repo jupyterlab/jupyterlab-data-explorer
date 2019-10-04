@@ -25,10 +25,9 @@
     "lint:typescript": "eslint packages/**/src/*.ts",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
-    "registry:init": "jlpm run registry:adduser && jlpm run registry:register && jlpm run registry:cache",
+    "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
     "registry:adduser": "npm adduser --registry http://localhost:4873",
     "registry:register": "lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
-    "registry:cache": "(jlpm add -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension || jlpm add -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension) && jlpm remove -W @jupyterlab/dataregistry-registry-extension @jupyterlab/dataregistry-csvviewer-extension && rimraf yarn.lock",
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },

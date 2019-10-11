@@ -29,34 +29,34 @@ interface Data {
 const CSV_MIME_TYPE: string = datatypes.csv.createMimeType();
 
 /**
+ * Converts from text data to CSV.
+ *
+ * @private
+ * @param obj - data object
+ * @param obj.data - data to convert
+ * @param obj.type - desired type
+ * @returns converted data
+ */
+function convert(obj: Data) {
+  if (obj.type === CSV_MIME_TYPE) {
+    return obj.data;
+  }
+  return null;
+}
+
+/**
  * Returns a converter for converting text data to CSV.
  *
  * @private
  * @returns data type converter
  */
-function text2csv(): any {
+function text2csv() {
   const conversion = {
     "from": datatypes.text,
     "to": datatypes.csv
   };
 
   return createConverter(conversion, convert);
-
-  /**
-   * Converts from text data to CSV.
-   *
-   * @private
-   * @param obj - data object
-   * @param obj.data - data to convert
-   * @param obj.type - desired type
-   * @returns converted data
-   */
-  function convert(obj: Data) {
-    if (obj.type === CSV_MIME_TYPE) {
-      return obj.data;
-    }
-    return null;
-  }
 }
 
 /**

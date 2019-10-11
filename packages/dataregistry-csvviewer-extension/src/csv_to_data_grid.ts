@@ -22,43 +22,43 @@ interface Data {
 }
 
 /**
+ * Converts CSV data to a data grid.
+ *
+ * @private
+ * @param obj - data object
+ * @param obj.data - data to convert
+ * @returns converted data
+ */
+function convert(obj: Data) {
+  return {
+    "type": "Grid",
+    "data": getData
+  };
+
+  /**
+   * Returns a data grid.
+   *
+   * @private
+   * @returns data grid
+   */
+  function getData() {
+    return new DataGrid(obj.data);
+  }
+}
+
+/**
  * Returns a converter for converting CSV data to a data grid.
  *
  * @private
  * @returns data type converter
  */
-function csv2datagrid(): any {
+function csv2datagrid() {
   const conversion = {
     "from": datatypes.csv,
     "to": datatypes.widget
   };
 
   return createConverter(conversion, convert);
-
-  /**
-   * Converts CSV data to a data grid.
-   *
-   * @private
-   * @param obj - data object
-   * @param obj.data - data to convert
-   * @returns converted data
-   */
-  function convert(obj: Data) {
-    return {
-      "type": "Grid",
-      "data": getData
-    };
-
-    /**
-     * Returns a data grid.
-     *
-     * @private
-     * @returns data grid
-     */
-    function getData() {
-      return new DataGrid(obj.data);
-    }
-  }
 }
 
 /**

@@ -1,0 +1,52 @@
+{
+  "name": "@jupyterlab/dataregistry-csvviewer-extension",
+  "version": "0.0.0",
+  "description": "CSV viewer data converter.",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/jupyterlab/jupyterlab-data-explorer",
+  "bugs": {
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Project Jupyter",
+  "files": [
+    "lib/**"
+  ],
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "directories": {
+    "lib": "./lib"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "link": "jupyter labextension link ./ --no-build",
+    "prepublishOnly": "npm run clean && npm run build",
+    "unlink": "jupyter labextension unlink ./ --no-build",
+    "watch": "tsc --build --watch --listEmittedFiles"
+  },
+  "dependencies": {
+    "@jupyterlab/application": "^1.0.0",
+    "@jupyterlab/csvviewer": "^1.0.0",
+    "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry-registry-extension": "0.0.0",
+    "@phosphor/datagrid": "^0.1.10",
+    "@phosphor/messaging": "^1.2.3",
+    "rxjs": "^6.5.2"
+  },
+  "devDependencies": {},
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": {
+    "extension": true
+  }
+}

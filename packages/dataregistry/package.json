@@ -1,0 +1,51 @@
+{
+  "name": "@jupyterlab/dataregistry",
+  "version": "3.0.0",
+  "description": "Framework for dealing with datasets in Javascript.",
+  "homepage": "https://github.com/jupyterlab/jupyterlab-data-explorer",
+  "bugs": {
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": "Project Jupyter",
+  "files": [
+    "lib/**"
+  ],
+  "main": "lib/index.js",
+  "types": "./lib/index.d.ts",
+  "directories": {
+    "lib": "lib/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
+  },
+  "scripts": {
+    "build": "tsc --build",
+    "clean": "rimraf lib tsconfig.tsbuildinfo",
+    "link": "jupyter labextension link ./ --no-build",
+    "prepublishOnly": "npm run clean && npm run build",
+    "test": "jest lib",
+    "test:watch": "npm run test --watch",
+    "unlink": "jupyter labextension unlink ./ --no-build",
+    "watch": "tsc --build --watch --listEmittedFiles"
+  },
+  "dependencies": {
+    "rxjs": "^6.5.2",
+    "rxjs-spy": "^7.5.1",
+    "uri-templates": "0.2.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.5.5",
+    "@babel/preset-env": "^7.5.5",
+    "@types/jest": "^24.0.13",
+    "@types/node": "^8.0.47",
+    "@types/uri-templates": "0.1.30",
+    "babel-jest": "^24.9.0",
+    "ix": "^2.5.3",
+    "jest": "^24.8.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

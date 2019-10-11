@@ -16,3 +16,5 @@ yarn-error.log
 .vscode
 
 __pycache__/
+yarn.lock
+package-lock.json

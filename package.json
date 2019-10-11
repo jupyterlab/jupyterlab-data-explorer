@@ -1,16 +1,50 @@
 {
   "private": true,
-  "workspaces": [
-    "dataregistry",
-    "dataregistry-extension"
-  ],
+  "workspaces": {
+    "packages": [
+      "packages/*"
+    ]
+  },
   "scripts": {
-    "build": "tsc --build dataregistry dataregistry-extension && jlpm workspace @jupyterlab/dataregistry-extension run generateSchema",
-    "build:dev": "jlpm install && jlpm clean && jlpm run build && jlpm run link",
-    "lint":  "jlpm workspace @jupyterlab/dataregistry-extension lint",
-    "clean": "jlpm workspace @jupyterlab/dataregistry run clean && jlpm workspace @jupyterlab/dataregistry-extension run clean",
-    "build:watch": "tsc --build --watch  dataregistry dataregistry-extension",
-    "link": "jupyter labextension link dataregistry --no-build && jupyter labextension link dataregistry-extension",
-    "unlink": "jupyter labextension unlink dataregistry --no-build && jupyter labextension unlink dataregistry-extension"
-  }
+    "all": "jlpm run clean && jlpm run build && jlpm run build:jupyter",
+    "all:watch": "jlpm run clean && jlpm run build && jlpm run build:jupyter:watch",
+    "build": "jlpm run build:dev",
+    "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages && jupyter labextension list",
+    "build:jupyter": "jupyter lab build || (jlpm run build:jupyter:remediate && jupyter lab build)",
+    "build:jupyter:remediate": "curr_dir=$PWD && (cd $(jupyter lab path | head -n1 | sed s/Application\\ directory:\\ *//)/staging && echo $PWD && echo '\"@jupyterlab:registry\" \"http://localhost:4873\"' >> .yarnrc && cat .yarnrc && YARN_REGISTRY=http://localhost:4873 node ./yarn.js install --non-interactive && cd $curr_dir) || cd $curr_dir",
+    "build:jupyter:watch": "jlpm run build:jupyter && jupyter lab --watch",
+    "build:packages": "lerna run build",
+    "build:watch": "tsc --build --watch --listEmittedFiles packages/*",
+    "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
+    "clean:jupyter": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...') && jupyter lab clean",
+    "clean:node": "lerna clean --yes && rimraf node_modules",
+    "clean:packages": "lerna run clean",
+    "link:packages": "lerna run link",
+    "lint": "jlpm run lint:css && jlpm run lint:typescript",
+    "lint:css": "stylelint packages/**/*.css",
+    "lint:typescript": "eslint packages/**/src/*.ts",
+    "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
+    "registry": "verdaccio",
+    "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
+    "registry:adduser": "npm adduser --registry http://localhost:4873",
+    "registry:register": "lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
+    "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
+    "unlink:packages": "lerna run unlink"
+  },
+  "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^1.13.0",
+    "@typescript-eslint/parser": "^1.13.0",
+    "eslint": "^6.1.0",
+    "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^1.6.1",
+    "lerna": "^3.16.4",
+    "rimraf": "^2.6.2",
+    "stylelint": "^11.0.0",
+    "stylelint-config-prettier": "^6.0.0",
+    "stylelint-config-standard": "^19.0.0",
+    "typescript": "^3.5.3",
+    "verdaccio": "^4.3.2"
+  },
+  "dependencies": {}
 }

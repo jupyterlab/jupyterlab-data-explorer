@@ -1,0 +1,25 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./lib",
+    "rootDir": "./src",
+    "skipLibCheck": true,
+    "types": [
+      "node"
+    ]
+  },
+  "include": [
+    "src/*"
+  ],
+  "exclude": [
+    "node_modules"
+  ],
+  "references": [
+    {
+      "path": "../dataregistry"
+    },
+    {
+      "path": "../dataregistry-registry-extension"
+    }
+  ]
+}

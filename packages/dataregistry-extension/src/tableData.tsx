@@ -5,27 +5,27 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { JupyterFrontEndPlugin } from "@jupyterlab/application";
+import { JupyterFrontEndPlugin } from '@jupyterlab/application';
 import {
   DataTypeNoArgs,
   Registry,
   createConverter
-} from "@jupyterlab/dataregistry";
+} from '@jupyterlab/dataregistry';
 
-import NteractDataExplorer, { Props } from "@nteract/data-explorer";
-import * as React from "react";
-import "react-table/react-table.css";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { reactDataType } from "./widgets";
-import { Observable } from "rxjs";
-import { UseObservable } from "./utils";
+import NteractDataExplorer, { Props } from '@nteract/data-explorer';
+import * as React from 'react';
+import 'react-table/react-table.css';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { reactDataType } from './widgets';
+import { Observable } from 'rxjs';
+import { UseObservable } from './utils';
 
 /**
  * Provides a table data type
  * https://frictionlessdata.io/specs/tabular-data-resource/
  */
-export const TableDataType = new DataTypeNoArgs<Observable<Props["data"]>>(
-  "application/vnd.dataresource+json"
+export const TableDataType = new DataTypeNoArgs<Observable<Props['data']>>(
+  'application/vnd.dataresource+json'
 );
 
 /**
@@ -36,7 +36,7 @@ export const TableDataType = new DataTypeNoArgs<Observable<Props["data"]>>(
 const nteractDataExplorerConverter = createConverter(
   { from: TableDataType, to: reactDataType },
   ({ data }) => ({
-    type: "nteract Data Explorer",
+    type: 'nteract Data Explorer',
     data: (
       <UseObservable observable={data} initial={undefined}>
         {data =>
@@ -60,7 +60,7 @@ export default {
   activate: (_, registry: Registry) => {
     registry.addConverter(nteractDataExplorerConverter);
   },
-  id: "@jupyterlab/dataregistry-extension:table-data",
+  id: '@jupyterlab/dataregistry-extension:table-data',
   requires: [IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

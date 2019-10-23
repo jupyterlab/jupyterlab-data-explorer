@@ -10,32 +10,32 @@ import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   WidgetTracker,
   MainAreaWidget,
   ReactWidget
-} from "@jupyterlab/apputils";
+} from '@jupyterlab/apputils';
 import {
   DataType,
   DataTypeStringArg,
   Registry,
   URL_,
   createConverter
-} from "@jupyterlab/dataregistry";
-import { Widget } from "@phosphor/widgets";
-import * as React from "react";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { viewerDataType } from "./viewers";
-import { Subscription } from "rxjs";
-import { first } from "rxjs/operators";
+} from '@jupyterlab/dataregistry';
+import { Widget } from '@phosphor/widgets';
+import * as React from 'react';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { viewerDataType } from './viewers';
+import { Subscription } from 'rxjs';
+import { first } from 'rxjs/operators';
 
-const tracker = new WidgetTracker<DataWidget>({ namespace: "dataregistry" });
-const commandID = "dataregistry:view-url";
+const tracker = new WidgetTracker<DataWidget>({ namespace: 'dataregistry' });
+const commandID = 'dataregistry:view-url';
 
 export const widgetDataType = new DataTypeStringArg<() => Widget>(
-  "application/x.jupyter.widget",
-  "label"
+  'application/x.jupyter.widget',
+  'label'
 );
 
 export interface IHasURL_ {
@@ -43,7 +43,7 @@ export interface IHasURL_ {
 }
 
 export function hasURL_(t: any): t is IHasURL_ {
-  return "url" in t;
+  return 'url' in t;
 }
 
 class DataWidget extends MainAreaWidget implements IHasURL_ {
@@ -80,21 +80,21 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
 }
 
 const wrappedWidgetDataType = new DataTypeStringArg<() => DataWidget>(
-  "application/x.jupyter.wrapped-widget",
-  "label"
+  'application/x.jupyter.wrapped-widget',
+  'label'
 );
 
 export const reactDataType: DataType<
   string,
   React.ReactElement<any>
 > = new DataTypeStringArg<React.ReactElement<any>>(
-  "application/x.jupyter.react",
-  "label"
+  'application/x.jupyter.react',
+  'label'
 );
 
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:widgets",
+  id: '@jupyterlab/dataregistry-extension:widgets',
   requires: [ILabShell, IRegistry, ILayoutRestorer],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
@@ -127,7 +127,7 @@ function activate(
             tracker.add(widget);
           }
           if (!widget.isAttached) {
-            labShell.add(widget, "main");
+            labShell.add(widget, 'main');
           }
           widget.content.update();
           app.shell.activateById(widget.id);

@@ -5,11 +5,11 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { DataTypeNoArgs, DataTypeStringArg } from "@jupyterlab/dataregistry";
-import { INotebookModel } from "@jupyterlab/notebook";
-import { DocumentRegistry, Context } from "@jupyterlab/docregistry";
-import { Widget } from "@phosphor/widgets";
-import { Observable } from "rxjs";
+import { DataTypeNoArgs, DataTypeStringArg } from '@jupyterlab/dataregistry';
+import { INotebookModel } from '@jupyterlab/notebook';
+import { DocumentRegistry, Context } from '@jupyterlab/docregistry';
+import { Widget } from '@phosphor/widgets';
+import { Observable } from 'rxjs';
 
 /**
  * Interface describing a dataset.
@@ -53,7 +53,7 @@ interface Datasets {
    * List of datasets.
    */
   datasets?: Array<Dataset>;
-};
+}
 
 /**
  * Table of data registry data types.
@@ -65,14 +65,27 @@ interface Datasets {
  * [1]: https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types
  */
 const datatypes = {
-  "csv": new DataTypeNoArgs<Observable<string>>("text/csv"),
-  "datagrid": new DataTypeNoArgs<Observable<string>>("application/x.phosphor.datagrid"),
-  "datasetsFile": new DataTypeNoArgs<Observable<Datasets>>("application/x.jupyterlab.datasets-file"),
-  "label": new DataTypeNoArgs<Observable<string>>("application/x.jupyterlab.label"),
-  "notebookContext": new DataTypeNoArgs<Observable<Context<INotebookModel>>>("application/x.jupyterlab.notebook-context"),
-  "text": new DataTypeStringArg<Observable<string>>("text/plain", "mimeType"),
-  "textContext": new DataTypeStringArg<Observable<Context<DocumentRegistry.ICodeModel>>>("application/x.jupyterlab.text-context", "mimeType"),
-  "widget": new DataTypeStringArg<() => Widget>("application/x.jupyter.widget", "label")
+  csv: new DataTypeNoArgs<Observable<string>>('text/csv'),
+  datagrid: new DataTypeNoArgs<Observable<string>>(
+    'application/x.phosphor.datagrid'
+  ),
+  datasetsFile: new DataTypeNoArgs<Observable<Datasets>>(
+    'application/x.jupyterlab.datasets-file'
+  ),
+  label: new DataTypeNoArgs<Observable<string>>(
+    'application/x.jupyterlab.label'
+  ),
+  notebookContext: new DataTypeNoArgs<Observable<Context<INotebookModel>>>(
+    'application/x.jupyterlab.notebook-context'
+  ),
+  text: new DataTypeStringArg<Observable<string>>('text/plain', 'mimeType'),
+  textContext: new DataTypeStringArg<
+    Observable<Context<DocumentRegistry.ICodeModel>>
+  >('application/x.jupyterlab.text-context', 'mimeType'),
+  widget: new DataTypeStringArg<() => Widget>(
+    'application/x.jupyter.widget',
+    'label'
+  )
 };
 
 /**

@@ -5,19 +5,19 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { JupyterFrontEndPlugin, JupyterLab } from "@jupyterlab/application";
+import { JupyterFrontEndPlugin, JupyterLab } from '@jupyterlab/application';
 import {
   Registry,
   folderDatasetsConverter,
   createFolderConverter
-} from "@jupyterlab/dataregistry";
-import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { Contents } from "@jupyterlab/services";
+} from '@jupyterlab/dataregistry';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { Contents } from '@jupyterlab/services';
 
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:folders",
+  id: '@jupyterlab/dataregistry-extension:folders',
   requires: [IRegistry, IFileBrowserFactory],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
@@ -40,7 +40,7 @@ function activate(
             )).content
           ].map((model: Contents.IModel) =>
             // Add trailing slash if this is a directory so that we know that.
-            model.type === "directory" ? `${model.name}/` : model.name
+            model.type === 'directory' ? `${model.name}/` : model.name
           )
         )
     )

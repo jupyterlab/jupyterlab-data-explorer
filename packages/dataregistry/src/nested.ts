@@ -26,11 +26,11 @@
  * * For the explorer, we have a top level `explorer:` URL that has a list of URLS to display.
  */
 
-import { URL_ } from "./datasets";
-import { DataTypeNoArgs } from "./datatypes";
-import { Observable } from "rxjs";
-import { map } from "rxjs/operators";
-import { createConverter } from "./createConverter";
+import { URL_ } from './datasets';
+import { DataTypeNoArgs } from './datatypes';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { createConverter } from './createConverter';
 
 /**
  * a list of relative URLs to resolve against the current URL.
@@ -39,13 +39,13 @@ import { createConverter } from "./createConverter";
  */
 export const relativeNestedDataType = new DataTypeNoArgs<
   Observable<Array<string>>
->("application/x.jupyter.relative-dataset-urls+json");
+>('application/x.jupyter.relative-dataset-urls+json');
 
 /**
  * A nested data type has datasets inside of it.
  */
 export const nestedDataType = new DataTypeNoArgs<Observable<Set<URL_>>>(
-  "application/x.jupyter.dataset-urls"
+  'application/x.jupyter.dataset-urls'
 );
 
 export const relativeNestedURLConverter = createConverter(

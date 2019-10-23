@@ -9,22 +9,22 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILayoutRestorer
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 
-import { Inspector } from "react-inspector";
+import { Inspector } from 'react-inspector';
 import {
   ReactWidget,
   ICommandPalette,
   MainAreaWidget,
   WidgetTracker
-} from "@jupyterlab/apputils";
+} from '@jupyterlab/apputils';
 
-import * as React from "react";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { Registry, CachedObservable } from "@jupyterlab/dataregistry";
-import { UseBehaviorSubject } from "./utils";
+import * as React from 'react';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { Registry, CachedObservable } from '@jupyterlab/dataregistry';
+import { UseBehaviorSubject } from './utils';
 
-const id = "@jupyterlab/dataregistry-extension:data-debugger";
+const id = '@jupyterlab/dataregistry-extension:data-debugger';
 
 class ErrorBoundary extends React.Component<any, any> {
   constructor(props: any) {
@@ -60,13 +60,13 @@ function Data({ data }: { data: unknown }) {
 function Debugger({ registry }: { registry: Registry }) {
   return (
     <div>
-      <ol style={{ listStyle: "none" }}>
+      <ol style={{ listStyle: 'none' }}>
         <UseBehaviorSubject subject={registry.URLs$}>
           {urls =>
             [...urls].sort().map(url => (
               <li key={url}>
                 <code>{url}</code>
-                <ol style={{ listStyle: "none" }}>
+                <ol style={{ listStyle: 'none' }}>
                   {[...registry.getURL(url).entries()].map(
                     ([mimeType, [cost, data]]) => (
                       <li key={mimeType}>
@@ -106,17 +106,17 @@ function activate(
   let widget: MainAreaWidget<ReactWidget>;
 
   // Add an application command
-  const command: string = "dataregistry-debugger:open";
+  const command: string = 'dataregistry-debugger:open';
   app.commands.addCommand(command, {
-    label: "Data Debugger",
+    label: 'Data Debugger',
     execute: () => {
       if (!widget) {
         // Create a new widget if one does not exist
         const content = ReactWidget.create(<Debugger registry={registry} />);
-        content.addClass("scrollable");
+        content.addClass('scrollable');
         widget = new MainAreaWidget({ content });
-        widget.id = "dataregistry-debugger";
-        widget.title.label = "Data Debugger";
+        widget.id = 'dataregistry-debugger';
+        widget.title.label = 'Data Debugger';
         widget.title.closable = true;
       }
       if (!tracker.has(widget)) {
@@ -125,7 +125,7 @@ function activate(
       }
       if (!widget.isAttached) {
         // Attach the widget to the main work area if it's not there
-        app.shell.add(widget, "main");
+        app.shell.add(widget, 'main');
       }
       widget.content.update();
 
@@ -135,14 +135,14 @@ function activate(
   });
 
   // Add the command to the palette.
-  palette.addItem({ command, category: "Data Registry" });
+  palette.addItem({ command, category: 'Data Registry' });
 
   // Track and restore the widget state
   const tracker = new WidgetTracker<MainAreaWidget<ReactWidget>>({
-    namespace: "dataregistry-debugger"
+    namespace: 'dataregistry-debugger'
   });
   restorer.restore(tracker, {
     command,
-    name: () => "dataregistry-debugger"
+    name: () => 'dataregistry-debugger'
   });
 }

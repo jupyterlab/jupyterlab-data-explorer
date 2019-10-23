@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
- /**
+/**
  * Typed datasets allow us to associate mimetypes with different types of the
  * the underlying data and parameters set in the mimetype.
  *
@@ -14,9 +14,9 @@
  * TODO: could `to` be just a function instead of a paramater to createConverter?
  */
 
-import { Converter } from "./converters";
-import { MimeType_, Dataset } from "./datasets";
-import { DataType, INVALID } from "./createConverter";
+import { Converter } from './converters';
+import { MimeType_, Dataset } from './datasets';
+import { DataType, INVALID } from './createConverter';
 
 /**
  * TypedConverter gives you the Converter type between two types. If either is a TypedConverter,

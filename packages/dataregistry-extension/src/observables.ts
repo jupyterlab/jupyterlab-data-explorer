@@ -5,13 +5,11 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Observable } from "rxjs";
-import { IObservableList, IObservableString } from "@jupyterlab/observables";
-import { toArray } from "@phosphor/algorithm";
-import { IOutputAreaModel } from "@jupyterlab/outputarea";
-import { IOutputModel } from "@jupyterlab/rendermime";
-
-
+import { Observable } from 'rxjs';
+import { IObservableList, IObservableString } from '@jupyterlab/observables';
+import { toArray } from '@phosphor/algorithm';
+import { IOutputAreaModel } from '@jupyterlab/outputarea';
+import { IOutputModel } from '@jupyterlab/rendermime';
 
 export function observableStringToObservable(
   l: IObservableString

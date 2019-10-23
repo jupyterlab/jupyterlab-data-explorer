@@ -5,20 +5,19 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as uriTemplates from "uri-templates";
+import * as uriTemplates from 'uri-templates';
 
-import { URL_ } from "./datasets";
-import { TypedURL } from "./createConverter";
-
+import { URL_ } from './datasets';
+import { TypedURL } from './createConverter';
 
 /**
  * https://stackoverflow.com/a/6640851/907060
  */
-const UUID_TEST = /^\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b$/
+const UUID_TEST = /^\b[0-9a-f]{8}\b-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-\b[0-9a-f]{12}\b$/;
 
 /**
  * Type safe URL / URI Templates from RFC 6570
- * 
+ *
  * ```
  * new URLTemplate('http://www.example.com/foo{?query,number}', {query: URLTemplate.string, number: URLTemplate.number})
  * ```
@@ -28,7 +27,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    * Creates a URL template, based on a string of a URL  template and a mapping of
    * variable names to pairs of inverse functions (adjunctions) which handle mapping to/from
    * that variable and a string.
-   * 
+   *
    * You can  use these to also filter variables, by returning null from these funcitons. We provide
    * a couple of common adjuncions on this class, like `string` and `number`.
    */
@@ -48,7 +47,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   static get uuid(): Dual<string, string> {
-    return [s => UUID_TEST.test(s) ? s : null, s => s]
+    return [s => (UUID_TEST.test(s) ? s : null), s => s];
   }
 
   /**
@@ -72,8 +71,8 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   /**
-   * Parses this URL using the template and specified adjunctions. Returns null or undefined if 
-   * the URL cannot  be parsed with this template or if any of the adjunctions return null. 
+   * Parses this URL using the template and specified adjunctions. Returns null or undefined if
+   * the URL cannot  be parsed with this template or if any of the adjunctions return null.
    */
   parse(url: URL_): T | null | undefined {
     const args = (this._template.fromUri(url) as any) as
@@ -134,10 +133,7 @@ function nonNullableValues<T extends { [k: string]: any }>(
  * is partial. Useful for a pari of deserializing function, which can fail,
  * and a serialize one which cannot.
  */
-export type Dual<T, V> = [
-  (args: T) => V | null | undefined,
-  (args: V) => T
-];
+export type Dual<T, V> = [(args: T) => V | null | undefined, (args: V) => T];
 
 type StringMapping<T extends { [key: string]: any }> = {
   [K in keyof T]: Dual<string, T[K]>;

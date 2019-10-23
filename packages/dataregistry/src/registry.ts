@@ -5,15 +5,15 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Datasets, Dataset, URL_ } from "./datasets";
+import { Datasets, Dataset, URL_ } from './datasets';
 import {
   Converter,
   combineManyConverters,
   applyConverterDataset
-} from "./converters";
-import { resolveDataType } from "./resolvers";
-import { BehaviorSubject, Observable, of } from "rxjs";
-import { externalURLDataType, internalURLDataType } from "./external";
+} from './converters';
+import { resolveDataType } from './resolvers';
+import { BehaviorSubject, Observable, of } from 'rxjs';
+import { externalURLDataType, internalURLDataType } from './external';
 
 export class Registry {
   /**

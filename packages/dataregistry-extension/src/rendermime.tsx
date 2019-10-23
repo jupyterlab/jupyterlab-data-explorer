@@ -12,19 +12,19 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
-import { relativeNestedDataType, Registry } from "@jupyterlab/dataregistry";
-import { IActiveDataset } from "./active";
-import { IRenderMimeRegistry, IRenderMime } from "@jupyterlab/rendermime";
-import { ReactWidget } from "@jupyterlab/apputils";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import * as React from "react";
-import { OutputArea } from "@jupyterlab/outputarea";
-import { PanelLayout, Panel } from "@phosphor/widgets";
-import { CodeCell } from "@jupyterlab/cells";
-import { Notebook, NotebookPanel } from "@jupyterlab/notebook";
-import { DatasetCompononent } from "./explorer";
-import { of } from "rxjs";
+} from '@jupyterlab/application';
+import { relativeNestedDataType, Registry } from '@jupyterlab/dataregistry';
+import { IActiveDataset } from './active';
+import { IRenderMimeRegistry, IRenderMime } from '@jupyterlab/rendermime';
+import { ReactWidget } from '@jupyterlab/apputils';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import * as React from 'react';
+import { OutputArea } from '@jupyterlab/outputarea';
+import { PanelLayout, Panel } from '@phosphor/widgets';
+import { CodeCell } from '@jupyterlab/cells';
+import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
+import { DatasetCompononent } from './explorer';
+import { of } from 'rxjs';
 
 const mimeType = relativeNestedDataType.createMimeType();
 
@@ -46,7 +46,7 @@ function getURLOfRenderer(w: Renderer): URL {
 
   return new URL(
     `${filePath}#/cells/${cellID}/outputs/${outputID}/data/${mimeType}`,
-    "file:"
+    'file:'
   );
 }
 class Renderer extends ReactWidget implements IRenderMime.IRenderer {
@@ -59,7 +59,7 @@ class Renderer extends ReactWidget implements IRenderMime.IRenderer {
   render() {
     return (
       <DatasetCompononent
-        parentURL={of("")}
+        parentURL={of('')}
         url={this._url!.toString()}
         active$={this._active}
         registry={this._registry}
@@ -86,7 +86,7 @@ function activate(
 
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:rendermime",
+  id: '@jupyterlab/dataregistry-extension:rendermime',
   requires: [IRenderMimeRegistry, IActiveDataset, IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

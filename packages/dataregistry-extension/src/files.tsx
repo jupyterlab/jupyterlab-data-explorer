@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { JupyterFrontEndPlugin, JupyterLab } from "@jupyterlab/application";
+import { JupyterFrontEndPlugin, JupyterLab } from '@jupyterlab/application';
 import {
   createConverter,
   fileURLConverter,
@@ -13,19 +13,19 @@ import {
   resolveExtensionConverter,
   resolveFileConverter,
   URLDataType
-} from "@jupyterlab/dataregistry";
-import { IFileBrowserFactory } from "@jupyterlab/filebrowser";
-import * as React from "react";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { UseObservable } from "./utils";
-import { reactDataType } from "./widgets";
+} from '@jupyterlab/dataregistry';
+import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import * as React from 'react';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { UseObservable } from './utils';
+import { reactDataType } from './widgets';
 
 /**
  * Integrates the dataregistry into the doc registry.
  */
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:files",
+  id: '@jupyterlab/dataregistry-extension:files',
   requires: [IRegistry, IFileBrowserFactory],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
@@ -38,15 +38,15 @@ function activate(
   // Add default converters
   registry.addConverter(
     resolveFileConverter,
-    resolveExtensionConverter(".png", "image/png"),
+    resolveExtensionConverter('.png', 'image/png'),
     createConverter(
       { from: URLDataType, to: reactDataType },
       ({ type, data }) => {
-        if (type !== "image/png") {
+        if (type !== 'image/png') {
           return null;
         }
         return {
-          type: "Image",
+          type: 'Image',
           data: (
             <UseObservable observable={data} initial={undefined}>
               {url => (url ? <img src={url} /> : <></>)}

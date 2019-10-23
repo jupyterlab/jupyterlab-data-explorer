@@ -5,19 +5,19 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from "react";
-import { Observable, of, combineLatest } from "rxjs";
-import { map } from "rxjs/operators";
-import { classes } from "typestyle";
-import { Token } from "@phosphor/coreutils";
-import { Widget } from "@phosphor/widgets";
-import { ReactWidget } from "@jupyterlab/apputils";
+import * as React from 'react';
+import { Observable, of, combineLatest } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { classes } from 'typestyle';
+import { Token } from '@phosphor/coreutils';
+import { Widget } from '@phosphor/widgets';
+import { ReactWidget } from '@jupyterlab/apputils';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILabShell,
   ILayoutRestorer
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   Registry,
   URL_,
@@ -25,14 +25,14 @@ import {
   nestedDataType,
   DataTypeNoArgs,
   externalURLDataType
-} from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { IActiveDataset, ACTIVE_URL } from "./active";
-import { UseObservable } from "./utils";
-import { viewerDataType } from "./viewers";
+} from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { IActiveDataset, ACTIVE_URL } from './active';
+import { UseObservable } from './utils';
+import { viewerDataType } from './viewers';
 
 export const labelDataType = new DataTypeNoArgs<Observable<string>>(
-  "application/x.jupyterlab.label"
+  'application/x.jupyterlab.label'
 );
 
 function Button({ onClick, text }: { onClick: () => void; text: string }) {
@@ -104,9 +104,9 @@ export function DatasetCompononent({
   return (
     <UseObservable observable={active$} initial={null}>
       {active => {
-        const classNames = ["jl-explorer-dataset"];
+        const classNames = ['jl-explorer-dataset'];
         if (active === url) {
-          classNames.push("jl-explorer-active-dataset");
+          classNames.push('jl-explorer-active-dataset');
         }
 
         const dataset = registry.getURL(url);
@@ -200,9 +200,7 @@ function Heading({
   onSearch: (search: string) => void;
 }) {
   return (
-    <h2
-      className="jl-explorer-heading"
-    >
+    <h2 className="jl-explorer-heading">
       Datasets
       {/* <input
         type="text"
@@ -225,21 +223,19 @@ class DataExplorer extends React.Component<
   { search: string }
 > {
   state: { search: string } = {
-    search: ""
+    search: ''
   };
 
   render() {
     return (
-      <div
-        className="jl-explorer"
-      >
+      <div className="jl-explorer">
         <Heading
           search={this.state.search}
           onSearch={(search: string) => this.setState({ search })}
         />
         <div className="jl-explorer-body">
           <DatasetsComponent
-            url={of("")}
+            url={of('')}
             registry={this.props.registry}
             active={this.props.active}
             urls$={this.props.urls$}
@@ -252,7 +248,7 @@ class DataExplorer extends React.Component<
 
 /* tslint:disable */
 export const IDataExplorer = new Token<IDataExplorer>(
-  "@jupyterlab/dataRegistry:IDataExplorer"
+  '@jupyterlab/dataRegistry:IDataExplorer'
 );
 
 export interface IDataExplorer {
@@ -269,7 +265,7 @@ export interface IDataExplorer {
   removeURL(url: URL_): void;
 }
 
-const id = "@jupyterlab/dataregistry-extension:data-explorer";
+const id = '@jupyterlab/dataregistry-extension:data-explorer';
 /**
  * Adds a visual data explorer to the sidebar.
  */
@@ -290,7 +286,7 @@ function activate(
 ): IDataExplorer {
   const displayedURLs = new ObservableSet<string>();
   displayedURLs.add(ACTIVE_URL);
-  displayedURLs.add(new URL("file:").toString());
+  displayedURLs.add(new URL('file:').toString());
 
   // Create a dataset with this URL
   const widget = ReactWidget.create(
@@ -300,11 +296,11 @@ function activate(
       urls$={displayedURLs.observable}
     />
   );
-  widget.id = "@jupyterlab-dataRegistry/explorer";
-  widget.title.iconClass = "jp-SpreadsheetIcon jp-SideBar-tabIcon";
-  widget.title.caption = "Data Explorer";
+  widget.id = '@jupyterlab-dataRegistry/explorer';
+  widget.title.iconClass = 'jp-SpreadsheetIcon jp-SideBar-tabIcon';
+  widget.title.caption = 'Data Explorer';
 
   restorer.add(widget, widget.id);
-  labShell.add(widget, "left");
+  labShell.add(widget, 'left');
   return { widget, addURL: displayedURLs.add, removeURL: displayedURLs.remove };
 }

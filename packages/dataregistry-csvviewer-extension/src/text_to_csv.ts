@@ -5,8 +5,8 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { createConverter } from "@jupyterlab/dataregistry";
-import datatypes from "./datatypes"; // FIXME
+import { createConverter } from '@jupyterlab/dataregistry';
+import datatypes from './datatypes'; // FIXME
 
 /**
  * Interface describing an object containing data to convert.
@@ -52,8 +52,8 @@ function convert(obj: Data) {
  */
 function text2csv() {
   const conversion = {
-    "from": datatypes.text,
-    "to": datatypes.csv
+    from: datatypes.text,
+    to: datatypes.csv
   };
 
   return createConverter(conversion, convert);

@@ -5,12 +5,12 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { IDocumentManager } from "@jupyterlab/docmanager";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
+import { IDocumentManager } from '@jupyterlab/docmanager';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   Registry,
   DataTypeStringArg,
@@ -19,20 +19,20 @@ import {
   DataTypeNoArgs,
   resolveExtensionConverter,
   textDataType
-} from "@jupyterlab/dataregistry";
-import { Observable, defer } from "rxjs";
-import { DocumentRegistry, Context } from "@jupyterlab/docregistry";
-import { INotebookModel } from "@jupyterlab/notebook";
-import { observableStringToObservable } from "./observables";
-import { switchMap } from "rxjs/operators";
+} from '@jupyterlab/dataregistry';
+import { Observable, defer } from 'rxjs';
+import { DocumentRegistry, Context } from '@jupyterlab/docregistry';
+import { INotebookModel } from '@jupyterlab/notebook';
+import { observableStringToObservable } from './observables';
+import { switchMap } from 'rxjs/operators';
 
 export const textContextDataType = new DataTypeStringArg<
   Observable<Context<DocumentRegistry.ICodeModel>>
->("application/x.jupyterlab.text-context", "mimeType");
+>('application/x.jupyterlab.text-context', 'mimeType');
 
 export const notebookContextDataType = new DataTypeNoArgs<
   Observable<Context<INotebookModel>>
->("application/x.jupyterlab.notebook-context");
+>('application/x.jupyterlab.notebook-context');
 
 async function getContext(
   docmanager: any,
@@ -49,26 +49,26 @@ async function getContext(
     context = docmanager._createContext(
       path,
       docmanager.registry.getModelFactory(factoryName),
-      docmanager.registry.getKernelPreference(path, "Kernel")
+      docmanager.registry.getKernelPreference(path, 'Kernel')
     );
     await context.initialize(false);
   }
   return context;
 }
 
-const notebookMimeType = "application/x.jupyterlab.notebook";
+const notebookMimeType = 'application/x.jupyterlab.notebook';
 function activate(
   app: JupyterFrontEnd,
   registry: Registry,
   docmanager: IDocumentManager
 ) {
   registry.addConverter(
-    resolveExtensionConverter(".ipynb", notebookMimeType),
+    resolveExtensionConverter('.ipynb', notebookMimeType),
     createConverter(
       { from: fileDataType, to: textContextDataType },
       ({ data, type }) => ({
         type,
-        data: defer(() => getContext(docmanager, data, "text"))
+        data: defer(() => getContext(docmanager, data, 'text'))
       })
     ),
     createConverter(
@@ -79,7 +79,7 @@ function activate(
         type === notebookMimeType
           ? defer(
               () =>
-                getContext(docmanager, data, "notebook") as Promise<
+                getContext(docmanager, data, 'notebook') as Promise<
                   Context<INotebookModel>
                 >
             )
@@ -100,7 +100,7 @@ function activate(
 }
 
 export default {
-  id: "@jupyterlab/dataregistry-extension:documents",
+  id: '@jupyterlab/dataregistry-extension:documents',
   requires: [IRegistry, IDocumentManager],
   activate,
   autoStart: true

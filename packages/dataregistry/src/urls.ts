@@ -5,21 +5,21 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { from, Observable, throwError, of } from "rxjs";
-import { fromFetch } from "rxjs/fetch";
-import { distinct, switchMap } from "rxjs/operators";
-import { URL_ } from "./datasets";
-import { DataTypeStringArg } from "./datatypes";
-import { resolveMimetypeDataType } from "./resolvers";
-import { createConverter } from "./createConverter";
+import { from, Observable, throwError, of } from 'rxjs';
+import { fromFetch } from 'rxjs/fetch';
+import { distinct, switchMap } from 'rxjs/operators';
+import { URL_ } from './datasets';
+import { DataTypeStringArg } from './datatypes';
+import { resolveMimetypeDataType } from './resolvers';
+import { createConverter } from './createConverter';
 
 /**
  * Type where data is a HTTP URL_ pointing to the data. It should be downloaded as a string and that
  * string will end up as the nested mimeType
  */
 export const URLDataType = new DataTypeStringArg<Observable<URL_>>(
-  "application/x.jupyter.url",
-  "mimeType"
+  'application/x.jupyter.url',
+  'mimeType'
 );
 
 /**
@@ -28,8 +28,8 @@ export const URLDataType = new DataTypeStringArg<Observable<URL_>>(
 export const resolverURLConverter = createConverter(
   { from: resolveMimetypeDataType, to: URLDataType },
   ({ url, type }) => {
-    const isHTTP = url.protocol === "http:";
-    const isHTTPS = url.protocol === "https:";
+    const isHTTP = url.protocol === 'http:';
+    const isHTTPS = url.protocol === 'https:';
     if (isHTTP || isHTTPS) {
       return { type, data: of(url.toString()) };
     }
@@ -40,10 +40,9 @@ export const resolverURLConverter = createConverter(
 // TODO: Change from text/plain to other mimetypes, if they  are valid
 // text mimetypes.
 export const textDataType = new DataTypeStringArg<Observable<string>>(
-  "text/plain",
-  "mimeType"
+  'text/plain',
+  'mimeType'
 );
-
 
 /**
  * Download URLs and put in their string mimetypes

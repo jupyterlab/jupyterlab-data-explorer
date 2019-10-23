@@ -5,9 +5,9 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { createConverter } from "@jupyterlab/dataregistry";
-import datatypes from "./datatypes"; // FIXME
-import DataGrid from "./data_grid";
+import { createConverter } from '@jupyterlab/dataregistry';
+import datatypes from './datatypes'; // FIXME
+import DataGrid from './data_grid';
 
 /**
  * Interface describing an object containing data to convert.
@@ -31,8 +31,8 @@ interface Data {
  */
 function convert(obj: Data) {
   return {
-    "type": "Grid",
-    "data": getData
+    type: 'Grid',
+    data: getData
   };
 
   /**
@@ -54,8 +54,8 @@ function convert(obj: Data) {
  */
 function csv2datagrid() {
   const conversion = {
-    "from": datatypes.csv,
-    "to": datatypes.widget
+    from: datatypes.csv,
+    to: datatypes.widget
   };
 
   return createConverter(conversion, convert);

@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Cost, Dataset, MimeType_, URL_ } from "./datasets";
+import { Cost, Dataset, MimeType_, URL_ } from './datasets';
 
 /**
  * Function that can possibly convert between data type T to

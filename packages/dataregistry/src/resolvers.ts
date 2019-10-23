@@ -5,26 +5,22 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import {
-  DataTypeNoArgs,
-  DataTypeStringArg,
-  TypedConverter,
-} from "./datatypes";
-import { createConverter } from "./createConverter";
+import { DataTypeNoArgs, DataTypeStringArg, TypedConverter } from './datatypes';
+import { createConverter } from './createConverter';
 
 /**
  * Datasets without a known mimetype start as just a resolve mimetype and no data.
  */
 export const resolveDataType = new DataTypeNoArgs<void>(
-  "application/x.jupyter.resolve"
+  'application/x.jupyter.resolve'
 );
 
 /**
  * Then, their mimetype is resolved.
  */
 export const resolveMimetypeDataType = new DataTypeStringArg<void>(
-  "application/x.jupyter.resolve",
-  "mimetype"
+  'application/x.jupyter.resolve',
+  'mimetype'
 );
 
 /**

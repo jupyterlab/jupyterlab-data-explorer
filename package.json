@@ -21,8 +21,12 @@
     "clean:packages": "lerna run clean",
     "link:packages": "lerna run link",
     "lint": "jlpm run lint:css && jlpm run lint:typescript",
+    "lint:check": "jlpm run prettier:check && jlpm run lint:typescript:check",
     "lint:css": "stylelint packages/**/*.css",
-    "lint:typescript": "eslint packages/**/src/*.ts",
+    "lint:typescript": "eslint --fix packages/**/src/*.ts",
+    "lint:typescript:check": "eslint packages/**/src/*.ts",
+    "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
+    "prettier:check": "prettier --list-different '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}'",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
     "registry": "verdaccio",
     "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
@@ -31,20 +35,29 @@
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "dependencies": {},
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^1.13.0",
     "@typescript-eslint/parser": "^1.13.0",
     "eslint": "^6.1.0",
     "eslint-config-prettier": "^6.0.0",
+    "eslint-plugin-prettier": "^3.1.1",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^1.6.1",
+    "husky": "^3.0.9",
     "lerna": "^3.16.4",
+    "lint-staged": "^9.4.2",
+    "prettier": "^1.18.2",
     "rimraf": "^2.6.2",
     "stylelint": "^11.0.0",
     "stylelint-config-prettier": "^6.0.0",
     "stylelint-config-standard": "^19.0.0",
     "typescript": "^3.5.3",
     "verdaccio": "^4.3.2"
-  },
-  "dependencies": {}
+  }
 }

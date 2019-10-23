@@ -5,26 +5,26 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from "react";
+import * as React from 'react';
 import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILabShell
-} from "@jupyterlab/application";
-import { ReactWidget } from "@jupyterlab/apputils";
+} from '@jupyterlab/application';
+import { ReactWidget } from '@jupyterlab/apputils';
 import {
   Registry,
   relativeNestedDataType,
   nestedDataType,
   URL_
-} from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { Widget } from "@phosphor/widgets";
-import { widgetDataType, reactDataType } from "./widgets";
-import { IActiveDataset } from ".";
-import { PhosphorWidget } from "./utils";
-import { Observable } from "rxjs";
+} from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { Widget } from '@phosphor/widgets';
+import { widgetDataType, reactDataType } from './widgets';
+import { IActiveDataset } from '.';
+import { PhosphorWidget } from './utils';
+import { Observable } from 'rxjs';
 
 function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
   // An array of all possible child paths after the last selected one
@@ -34,7 +34,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     Observable<Set<string> | Array<string>> | undefined
   >(undefined);
   // The current display label to use, if it exists on the current widget
-  const [label, setLabel] = React.useState("");
+  const [label, setLabel] = React.useState('');
   // The current display creators for the submitted URL
   const [widgets, setWidgets] = React.useState(new Map<string, () => Widget>());
   // The current display creators for the submitted URL
@@ -73,15 +73,15 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
   }, [url, registry]);
 
   // Fill in options mapping
-  const options = new Map<string, { value: string; type: "child" | "view" }>();
+  const options = new Map<string, { value: string; type: 'child' | 'view' }>();
 
   for (const key of widgets.keys()) {
-    options.set(`view-${key}`, { value: key, type: "view" });
+    options.set(`view-${key}`, { value: key, type: 'view' });
   }
   for (const child of children) {
     options.set(`child-${child}`, {
       value: child,
-      type: "child"
+      type: 'child'
     });
   }
 
@@ -97,7 +97,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
 
   const Component: React.ReactElement<any> | undefined = React.useMemo(() => {
     const selected = options.get(label);
-    if (!selected || selected.type === "child") {
+    if (!selected || selected.type === 'child') {
       return;
     }
     const name = selected.value;
@@ -114,13 +114,13 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
       <select value={label} onChange={event => setLabel(event.target.value)}>
         {[...options.entries()].map(([idx, { value, type }]) => (
           <option key={idx} value={idx}>
-            {type === "child" && value.startsWith(url)
+            {type === 'child' && value.startsWith(url)
               ? value.slice(url.length)
               : value}
           </option>
         ))}
       </select>
-      {parsedLabel && parsedLabel.type === "child" ? (
+      {parsedLabel && parsedLabel.type === 'child' ? (
         <InnerBrowser
           registry={registry}
           url={new URL(parsedLabel.value, url).toString()}
@@ -128,7 +128,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
       ) : Component ? (
         Component
       ) : (
-        "Select another dataset to view it..."
+        'Select another dataset to view it...'
       )}
     </>
   );
@@ -142,7 +142,7 @@ function Browser({
   active: IActiveDataset;
 }) {
   // Current url in the form
-  const [url, setURL] = React.useState(active.value || "");
+  const [url, setURL] = React.useState(active.value || '');
   // Last url we have submitted
   const [submittedURL, setSubmittedURL] = React.useState(url);
   // Whether to update both urls whenever the active dataset changes
@@ -153,8 +153,8 @@ function Browser({
     if (follow) {
       const subscription = active.subscribe({
         next: value => {
-          setURL(value || "");
-          setSubmittedURL(value || "");
+          setURL(value || '');
+          setSubmittedURL(value || '');
         }
       });
       return () => subscription.unsubscribe();
@@ -186,7 +186,7 @@ function Browser({
           checked={follow}
           onChange={e => {
             if (e.target.checked) {
-              setURL(active.value || "");
+              setURL(active.value || '');
             }
             setFollow(e.target.checked);
           }}
@@ -199,7 +199,7 @@ function Browser({
 
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:browser",
+  id: '@jupyterlab/dataregistry-extension:browser',
   requires: [ILabShell, IRegistry, ILayoutRestorer, IActiveDataset],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;
@@ -214,10 +214,10 @@ function activate(
   const content = ReactWidget.create(
     <Browser registry={registry} active={active} />
   );
-  content.id = "@jupyterlab-dataregistry/browser";
-  content.title.iconClass = "jp-SpreadsheetIcon jp-SideBar-tabIcon";
-  content.title.caption = "Data Browser";
+  content.id = '@jupyterlab-dataregistry/browser';
+  content.title.iconClass = 'jp-SpreadsheetIcon jp-SideBar-tabIcon';
+  content.title.caption = 'Data Browser';
 
   restorer.add(content, content.id);
-  labShell.add(content, "right");
+  labShell.add(content, 'right');
 }

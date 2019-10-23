@@ -19,15 +19,18 @@ insert_final_newline = true
 
 # Set properties for JavaScript files:
 [*.js]
-indent_style = tab
+indent_style = space
+indent_size = 2
 
 # Set properties for TypeScript files:
 [*.ts]
-indent_style = tab
+indent_style = space
+indent_size = 2
 
 # Set properties for TSX files:
 [*.tsx]
-indent_style = tab
+indent_style = space
+indent_size = 2
 
 # Set properties for Python files:
 [*.py]

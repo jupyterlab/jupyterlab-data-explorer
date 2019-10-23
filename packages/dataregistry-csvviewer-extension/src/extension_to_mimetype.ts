@@ -5,8 +5,8 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { resolveExtensionConverter } from "@jupyterlab/dataregistry";
-import datatypes from "./datatypes"; // FIXME
+import { resolveExtensionConverter } from '@jupyterlab/dataregistry';
+import datatypes from './datatypes'; // FIXME
 
 /**
  * Returns a converter for converting from a resolver MIME type to a file MIME type.
@@ -15,7 +15,7 @@ import datatypes from "./datatypes"; // FIXME
  * @returns data type converter
  */
 function extension2mimetype() {
-  return resolveExtensionConverter(".csv", datatypes.csv.createMimeType());
+  return resolveExtensionConverter('.csv', datatypes.csv.createMimeType());
 }
 
 /**

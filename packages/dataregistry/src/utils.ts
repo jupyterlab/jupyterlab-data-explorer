@@ -17,8 +17,8 @@ export function mergeMaps<K, V>(
 ): Map<K, V> {
   const res = new Map<K, V>();
   for (const x of xs) {
+    // eslint-disable-next-line prefer-const
     for (let [k, v] of x) {
-      // eslint-disable-line prefer-const
       const otherV = res.get(k);
       if (otherV !== undefined) {
         v = combine(otherV, v);

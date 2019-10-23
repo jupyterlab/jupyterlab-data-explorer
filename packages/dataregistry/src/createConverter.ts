@@ -5,13 +5,18 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Observable } from "rxjs";
-import { MimeType_, URL_, createDataset, createDatasets, Dataset } from "./datasets";
-import { Converter } from "./converters";
-import { CachedObservable } from "./cachedObservable";
+import { Observable } from 'rxjs';
+import {
+  MimeType_,
+  URL_,
+  createDataset,
+  createDatasets,
+  Dataset
+} from './datasets';
+import { Converter } from './converters';
+import { CachedObservable } from './cachedObservable';
 
-export const INVALID = Symbol("INVALID");
-
+export const INVALID = Symbol('INVALID');
 
 export abstract class DataType<T, U> {
   abstract parseMimeType(mimeType: MimeType_): T | typeof INVALID;
@@ -50,7 +55,6 @@ export class MimeTypeDataType<T> extends DataType<MimeType_, T> {
     return typeData;
   }
 }
-
 
 export abstract class TypedURL<T> {
   abstract parse(url: URL_): T | null | undefined;
@@ -132,5 +136,5 @@ export function createConverter<
 }
 
 export function isTypeData(o: unknown): o is { data: unknown; type: unknown } {
-  return o instanceof Object && "data" in o && "type" in o;
+  return o instanceof Object && 'data' in o && 'type' in o;
 }

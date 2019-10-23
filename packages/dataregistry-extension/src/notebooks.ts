@@ -9,8 +9,8 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILabShell
-} from "@jupyterlab/application";
-import { ICellModel, isCodeCellModel } from "@jupyterlab/cells";
+} from '@jupyterlab/application';
+import { ICellModel, isCodeCellModel } from '@jupyterlab/cells';
 import {
   Converter,
   createConverter,
@@ -22,54 +22,54 @@ import {
   Registry,
   resolveDataType,
   URLTemplate
-} from "@jupyterlab/dataregistry";
-import { IOutputModel } from "@jupyterlab/rendermime";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { NotebookPanel } from "@jupyterlab/notebook";
-import { ReadonlyJSONObject, ReadonlyJSONValue } from "@phosphor/coreutils";
-import { combineLatest, defer, Observable, of, from } from "rxjs";
-import { map, switchMap, filter } from "rxjs/operators";
-import { notebookContextDataType } from "./documents";
+} from '@jupyterlab/dataregistry';
+import { IOutputModel } from '@jupyterlab/rendermime';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { NotebookPanel } from '@jupyterlab/notebook';
+import { ReadonlyJSONObject, ReadonlyJSONValue } from '@phosphor/coreutils';
+import { combineLatest, defer, Observable, of, from } from 'rxjs';
+import { map, switchMap, filter } from 'rxjs/operators';
+import { notebookContextDataType } from './documents';
 import {
   observableListToObservable,
   outputAreaModelToObservable
-} from "./observables";
-import { IActiveDataset } from "./active";
-import { signalToObservable } from "./utils";
+} from './observables';
+import { IActiveDataset } from './active';
+import { signalToObservable } from './utils';
 
 /**
  * URLS
  */
 
-const notebookURL = new URLTemplate("file://{+path}", {
-  path: URLTemplate.extension(".ipynb")
+const notebookURL = new URLTemplate('file://{+path}', {
+  path: URLTemplate.extension('.ipynb')
 });
 
-const notebookCellURL = notebookURL.extend("#/cell-model/{cellID}", {
+const notebookCellURL = notebookURL.extend('#/cell-model/{cellID}', {
   cellID: URLTemplate.uuid
 });
 
-const notebookCellExternalURL = notebookURL.extend("#/cells/{cellIndex}", {
+const notebookCellExternalURL = notebookURL.extend('#/cells/{cellIndex}', {
   cellIndex: URLTemplate.number
 });
 
-const notebookOutputURL = notebookCellURL.extend("/outputs/{outputID}", {
+const notebookOutputURL = notebookCellURL.extend('/outputs/{outputID}', {
   outputID: URLTemplate.number
 });
 
 const notebookOutputExternalURL = notebookCellExternalURL.extend(
-  "/outputs/{outputID}",
+  '/outputs/{outputID}',
   {
     outputID: URLTemplate.number
   }
 );
 
-const notebookMimeDataURL = notebookOutputURL.extend("/data/{mimeType}", {
+const notebookMimeDataURL = notebookOutputURL.extend('/data/{mimeType}', {
   mimeType: URLTemplate.string
 });
 
 const notebookMimeDataExternalURL = notebookOutputExternalURL.extend(
-  "/data/{mimeType}",
+  '/data/{mimeType}',
   {
     mimeType: URLTemplate.string
   }
@@ -80,33 +80,33 @@ const notebookMimeDataExternalURL = notebookOutputExternalURL.extend(
  */
 
 const notebookCellsDataType = new DataTypeNoArgs<Observable<Array<ICellModel>>>(
-  "application/x.jupyterlab.notebook-cells"
+  'application/x.jupyterlab.notebook-cells'
 );
 
 const cellModelDataType = new DataTypeNoArgs<Observable<ICellModel>>(
-  "application/x.jupyterlab.cell-model"
+  'application/x.jupyterlab.cell-model'
 );
 
 const cellIndexDataType = new DataTypeNoArgs<Observable<number>>(
-  "application/x.jupyterlab.cell-index"
+  'application/x.jupyterlab.cell-index'
 );
 const cellIDDataType = new DataTypeNoArgs<Observable<string>>(
-  "application/x.jupyterlab.cell-id"
+  'application/x.jupyterlab.cell-id'
 );
 
 const outputsDataType = new DataTypeNoArgs<Observable<Array<IOutputModel>>>(
-  "application/x.jupyterlab.outputs"
+  'application/x.jupyterlab.outputs'
 );
 
 // The data in the mimebundle of an output cell
 const mimeBundleDataType = new DataTypeNoArgs<Observable<ReadonlyJSONObject>>(
-  "application/x.jupyterlab.mime-bundle"
+  'application/x.jupyterlab.mime-bundle'
 );
 
 // The data for a certain mimetype in an output.
 const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
-  "application/x.jupyterlab.mimedata",
-  "mimeType"
+  'application/x.jupyterlab.mimedata',
+  'mimeType'
 );
 
 /**
@@ -428,7 +428,7 @@ function activate(
 }
 
 export default {
-  id: "@jupyterlab/dataregistry-extension:notebooks",
+  id: '@jupyterlab/dataregistry-extension:notebooks',
   requires: [ILabShell, IRegistry, IActiveDataset],
   activate,
   autoStart: true

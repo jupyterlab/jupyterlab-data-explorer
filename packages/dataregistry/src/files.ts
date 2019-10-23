@@ -10,23 +10,20 @@
  *
  * Then convert to known filetype, with URL on it.
  */
-import { URLDataType } from "./urls";
-import {
-  DataTypeStringArg,
-  TypedConverter,
-} from "./datatypes";
-import { resolveMimetypeDataType } from "./resolvers";
-import { defer } from "rxjs";
-import { URL_ } from "./datasets";
-import { createConverter } from "./createConverter";
+import { URLDataType } from './urls';
+import { DataTypeStringArg, TypedConverter } from './datatypes';
+import { resolveMimetypeDataType } from './resolvers';
+import { defer } from 'rxjs';
+import { URL_ } from './datasets';
+import { createConverter } from './createConverter';
 
 export type FilePath = string;
 export const fileDataType = new DataTypeStringArg<FilePath>(
-  "application/x.jupyter.file",
-  "mimeType"
+  'application/x.jupyter.file',
+  'mimeType'
 );
 export function createFileURL_(path: string): URL_ {
-  const url = new URL("file:");
+  const url = new URL('file:');
   url.pathname = path;
   return url.toString();
 }
@@ -40,7 +37,7 @@ export const resolveFileConverter = createConverter(
     to: fileDataType
   },
   ({ type, url }) => {
-    if (url.protocol !== "file:") {
+    if (url.protocol !== 'file:') {
       return null;
     }
     return { type, data: url.pathname };

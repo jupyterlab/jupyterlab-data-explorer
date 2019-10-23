@@ -6,15 +6,15 @@
 */
 
 .scrollable {
-  overflow: scroll;
+	overflow: scroll;
 }
 
 .p-DataGrid {
-  height: 100%;
+	height: 100%;
 }
 
 .jl-phosphor-widget {
-  height: 100%;
+	height: 100%;
 }
 
 /**
@@ -22,21 +22,21 @@
  */
 
 .jl-dr-browser {
-  height: 100%;
-  display: flex;
-  flex-flow: column;
-  padding: 4px;
-  color: var(--jp-ui-font-color1);
-  background-color: var(--jp-layout-color1);
-  font-size: var(--jp-ui-font-size1);
+	height: 100%;
+	display: flex;
+	flex-flow: column;
+	padding: 4px;
+	color: var(--jp-ui-font-color1);
+	background-color: var(--jp-layout-color1);
+	font-size: var(--jp-ui-font-size1);
 }
 
 .jl-dr-browser-url {
-  display: flex;
+	display: flex;
 }
 
 .jl-dr-browser-url-text {
-  flex: auto;
+	flex: auto;
 }
 
 /**
@@ -44,93 +44,93 @@
  */
 
 .jl-explorer {
-  background-color: var(--jp-layout-color1);
-  color: var(--jp-ui-font-color1);
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+	background-color: var(--jp-layout-color1);
+	color: var(--jp-ui-font-color1);
+	height: 100%;
+	display: flex;
+	flex-direction: column;
 }
 
 .jl-explorer-body {
-  overflow: auto;
+	overflow: auto;
 }
 .jl-explorer-button {
-  color: var(--jp-brand-color1);
-  background: var(--jp-layout-color1);
-  border-radius: 2px;
-  font-size: 10px;
-  border-width: 0;
-  margin-right: 12px; /* 2 + 10 spacer between */
-  padding: 2px 4px;
+	color: var(--jp-brand-color1);
+	background: var(--jp-layout-color1);
+	border-radius: 2px;
+	font-size: 10px;
+	border-width: 0;
+	margin-right: 12px; /* 2 + 10 spacer between */
+	padding: 2px 4px;
 }
 
 .jl-explorer-button:active {
-  background: var(--jp-border-color1);
+	background: var(--jp-border-color1);
 }
 .jl-explorer-button:hover {
-  background-color: var(--jp-border-color2);
+	background-color: var(--jp-border-color2);
 }
 
 .jl-explorer-button:active:hover {
-  background: var(--jp-border-color1);
+	background: var(--jp-border-color1);
 }
 
 .jl-explorer-dataset {
-  padding: 4px;
-  padding-right: 12px;
-  padding-left: 12px;
-  border-left-width: 8px;
-  border-left-color: var(--jp-layout-color1);
-  border-left-style: solid;
+	padding: 4px;
+	padding-right: 12px;
+	padding-left: 12px;
+	border-left-width: 8px;
+	border-left-color: var(--jp-layout-color1);
+	border-left-style: solid;
 }
 
 .jl-explorer-dataset:hover {
-  border-left-color: var(--jp-border-color2);
+	border-left-color: var(--jp-border-color2);
 }
 .jl-explorer-dataset:active {
-  border-left-color: var(--jp-border-color1);
+	border-left-color: var(--jp-border-color1);
 }
 
 .jl-explorer-dataset:active:hover {
-  border-left-color: var(--jp-border-color1);
+	border-left-color: var(--jp-border-color1);
 }
 
 .jl-explorer-active-dataset {
-  border-left-color: var(--jp-brand-color1);
+	border-left-color: var(--jp-brand-color1);
 }
 
 .jl-explorer-active-dataset:hover {
-  border-left-color: var(--jp-brand-color1);
+	border-left-color: var(--jp-brand-color1);
 }
 
 .jl-explorer-active-dataset:active {
-  border-left-color: var(--jp-brand-color1);
+	border-left-color: var(--jp-brand-color1);
 }
 
 .jl-explorer-active-dataset:active:hover {
-  border-left-color: var(--jp-brand-color1);
+	border-left-color: var(--jp-brand-color1);
 }
 
 .jl-explorer-dataset-name {
-  font-size: var(--jp-ui-font-size0);
-  font-weight: unset;
-  margin: unset;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  text-align: left;
+	font-size: var(--jp-ui-font-size0);
+	font-weight: unset;
+	margin: unset;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	text-align: left;
 }
 
 .jl-explorer-heading {
-  padding-top: 8px;
-  padding-bottom: 6px;
-  padding-left: 12px;
-  padding-right: 12px;
-  font-size: var(--jp-ui-font-size1);
-  color: var(--jp-ui-font-color0);
-  letter-spacing: 0.1em;
-  margin: unset;
-  display: flex;
-  justify-content: space-between;
-  border-bottom: var(--jp-border-width) solid var(--jp-toolbar-border-color);
-  box-shadow: var(--jp-toolbar-box-shadow);
+	padding-top: 8px;
+	padding-bottom: 6px;
+	padding-left: 12px;
+	padding-right: 12px;
+	font-size: var(--jp-ui-font-size1);
+	color: var(--jp-ui-font-color0);
+	letter-spacing: 0.1em;
+	margin: unset;
+	display: flex;
+	justify-content: space-between;
+	border-bottom: var(--jp-border-width) solid var(--jp-toolbar-border-color);
+	box-shadow: var(--jp-toolbar-box-shadow);
 }

@@ -9,34 +9,34 @@ import {
   ILabShell,
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   createConverter,
   nestedDataType,
   Registry,
   resolveDataType,
   URL_
-} from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { IDocumentManager } from "@jupyterlab/docmanager";
-import { Token } from "@phosphor/coreutils";
-import { Widget } from "@phosphor/widgets";
-import { BehaviorSubject } from "rxjs";
-import { map } from "rxjs/operators";
-import { hasURL_ } from "./widgets";
+} from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { IDocumentManager } from '@jupyterlab/docmanager';
+import { Token } from '@phosphor/coreutils';
+import { Widget } from '@phosphor/widgets';
+import { BehaviorSubject } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { hasURL_ } from './widgets';
 
 export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
 export const IActiveDataset = new Token<IActiveDataset>(
-  "@jupyterlab/dataregistry:IActiveDataset"
+  '@jupyterlab/dataregistry:IActiveDataset'
 );
 
-export const ACTIVE_URL = new URL("active:").toString();
+export const ACTIVE_URL = new URL('active:').toString();
 /**
  * The active dataset extension.
  */
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:active-dataset",
+  id: '@jupyterlab/dataregistry-extension:active-dataset',
   requires: [ILabShell, IRegistry, IDocumentManager],
   provides: IActiveDataset,
   autoStart: true
@@ -52,15 +52,18 @@ function activate(
 
   // Show active datasets in explorer
   registry.addConverter(
-    createConverter<void, any, void, string>({ from: resolveDataType }, ({ url }) => {
-      if (url.toString() !== ACTIVE_URL) {
-        return null;
+    createConverter<void, any, void, string>(
+      { from: resolveDataType },
+      ({ url }) => {
+        if (url.toString() !== ACTIVE_URL) {
+          return null;
+        }
+        return {
+          type: nestedDataType.createMimeType(),
+          data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
+        };
       }
-      return {
-        type: nestedDataType.createMimeType(),
-        data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
-      };
-    })
+    )
   );
 
   // Track active documents open.
@@ -79,7 +82,7 @@ function getURL_(
   }
   const context = docManager.contextForWidget(widget);
   if (context) {
-    return new URL(context.session.path, "file:").toString();
+    return new URL(context.session.path, 'file:').toString();
   }
   if (hasURL_(widget)) {
     return widget.url;

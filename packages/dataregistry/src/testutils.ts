@@ -5,8 +5,8 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Observable } from "rxjs";
-import { tag } from "rxjs-spy/operators/tag";
+import { Observable } from 'rxjs';
+import { tag } from 'rxjs-spy/operators/tag';
 
 /**
  * A testing util that takes in an observables and lets you await each next.
@@ -22,7 +22,7 @@ export class ToPromises<T> {
     return new Promise(resolve => this._promises.push(resolve));
   }
   constructor(observable: Observable<T>) {
-    observable.pipe(tag("ToPromise")).subscribe(next => {
+    observable.pipe(tag('ToPromise')).subscribe(next => {
       const promise = this._promises.pop();
       if (promise === undefined) {
         this._values.push(next);

@@ -5,19 +5,19 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { DataTypeNoArgs, TypedConverter } from "./datatypes";
-import { nestedDataType } from "./nested";
+import { DataTypeNoArgs, TypedConverter } from './datatypes';
+import { nestedDataType } from './nested';
 
-import { map } from "rxjs/operators";
-import { resolveDataType } from "./resolvers";
-import { Observable, defer } from "rxjs";
-import { join } from "path";
-import { createConverter } from "./createConverter";
+import { map } from 'rxjs/operators';
+import { resolveDataType } from './resolvers';
+import { Observable, defer } from 'rxjs';
+import { join } from 'path';
+import { createConverter } from './createConverter';
 /**
  * A folder is a list paths in it as strings
  */
 export const folderDataType = new DataTypeNoArgs<Observable<Set<string>>>(
-  "application/x.jupyter.folder"
+  'application/x.jupyter.folder'
 );
 
 /**
@@ -30,7 +30,7 @@ export function createFolderConverter(
   return createConverter(
     { from: resolveDataType, to: folderDataType },
     ({ url }) => {
-      return url.protocol === "file:" && url.pathname.endsWith("/")
+      return url.protocol === 'file:' && url.pathname.endsWith('/')
         ? defer(() => folderContents(url.pathname))
         : null;
     }

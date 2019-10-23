@@ -5,10 +5,10 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Observable, Subscription } from "rxjs";
-import { DataGrid } from "@phosphor/datagrid";
-import { Message } from "@phosphor/messaging";
-import { DSVModel } from "@jupyterlab/csvviewer";
+import { Observable, Subscription } from 'rxjs';
+import { DataGrid } from '@phosphor/datagrid';
+import { Message } from '@phosphor/messaging';
+import { DSVModel } from '@jupyterlab/csvviewer';
 
 /**
  * Class to support the conversion from CSV data to data grid widget data.
@@ -28,7 +28,7 @@ class CSVDataGrid extends DataGrid {
   constructor(data: Observable<string>) {
     super();
     this._data = data;
-    this.headerVisibility = "all";
+    this.headerVisibility = 'all';
   }
 
   /**
@@ -52,8 +52,8 @@ class CSVDataGrid extends DataGrid {
         (self.model as DSVModel).dispose();
       }
       self.model = new DSVModel({
-        "data": data,
-        "delimiter": ","
+        data: data,
+        delimiter: ','
       });
     }
   }

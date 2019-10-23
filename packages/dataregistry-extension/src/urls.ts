@@ -8,17 +8,17 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   URLStringConverter,
   resolverURLConverter,
   Registry
-} from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
+} from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 
 export default {
   activate,
-  id: "@jupyterlab/dataregistry-extension:urls",
+  id: '@jupyterlab/dataregistry-extension:urls',
   requires: [IRegistry],
   autoStart: true
 } as JupyterFrontEndPlugin<void>;

@@ -55,7 +55,6 @@ export type Dataset<T> = Map<MimeType_, DataValue<T>>;
 
 export type Datasets<T> = Map<URL_, Dataset<T>>;
 
-
 export function createDataset<T>(mimeType: MimeType_, data: T): Dataset<T> {
   return new Map([[mimeType, [0, data]]]);
 }

@@ -19,7 +19,7 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
+} from '@jupyterlab/application';
 import {
   DataTypeNoArgs,
   Registry,
@@ -28,21 +28,21 @@ import {
   relativeNestedDataType,
   resolveDataType,
   textDataType
-} from "@jupyterlab/dataregistry";
-import { Observable, of } from "rxjs";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { map } from "rxjs/operators";
-import * as yaml from "js-yaml";
-import { snippedDataType } from "./snippets";
-import * as Ajv from "ajv";
-import { labelDataType } from "./explorer";
+} from '@jupyterlab/dataregistry';
+import { Observable, of } from 'rxjs';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { map } from 'rxjs/operators';
+import * as yaml from 'js-yaml';
+import { snippedDataType } from './snippets';
+import * as Ajv from 'ajv';
+import { labelDataType } from './explorer';
 
-const datasetSchema = require("./datasets-file.schema.json");
+const datasetSchema = require('./datasets-file.schema.json');
 
 const ajv = new Ajv();
 const validate = ajv.compile(datasetSchema);
 
-const datasetsFileMimeType = "application/x.jupyterlab.datasets-file";
+const datasetsFileMimeType = 'application/x.jupyterlab.datasets-file';
 
 export type datasetsObjectType = {
   children?: Array<string>;
@@ -60,8 +60,8 @@ export const datasetsFileDataType = new DataTypeNoArgs<
 
 function activate(app: JupyterFrontEnd, registry: Registry) {
   registry.addConverter(
-    resolveExtensionConverter("datasets.yml", datasetsFileMimeType),
-    resolveExtensionConverter("datasets.yaml", datasetsFileMimeType),
+    resolveExtensionConverter('datasets.yml', datasetsFileMimeType),
+    resolveExtensionConverter('datasets.yaml', datasetsFileMimeType),
     createConverter(
       { from: textDataType, to: datasetsFileDataType },
       ({ data, type }) =>
@@ -142,7 +142,7 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
 }
 
 export default {
-  id: "@jupyterlab/dataregistry-extension:file",
+  id: '@jupyterlab/dataregistry-extension:file',
   requires: [IRegistry],
   activate,
   autoStart: true

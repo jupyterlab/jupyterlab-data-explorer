@@ -5,12 +5,12 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from "react";
+import * as React from 'react';
 
-import { Observable, Subscription, BehaviorSubject } from "rxjs";
+import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 
-import { Widget } from "@phosphor/widgets";
-import { ISignal } from "@phosphor/signaling";
+import { Widget } from '@phosphor/widgets';
+import { ISignal } from '@phosphor/signaling';
 
 interface IUseBehaviorSubjectProps<T> {
   subject: BehaviorSubject<T>;

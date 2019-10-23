@@ -8,11 +8,11 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin
-} from "@jupyterlab/application";
-import { relative, dirname } from "path";
-import { INotebookTracker } from "@jupyterlab/notebook";
+} from '@jupyterlab/application';
+import { relative, dirname } from 'path';
+import { INotebookTracker } from '@jupyterlab/notebook';
 
-import { first } from "rxjs/operators";
+import { first } from 'rxjs/operators';
 import {
   DataTypeStringArg,
   fileDataType,
@@ -21,9 +21,9 @@ import {
   TypedConverter,
   createConverter,
   Registry
-} from "@jupyterlab/dataregistry";
-import { IRegistry } from "@jupyterlab/dataregistry-registry-extension";
-import { viewerDataType } from "./viewers";
+} from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { viewerDataType } from './viewers';
 
 type SnippetContext = {
   path: string;
@@ -31,7 +31,7 @@ type SnippetContext = {
 
 export const snippedDataType = new DataTypeStringArg<
   (context: SnippetContext) => Promise<string>
->("application/x.jupyter.snippet", "label");
+>('application/x.jupyter.snippet', 'label');
 
 export interface IFileSnippetConverterOptions {
   mimeType: string;
@@ -91,7 +91,7 @@ export function URLSnippetConverter({
 }
 
 export default {
-  id: "@jupyterlab/dataregistry-extension:snippets",
+  id: '@jupyterlab/dataregistry-extension:snippets',
   requires: [IRegistry, INotebookTracker],
   activate: (
     app: JupyterFrontEnd,
@@ -113,14 +113,14 @@ export default {
         })
       ),
       fileSnippetConverter({
-        mimeType: "text/csv",
-        label: "Snippet",
+        mimeType: 'text/csv',
+        label: 'Snippet',
         createSnippet: path =>
           `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(path)})\ndf`
       }),
       URLSnippetConverter({
-        mimeType: "text/csv",
-        label: "Snippet",
+        mimeType: 'text/csv',
+        label: 'Snippet',
         createSnippet: (url: URL_) =>
           `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(url)})\ndf`
       })

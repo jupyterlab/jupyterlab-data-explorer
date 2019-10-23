@@ -4,16 +4,10 @@
     "outDir": "./lib",
     "rootDir": "./src",
     "skipLibCheck": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "src/*"
-  ],
-  "exclude": [
-    "node_modules"
-  ],
+  "include": ["src/*"],
+  "exclude": ["node_modules"],
   "references": [
     {
       "path": "../dataregistry"

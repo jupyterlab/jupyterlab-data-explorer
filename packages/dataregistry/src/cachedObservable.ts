@@ -11,19 +11,19 @@ import {
   Subscriber,
   Subscription,
   Observer
-} from "rxjs";
+} from 'rxjs';
 
 /**
  * Possible states our observables can be in.
  */
 const enum State {
-  initial = "initial",
-  waitingFirst = "waiting first",
-  waitingNext = "waiting next",
-  waitingFirstSubs = "waiting first and subscribed",
-  waitingNextSubs = "waiting next and subscribed",
-  complete = "complete",
-  error = "error"
+  initial = 'initial',
+  waitingFirst = 'waiting first',
+  waitingNext = 'waiting next',
+  waitingFirstSubs = 'waiting first and subscribed',
+  waitingNextSubs = 'waiting next and subscribed',
+  complete = 'complete',
+  error = 'error'
 }
 /**
  * We want to capture the last emitted value and whether the observable is finalized yet.
@@ -146,15 +146,15 @@ export class CachedObservable<T> extends Observable<T> {
         switch (state.state) {
           case State.initial:
             throw new Error(
-              "Should not be in initial state when unsubscribing"
+              'Should not be in initial state when unsubscribing'
             );
           case State.waitingFirst:
             throw new Error(
-              "Should not be waiting for subscription and first when unsubscribing"
+              'Should not be waiting for subscription and first when unsubscribing'
             );
           case State.waitingNext:
             throw new Error(
-              "Should not be waiting for subscription and next when unsubscribing"
+              'Should not be waiting for subscription and next when unsubscribing'
             );
           case State.waitingNextSubs:
           case State.waitingFirstSubs:
@@ -233,7 +233,7 @@ export class CachedObservable<T> extends Observable<T> {
             throw new Error("Shouldn't be in initial state on complete");
           case State.waitingFirst:
           case State.waitingFirstSubs:
-            throw new Error("Should have recieved value before complete");
+            throw new Error('Should have recieved value before complete');
           case State.waitingNext:
           case State.waitingNextSubs:
             this.state.next({ state: State.complete, value: state.value });

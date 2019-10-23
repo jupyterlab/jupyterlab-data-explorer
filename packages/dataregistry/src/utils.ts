@@ -5,8 +5,8 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Observable, BehaviorSubject } from "rxjs";
-import { tag } from "rxjs-spy/operators/tag";
+import { Observable, BehaviorSubject } from 'rxjs';
+import { tag } from 'rxjs-spy/operators/tag';
 
 /**
  * Combine two maps by merging duplicate keys.
@@ -17,7 +17,8 @@ export function mergeMaps<K, V>(
 ): Map<K, V> {
   const res = new Map<K, V>();
   for (const x of xs) {
-    for (let [k, v] of x) { // eslint-disable-line prefer-const
+    for (let [k, v] of x) {
+      // eslint-disable-line prefer-const
       const otherV = res.get(k);
       if (otherV !== undefined) {
         v = combine(otherV, v);
@@ -50,7 +51,7 @@ export class ObservableSet<T> {
   );
 
   constructor(values?: Iterable<T>) {
-    this.observable = this._observable.pipe(tag("ObservableSet"));
+    this.observable = this._observable.pipe(tag('ObservableSet'));
     if (values) {
       this.add(...values);
     }

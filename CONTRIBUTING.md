@@ -159,7 +159,7 @@ Tests should accompany **all** bug fixes and features. For guidance on how to wr
 
 **Before** submitting a [pull request][github-pull-request] to the `upstream` repository, ensure that all tests pass, including linting.
 
-Any [pull requests][github-pull-request] which include failing tests and/or lint errors will **not** be accepted. 
+Any [pull requests][github-pull-request] which include failing tests and/or lint errors will **not** be accepted.
 
 #### Step 7: Push
 
@@ -230,33 +230,19 @@ Phew. While the above may be a lot to remember, even for what seem like minor ch
 <!-- links -->
 
 [jupyter-of-conduct]: https://jupyter.org/conduct/
-
 [license]: https://github.com/jupyter/jupyterlab-data-explorer/blob/master/LICENSE
-
 [development-guide]: https://github.com/jupyter/jupyterlab-data-explorer/blob/master/docs/development.md
-
 [github-signup]: https://github.com/signup/free
-
 [github-pull-request]: https://help.github.com/articles/creating-a-pull-request/
-
 [github-gist]: https://gist.github.com/
-
 [github-markdown-guide]: https://guides.github.com/features/mastering-markdown/
-
 [github-fork]: https://help.github.com/articles/fork-a-repo/
-
 [github-git-tutorial]: http://try.github.io/levels/1/challenges/1
-
 [git]: http://git-scm.com/
-
 [git-clone-depth]: https://git-scm.com/docs/git-clone#git-clone---depthltdepthgt
-
 [git-remotes]: https://git-scm.com/book/en/v2/Git-Basics-Working-with-Remotes
-
 [git-rebase]: https://git-scm.com/docs/git-rebase
-
 [git-merge]: https://git-scm.com/docs/git-merge
-
 [git-rewriting-history]: https://git-scm.com/book/en/v2/Git-Tools-Rewriting-History
 
 <!-- /.links -->

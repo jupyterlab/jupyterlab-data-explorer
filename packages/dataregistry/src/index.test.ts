@@ -5,17 +5,17 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { Registry, Converter } from "./index";
-import { resolveDataType } from "./resolvers";
+import { Registry, Converter } from './index';
+import { resolveDataType } from './resolvers';
 
-import { create } from "rxjs-spy";
-import { getURLs, getMimeTypes, getData, createDatasets } from "./datasets";
+import { create } from 'rxjs-spy';
+import { getURLs, getMimeTypes, getData, createDatasets } from './datasets';
 
 const spy = create();
-spy.log("");
+spy.log('');
 
-test("Creating resolve dataset", () => {
-  const url = "http://some-url.com/";
+test('Creating resolve dataset', () => {
+  const url = 'http://some-url.com/';
   const datasets = resolveDataType.createDatasets(url);
 
   //  Verify that URL is
@@ -28,11 +28,11 @@ test("Creating resolve dataset", () => {
   expect(getData(datasets, url, expectedMimeType)).toBeFalsy();
 });
 
-test("Adding dataset URL registers it", () => {
+test('Adding dataset URL registers it', () => {
   const r = new Registry();
-  const url = "http://some-url.com/";
-  const mimeType = "some-mimetype";
-  const data = "data";
+  const url = 'http://some-url.com/';
+  const mimeType = 'some-mimetype';
+  const data = 'data';
 
   r.addDatasets(createDatasets(url, mimeType, data));
   const dataset = r.getURL(url);
@@ -44,12 +44,12 @@ test("Adding dataset URL registers it", () => {
   expect(dataset.get(mimeType)![1]).toEqual(data);
 });
 
-test("Adding a converter gives the new mimetype", () => {
-  const url = "some-url";
-  const initialMimeType = "initial";
-  const convertedMimeType = "converted";
-  const initialData = "initial-data";
-  const convertedData = "some-url/initial-data";
+test('Adding a converter gives the new mimetype', () => {
+  const url = 'some-url';
+  const initialMimeType = 'initial';
+  const convertedMimeType = 'converted';
+  const initialData = 'initial-data';
+  const convertedData = 'some-url/initial-data';
   const dataConverter = jest.fn(
     (url: string, data: string) => `${url}/${data}`
   );

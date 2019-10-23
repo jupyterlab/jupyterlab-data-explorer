@@ -29,7 +29,6 @@ module.exports = {
 		'react-hooks/rules-of-hooks': 'error',
 		'react-hooks/exhaustive-deps': 'warn',
 		'prettier/prettier': ['error', { singleQuote: true }],
-		indent: ['error', 2],
 		'linebreak-style': ['error', 'unix'],
 		'no-console': ['error', { allow: ['warn', 'error'] }]
 	}

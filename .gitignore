@@ -5,9 +5,11 @@
 # Distributed under the terms of the 3-Clause BSD License.
 #/
 
+build
 lib
 node_modules
-yarn-error.log
+screenshots
+
 **/.ipynb_checkpoints
 *.tsbuildinfo
 
@@ -16,5 +18,7 @@ yarn-error.log
 .vscode
 
 __pycache__/
+
 yarn.lock
+yarn-error.log
 package-lock.json

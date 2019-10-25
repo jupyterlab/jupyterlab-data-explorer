@@ -33,6 +33,8 @@
     "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
     "registry:adduser": "npm adduser --registry http://localhost:4873",
     "registry:register": "lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
+    "test": "jest --runInBand --config ./etc/jest/jest.config.js",
+    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test",
     "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
     "unlink:packages": "lerna run unlink"
   },

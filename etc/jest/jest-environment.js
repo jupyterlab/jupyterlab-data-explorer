@@ -9,6 +9,7 @@
 
 const PuppeteerEnvironment = require("jest-environment-puppeteer");
 const JestScreenshot = require("@rws-air/jestscreenshot");
+const resolve = require("path").resolve;
 
 class CustomEnvironment extends PuppeteerEnvironment {
   async setup() {
@@ -25,7 +26,7 @@ class CustomEnvironment extends PuppeteerEnvironment {
 
       const jestScreenshot = new JestScreenshot({
         page: this.global.page,
-        dirName: __dirname,
+        dirName: resolve(__dirname, "..", ".."),
         testName
       });
 

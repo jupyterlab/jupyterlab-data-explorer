@@ -5,7 +5,9 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-module.exports = {
+const resolve = require('path').resolve;
+
+const config = {
   env: {
     browser: true,
     es6: true
@@ -17,6 +19,7 @@ module.exports = {
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
+    tsconfigRootDir: resolve(__dirname, '..', '..'),
     project: 'tsconfig.json',
     ecmaFeatures: {
       jsx: true
@@ -33,3 +36,8 @@ module.exports = {
     'no-console': ['error', { allow: ['warn', 'error'] }]
   }
 };
+
+/**
+ * Exports.
+ */
+module.exports = config;

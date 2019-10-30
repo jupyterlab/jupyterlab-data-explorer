@@ -25,10 +25,14 @@
 	height: 100%;
 	display: flex;
 	flex-flow: column;
-	padding: 4px;
+	padding: 8px;
 	color: var(--jp-ui-font-color1);
 	background-color: var(--jp-layout-color1);
 	font-size: var(--jp-ui-font-size1);
+}
+
+.jl-dr-browser label {
+	padding: 4px;
 }
 
 .jl-dr-browser-url {
@@ -37,6 +41,7 @@
 
 .jl-dr-browser-url-text {
 	flex: auto;
+	margin-right: 4px;
 }
 
 /**

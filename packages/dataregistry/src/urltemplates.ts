@@ -5,10 +5,10 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as uriTemplates from 'uri-templates';
+import * as uriTemplates from "uri-templates";
 
-import { URL_ } from './datasets';
-import { TypedURL } from './createConverter';
+import { URL_ } from "./datasets";
+import { TypedURL } from "./createConverter";
 
 /**
  * https://stackoverflow.com/a/6640851/907060
@@ -28,7 +28,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    * variable names to pairs of inverse functions (adjunctions) which handle mapping to/from
    * that variable and a string.
    *
-   * You can  use these to also filter variables, by returning null from these funcitons. We provide
+   * You can  use these to also filter variables, by returning null from these functions. We provide
    * a couple of common adjuncions on this class, like `string` and `number`.
    */
   constructor(
@@ -40,7 +40,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   /**
-   * Identity isomorphism for strings
+   * Identity isomorphism for strings.
    */
   static get string(): Dual<string, string> {
     return [s => s, s => s];
@@ -93,7 +93,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   }
 
   /**
-   * Create a URL give the args. It fills in the template afer calling the mapping functions on each arg.
+   * Create a URL give the args. It fills in the template after calling the mapping functions on each arg.
    */
   create(args: T): URL_ {
     return this._template.fill(
@@ -120,7 +120,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
 }
 
 /**
- * Checks if an object has all non nullable values.
+ * Checks if an object has all non-nullable values.
  */
 function nonNullableValues<T extends { [k: string]: any }>(
   t: T
@@ -129,7 +129,7 @@ function nonNullableValues<T extends { [k: string]: any }>(
 }
 
 /**
- * Two functions that are isomporphsisms of each other, except the first
+ * Two functions that are isomporphisms of each other, except the first
  * is partial. Useful for a pari of deserializing function, which can fail,
  * and a serialize one which cannot.
  */

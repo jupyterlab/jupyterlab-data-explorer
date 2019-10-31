@@ -40,7 +40,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": "lint-staged --config ./etc/lint-staged/.lintstagedrc"
+      "pre-commit": "lint-staged --config ./etc/lint-staged/lint-staged.config.js"
     }
   },
   "dependencies": {},

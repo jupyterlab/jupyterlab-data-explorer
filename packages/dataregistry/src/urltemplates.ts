@@ -5,10 +5,10 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as uriTemplates from "uri-templates";
+import * as uriTemplates from 'uri-templates';
 
-import { URL_ } from "./datasets";
-import { TypedURL } from "./createConverter";
+import { URL_ } from './datasets';
+import { TypedURL } from './createConverter';
 
 /**
  * https://stackoverflow.com/a/6640851/907060

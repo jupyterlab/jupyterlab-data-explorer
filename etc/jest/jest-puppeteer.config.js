@@ -7,8 +7,8 @@
 
 const config = {
   launch: {
-    headless: process.env.HEADLESS !== "false",
-    slowMo: process.env.SLOWMO === "true"
+    headless: process.env.HEADLESS !== 'false',
+    slowMo: process.env.SLOWMO === 'true'
   },
   // https://github.com/smooth-code/jest-puppeteer/tree/master/packages/jest-dev-server#options
   server: {

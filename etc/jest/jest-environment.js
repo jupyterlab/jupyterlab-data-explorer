@@ -7,9 +7,9 @@
 
 // Based on from https://yarnpkg.com/en/package/@rws-air/jestscreenshot
 
-const PuppeteerEnvironment = require("jest-environment-puppeteer");
-const JestScreenshot = require("@rws-air/jestscreenshot");
-const resolve = require("path").resolve;
+const PuppeteerEnvironment = require('jest-environment-puppeteer');
+const JestScreenshot = require('@rws-air/jestscreenshot');
+const resolve = require('path').resolve;
 
 class CustomEnvironment extends PuppeteerEnvironment {
   async setup() {
@@ -21,12 +21,12 @@ class CustomEnvironment extends PuppeteerEnvironment {
   }
 
   async handleTestEvent(event, state) {
-    if (event.name === "test_fn_failure") {
+    if (event.name === 'test_fn_failure') {
       const testName = state.currentlyRunningTest.name;
 
       const jestScreenshot = new JestScreenshot({
         page: this.global.page,
-        dirName: resolve(__dirname, "..", ".."),
+        dirName: resolve(__dirname, '..', '..'),
         testName
       });
 

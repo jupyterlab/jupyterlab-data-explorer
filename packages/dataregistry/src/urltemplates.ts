@@ -129,7 +129,7 @@ function nonNullableValues<T extends { [k: string]: any }>(
 }
 
 /**
- * Two functions that are isomporphisms of each other, except the first
+ * Two functions that are isomorphisms of each other, except the first
  * is partial. Useful for a pari of deserializing function, which can fail,
  * and a serialize one which cannot.
  */

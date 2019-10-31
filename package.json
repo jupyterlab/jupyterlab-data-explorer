@@ -19,7 +19,7 @@
     "clean:jupyter": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...') && jupyter lab clean",
     "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
-    "link:packages": "lerna run link",
+    "link:packages": "jupyter labextension link ./packages/* --no-build",
     "lint": "jlpm run lint:css && jlpm run lint:typescript",
     "lint:check": "jlpm run prettier:check && jlpm run lint:css:check && jlpm run lint:typescript:check",
     "lint:css": "stylelint packages/**/*.css --config ./etc/stylelint/.stylelintrc.json --fix",

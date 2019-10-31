@@ -10,6 +10,7 @@
     "checkJs": false,
     "composite": true,
     "declaration": true,
+    "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "keyofStringsOnly": false,
@@ -35,7 +36,7 @@
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
     "target": "es2019",
-    "types": []
+    "types": ["jest"]
   },
   "exclude": ["node_modules"]
 }

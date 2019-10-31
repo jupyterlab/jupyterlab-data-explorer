@@ -9,13 +9,17 @@
 
 var RegistryClient = require('npm-registry-client');
 
-var client = new RegistryClient();
+var client = new RegistryClient({
+  scope: '@jupyterlab'
+});
+
 var params = {
   timeout: 1000,
   auth: {
     username: 'foo',
     password: 'bar',
-    email: 'foo@bar.com'
+    email: 'foo@bar.com',
+    alwaysAuth: false
   }
 };
 

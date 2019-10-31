@@ -30,7 +30,7 @@ function done(error, data, raw, res) {
     console.error(error);
     return;
   }
-  console.log('Login succeeded');
+  console.log('User added.');
   console.log('data: %s', JSON.stringify(data, null, 2));
   console.log('NPM access token: %s', data.token);
 }

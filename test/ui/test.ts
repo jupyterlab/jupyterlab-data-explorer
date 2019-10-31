@@ -5,29 +5,12 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { ElementHandle } from "puppeteer";
-import { setDefaultOptions } from "expect-puppeteer";
+const { setDefaultOptions } = require("expect-puppeteer");
 
 // Extend the time allowed for tests to complete:
 const timeout = 15 * 1000;
 jest.setTimeout(timeout);
 setDefaultOptions({ timeout });
-
-/**
- * Returns an element specified by an [XPath][1].
- *
- * [1]: https://developer.mozilla.org/en-US/docs/Web/XPath
- *
- * @private
- * @param xpath - XML path
- * @returns element handle
- */
-async function getXPath(xpath: string): Promise<ElementHandle<Element>> {
-  await page.waitForXPath(xpath);
-  const elements = await page.$x(xpath);
-  expect(elements.length).toBe(1);
-  return elements[0];
-}
 
 /**
  * Returns a promise for suspending stack execution for a specified duration.

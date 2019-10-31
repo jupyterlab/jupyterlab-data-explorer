@@ -35,8 +35,7 @@
     "strictPropertyInitialization": true,
     "suppressExcessPropertyErrors": false,
     "suppressImplicitAnyIndexErrors": false,
-    "target": "es2019",
-    "types": ["jest"]
+    "target": "es2019"
   },
   "exclude": ["node_modules"]
 }

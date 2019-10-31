@@ -106,8 +106,6 @@ Returning to the previous terminal window, initialize the local package registry
 $ jlpm run registry:init
 ```
 
-When prompted for user credentials, simply enter `foo` for the username, `bar` for the password, and `foo@bar.com` for the e-mail address. These values are not checked and can be anything.
-
 To verify that the local package registry is running and that local packages have been published to that registry,
 
 ```bash

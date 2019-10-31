@@ -1,0 +1,42 @@
+on: [push, pull_request]
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.6"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: python -m pip install --upgrade pip
+      - run: pip install jupyterlab
+      - run: jlpm
+      - run: jlpm run lint:check
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.6"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: python -m pip install --upgrade pip
+      - run: pip install jupyterlab
+      - run: jlpm run build
+      - run: jlpm run registry &>/dev/null &
+      - run: jlpm run registry:init
+      - run: jupyter lab build --debug-log-path log.txt
+      - if: failure()
+        run: cat log.txt
+      - run: jlpm run test
+      - name: upload screenshots
+        if: failure()
+        uses: actions/upload-artifact@v1
+        with:
+          name: screenshots
+          path: screenshots

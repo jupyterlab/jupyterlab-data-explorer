@@ -1,6 +1,20 @@
 on: [push, pull_request]
 jobs:
-  build:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-python@v1
+        with:
+          python-version: "3.6"
+      - uses: actions/setup-node@v1
+        with:
+          node-version: "10.x"
+      - run: python -m pip install --upgrade pip
+      - run: pip install jupyterlab
+      - run: jlpm
+      - run: jlpm run lint:check
+  test:
     runs-on: ubuntu-latest
 
     steps:

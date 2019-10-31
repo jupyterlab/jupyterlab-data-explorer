@@ -10,7 +10,7 @@
     "checkJs": false,
     "composite": true,
     "declaration": true,
-    "esModuleInterop": true,
+    "esModuleInterop": false,
     "forceConsistentCasingInFileNames": true,
     "jsx": "react",
     "keyofStringsOnly": false,

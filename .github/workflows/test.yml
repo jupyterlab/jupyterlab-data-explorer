@@ -16,9 +16,9 @@ jobs:
       - run: jlpm run build
       - run: jlpm run registry &>/dev/null &
       - run: jlpm run registry:init
-      - run: jupyter lab build --debug-log-path ./log_jupyter_debug.txt > ./log_build_jupyter.txt
+      - run: jupyter lab build --debug-log-path log.txt
       - if: failure()
-        run: cat ./log_build_jupyter.txt && cat ./log_jupyter_debug.txt
+        run: cat log.txt
       - run: jlpm run test
       - name: upload screenshots
         if: failure()

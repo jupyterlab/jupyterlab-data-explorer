@@ -2,7 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "./build",
-    "rootDir": "./test"
+    "rootDir": "./test",
+    "esModuleInterop": true
   },
   "include": ["test/*", "test/**/*"]
 }

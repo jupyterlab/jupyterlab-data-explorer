@@ -16,10 +16,9 @@ jobs:
       - run: jlpm run build > ./log_build.txt
       - if: failure()
         run: cat ./log_build.txt
-      - run: jupyter lab build --debug-log-path log_jupyter_debug.txt > ./log_build_jupyter.txt
+      - run: jupyter lab build --debug-log-path ./log_jupyter_debug.txt > ./log_build_jupyter.txt
       - if: failure()
-        run: cat ./log_build_jupyter.txt
-        run: cat ./log_jupyter_debug.txt
+        run: cat ./log_build_jupyter.txt && cat ./log_jupyter_debug.txt
       - run: jlpm run test
       - name: upload screenshots
         if: failure()

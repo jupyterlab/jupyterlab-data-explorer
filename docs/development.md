@@ -198,8 +198,11 @@ The repository is organized as follows:
 ```text
 binder     Binder configuration
 docs       top-level documentation
+etc        project configuration files
 notebooks  Jupyter notebooks
 packages   project packages
+scripts    development scripts
+test       project tests
 ```
 
 ## Core concepts

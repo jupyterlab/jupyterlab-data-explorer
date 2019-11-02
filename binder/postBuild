@@ -13,4 +13,5 @@ jlpm run registry &
 jlpm run registry:init
 jlpm run build
 jlpm run build:jupyter
-jlpm run build:jupyter:remediate && jupyter lab build
+jlpm run build:jupyter:remediate
+jupyter lab build

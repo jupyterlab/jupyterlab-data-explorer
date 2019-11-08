@@ -67,7 +67,7 @@ We try to keep the current issues relevant and matched to relevant milestones.
 
 [badge-stability]: https://img.shields.io/badge/stability-experimental-red.svg
 [badge-binder]: https://mybinder.org/badge_logo.svg
-[binder-stable]: https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/2bcb40f4422c3eb6bcaad590e27fd2a5e466cc25?urlpath=lab%2Ftree%2Fnotebooks%2FTable.ipynb
+[binder-stable]: https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/4a47ff159818159450814b33b0b33f2221c223a5?urlpath=lab%2Ftree%2Fnotebooks%2Fdemo.ipynb
 [binder-master]: https://mybinder.org/v2/gh/jupyterlab/jupyterlab-data-explorer/master?urlpath=lab%2Ftree%2Fnotebooks%2Fdemo.ipynb
 [badge-npm-version-dataregistry-extension]: https://img.shields.io/npm/v/@jupyterlab/dataregistry-extension?label=%40jupyterlab%2Fdataregistry-extension&style=flat
 [npm-package-dataregistry-extension]: https://www.npmjs.com/package/@jupyterlab/dataregistry-extension

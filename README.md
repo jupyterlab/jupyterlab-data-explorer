@@ -49,7 +49,7 @@ I want to...
 
 ### Support a new data type or conversion:
 
-You can either add support in this repository or by creating a new [JupyterLab][jupyterlab] extension that depends on the `IRegistry` exposed by this extension. You can access a `Registry`, which you can use to add your own converter.
+You can either add support by adding a new converter to this repository or create a new [JupyterLab][jupyterlab] extension that depends on the `IRegistry` exposed by this extension. You can access a `Registry`, which you can use to add your own converter.
 
 It might also be useful to view the existing data types by looking at the source code in this repository and by using the debugger. You can open this in [JupyterLab][jupyterlab] by looking for the "Data Debugger" command:
 

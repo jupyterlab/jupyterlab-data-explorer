@@ -34,26 +34,7 @@ $ jupyter labextension install @jupyterlab/dataregistry-extension
 
 ## Usage
 
-I want to...
-
-### Explore my data in JupyterLab:
-
-1.  Install [JupyterLab][jupyterlab] >= 1.0
-2.  `jupyter labextension install @jupyterlab/dataregistry-extension`
-3.  Browse available datasets in the data explorer left side pane. We include support for viewing a few datasets. We plan on expanding this list and third party extensions can extend the list, as well:
-    -   Opening CSV files in the data grid and adding a snippet to open them with Pandas
-    -   Opening PNG images in an image viewer
-    -   Opening table data output in a notebook with [`nteract`'s data explorer][nteract-data-explorer]
-
-![](./docs/img/nteract.png)
-
-### Support a new data type or conversion:
-
-You can either add support by adding a new converter to this repository or creating a new [JupyterLab][jupyterlab] extension that depends on the `IRegistry` exposed by this extension. You can access a `Registry`, which you can use to add your own converter.
-
-It might also be useful to view the existing data types by looking at the source code in this repository and by using the debugger. You can open this in [JupyterLab][jupyterlab] by looking for the "Data Debugger" command:
-
-![](./docs/img/debugger.png)
+[Usage docs](./docs/usage.md)
 
 ## Contributing
 
@@ -62,6 +43,14 @@ This repository is in active development, and we welcome collaboration. For deve
 If you have ideas or questions, feel free to open an issue, or, if you feel like getting your hands dirty, feel free to tackle an existing issue by contributing a pull request.
 
 We try to keep the current issues relevant and matched to relevant milestones.
+
+### Third Party Extenson
+
+You can either add support by adding a new converter to this repository or creating a new [JupyterLab][jupyterlab] extension that depends on the `IRegistry` exposed by this extension. You can access a `Registry`, which you can use to add your own converter.
+
+It might also be useful to view the existing data types by looking at the source code in this repository and by using the debugger. You can open this in [JupyterLab][jupyterlab] by looking for the "Data Debugger" command:
+
+![](./docs/img/debugger.png)
 
 <!-- links -->
 

@@ -34,10 +34,12 @@ function activate(
       async path =>
         new Set(
           [
-            ...(await fileBrowserFactory.defaultBrowser.model.manager.services.contents.get(
-              // Remove trailing slace before querying
-              path.slice(0, -1)
-            )).content
+            ...(
+              await fileBrowserFactory.defaultBrowser.model.manager.services.contents.get(
+                // Remove trailing slace before querying
+                path.slice(0, -1)
+              )
+            ).content
           ].map((model: Contents.IModel) =>
             // Add trailing slash if this is a directory so that we know that.
             model.type === 'directory' ? `${model.name}/` : model.name

@@ -6,7 +6,7 @@ The Data Registry JupyterLab extension adds two new UI elements, a Data Explorer
 
 The Data Registry lets you browse datasets that are available to you. It is a nested view that shows a number of actions you can take for each dataset along with any children datasets.
 
-![Show children datasets of a folder and actions](./img/registry)
+![Show children datasets of a folder and actions](./img/registry.png)
 
 We currently provide built-in support for a limited number of data types. These are meant to show examples of different types of interactions and stress test the system. They can be extended by creating custom JupyterLab extensions which add new data types and/or viewers:
 

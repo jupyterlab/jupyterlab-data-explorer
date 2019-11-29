@@ -44,7 +44,7 @@ If you have ideas or questions, feel free to open an issue, or, if you feel like
 
 We try to keep the current issues relevant and matched to relevant milestones.
 
-### Third Party Extenson
+### Third Party Extension
 
 You can either add support by adding a new converter to this repository or creating a new [JupyterLab][jupyterlab] extension that depends on the `IRegistry` exposed by this extension. You can access a `Registry`, which you can use to add your own converter.
 

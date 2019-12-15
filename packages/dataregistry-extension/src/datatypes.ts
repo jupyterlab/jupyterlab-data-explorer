@@ -8,7 +8,7 @@
 import { DataTypeNoArgs, DataTypeStringArg } from '@jupyterlab/dataregistry';
 import { INotebookModel } from '@jupyterlab/notebook';
 import { DocumentRegistry, Context } from '@jupyterlab/docregistry';
-import { Widget } from '@phosphor/widgets';
+import { Widget } from '@lumino/widgets';
 import { Observable } from 'rxjs';
 
 /**
@@ -67,7 +67,7 @@ interface Datasets {
 const datatypes = {
   csv: new DataTypeNoArgs<Observable<string>>('text/csv'),
   datagrid: new DataTypeNoArgs<Observable<string>>(
-    'application/x.phosphor.datagrid'
+    'application/x.lumino.datagrid'
   ),
   datasetsFile: new DataTypeNoArgs<Observable<Datasets>>(
     'application/x.jupyterlab.datasets-file'

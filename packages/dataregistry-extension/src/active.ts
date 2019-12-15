@@ -19,8 +19,8 @@ import {
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { IDocumentManager } from '@jupyterlab/docmanager';
-import { Token } from '@phosphor/coreutils';
-import { Widget } from '@phosphor/widgets';
+import { Token } from '@lumino/coreutils';
+import { Widget } from '@lumino/widgets';
 import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { hasURL_ } from './widgets';

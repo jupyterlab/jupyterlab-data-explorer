@@ -5,12 +5,12 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from 'react';
+import React from 'react';
 import { Observable, of, combineLatest } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { classes } from 'typestyle';
-import { Token } from '@phosphor/coreutils';
-import { Widget } from '@phosphor/widgets';
+import { Token } from '@lumino/coreutils';
+import { Widget } from '@lumino/widgets';
 import { ReactWidget } from '@jupyterlab/apputils';
 import {
   JupyterFrontEnd,

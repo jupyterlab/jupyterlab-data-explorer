@@ -26,7 +26,7 @@ import {
 import { IOutputModel } from '@jupyterlab/rendermime';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { NotebookPanel } from '@jupyterlab/notebook';
-import { ReadonlyJSONObject, ReadonlyJSONValue } from '@phosphor/coreutils';
+import { ReadonlyJSONObject, ReadonlyJSONValue } from '@lumino/coreutils';
 import { combineLatest, defer, Observable, of, from } from 'rxjs';
 import { map, switchMap, filter } from 'rxjs/operators';
 import { notebookContextDataType } from './documents';

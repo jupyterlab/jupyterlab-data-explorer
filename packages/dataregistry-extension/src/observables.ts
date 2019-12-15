@@ -7,7 +7,7 @@
 
 import { Observable } from 'rxjs';
 import { IObservableList, IObservableString } from '@jupyterlab/observables';
-import { toArray } from '@phosphor/algorithm';
+import { toArray } from '@lumino/algorithm';
 import { IOutputAreaModel } from '@jupyterlab/outputarea';
 import { IOutputModel } from '@jupyterlab/rendermime';
 

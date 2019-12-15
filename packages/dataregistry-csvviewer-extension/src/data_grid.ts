@@ -6,8 +6,13 @@
  */
 
 import { Observable, Subscription } from 'rxjs';
-import { DataGrid } from '@phosphor/datagrid';
-import { Message } from '@phosphor/messaging';
+import {
+  BasicKeyHandler,
+  BasicMouseHandler,
+  BasicSelectionModel,
+  DataGrid
+} from '@lumino/datagrid';
+import { Message } from '@lumino/messaging';
 import { DSVModel } from '@jupyterlab/csvviewer';
 
 /**
@@ -48,13 +53,16 @@ class CSVDataGrid extends DataGrid {
      * @param data - CSV data
      */
     function onData(data: string) {
-      if (self.model) {
-        (self.model as DSVModel).dispose();
+      if (self.dataModel) {
+        (self.dataModel as DSVModel).dispose();
       }
-      self.model = new DSVModel({
+      self.dataModel = new DSVModel({
         data: data,
         delimiter: ','
       });
+      self.keyHandler = new BasicKeyHandler();
+      self.mouseHandler = new BasicMouseHandler();
+      self.selectionModel = new BasicSelectionModel({ dataModel: self.dataModel });
     }
   }
 

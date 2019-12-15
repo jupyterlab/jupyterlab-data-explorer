@@ -6,7 +6,7 @@
  */
 
 import { DataTypeNoArgs, DataTypeStringArg } from '@jupyterlab/dataregistry';
-import { Widget } from '@phosphor/widgets';
+import { Widget } from '@lumino/widgets';
 import { Observable } from 'rxjs';
 
 // TODO: refactor

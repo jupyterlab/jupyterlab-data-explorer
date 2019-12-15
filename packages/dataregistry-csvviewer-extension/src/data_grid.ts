@@ -62,7 +62,9 @@ class CSVDataGrid extends DataGrid {
       });
       self.keyHandler = new BasicKeyHandler();
       self.mouseHandler = new BasicMouseHandler();
-      self.selectionModel = new BasicSelectionModel({ dataModel: self.dataModel });
+      self.selectionModel = new BasicSelectionModel({
+        dataModel: self.dataModel
+      });
     }
   }
 

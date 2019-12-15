@@ -36,7 +36,7 @@
   "dependencies": {
     "@jupyterlab/application": "^2.0.0-alpha.4",
     "@jupyterlab/csvviewer": "^2.0.0-alpha.4",
-    "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry": "^4.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
     "@lumino/datagrid": "^0.3.0",
     "@lumino/messaging": "^1.3.0",

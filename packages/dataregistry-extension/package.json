@@ -40,7 +40,7 @@
     "@jupyterlab/application": "^2.0.0-alpha.4",
     "@jupyterlab/apputils": "^2.0.0-alpha.4",
     "@jupyterlab/cells": "^2.0.0-alpha.4",
-    "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry": "^4.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
     "@jupyterlab/docmanager": "^2.0.0-alpha.4",
     "@jupyterlab/docregistry": "^2.0.0-alpha.4",

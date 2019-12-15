@@ -1,9 +1,16 @@
 {
   "extends": "./tsconfigbase",
   "compilerOptions": {
+    "esModuleInterop": true,
     "outDir": "./build",
     "rootDir": "./test",
-    "esModuleInterop": true
+    "types": [
+      "node",
+      "expect-puppeteer",
+      "jest",
+      "jest-environment-puppeteer",
+      "puppeteer"
+    ]
   },
   "include": ["test/*", "test/**/*"]
 }

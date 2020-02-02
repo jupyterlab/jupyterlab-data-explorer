@@ -30,6 +30,12 @@ If you are browsing a number of datasets and want to preview the different ways 
 
 ![Gif data browser showing output from notebook cell](./img/notebook.png)
 
+Note that you must enable Panda's JSON outputs to see the nteract table viewer:
+
+```python
+pandas.set_option('display.html.table_schema', True)
+```
+
 You can also install other extensions to add functionality to the data registry, including:
 
 -   [`@jupyterlab/hdf5`][hdf5] Adds support for viewing HDF5 files

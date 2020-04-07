@@ -28,7 +28,8 @@
     "lib": "./lib"
   },
   "scripts": {
-    "build": "tsc --build && jlpm run generateSchema",
+    "build": "tsc --build && jlpm run postBuild",
+    "postBuild": "jlpm run generateSchema",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json",
     "prepublishOnly": "npm run clean && npm run build",

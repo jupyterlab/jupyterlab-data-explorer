@@ -6,8 +6,9 @@
     ]
   },
   "scripts": {
-    "build": "jlpm && lerna bootstrap --hoist && jlpm run build:packages && jlpm run link:packages",
+    "build": "jlpm && lerna bootstrap --hoist && jlpm run build:packages && build:packages:post && jlpm run link:packages",
     "build:packages": "tsc --build packages/*",
+    "build:packages:post": "lerna run postBuild",
     "build:watch": "jlpm run build:packages --watch --listEmittedFiles",
     "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
     "clean:jupyter": "jlpm run uninstall:extensions && jupyter lab clean",

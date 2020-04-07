@@ -93,7 +93,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     if (!options.has(label) && options.size) {
       setLabel(options.keys().next().value);
     }
-  }, [label, widgets, children]);
+  }, [label, widgets, children, options]);
 
   const Component: React.ReactElement<any> | undefined = React.useMemo(() => {
     const selected = options.get(label);

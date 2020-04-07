@@ -16,7 +16,7 @@
     "clean:packages": "lerna run clean",
     "link:packages": "jupyter labextension link ./packages/* --no-build",
     "lint": "jlpm run lint:css && jlpm run lint:typescript && jlpm run prettier:write",
-    "lint:check": "jlpm run lint:css:check && jlpm run lint:typescript:check && jlpm run lint:prettier",
+    "lint:check": "jlpm run lint:css:check && jlpm run lint:typescript:check && jlpm run prettier",
     "lint:css": "jlpm run lint:css:check --fix",
     "lint:css:check": "stylelint packages/**/*.css --config ./etc/stylelint/.stylelintrc.json",
     "lint:typescript": "jlpm run lint:typescript:check --fix",

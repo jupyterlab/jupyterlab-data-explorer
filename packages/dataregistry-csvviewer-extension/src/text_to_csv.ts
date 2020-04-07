@@ -53,7 +53,7 @@ function convert(obj: Data) {
 function text2csv() {
   const conversion = {
     from: datatypes.text,
-    to: datatypes.csv
+    to: datatypes.csv,
   };
 
   return createConverter(conversion, convert);

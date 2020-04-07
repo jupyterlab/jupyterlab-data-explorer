@@ -44,9 +44,9 @@ export const folderDatasetsConverter = createConverter(
   ({ url, data }) =>
     data.pipe(
       map(
-        paths =>
+        (paths) =>
           new Set(
-            [...paths].map(path => {
+            [...paths].map((path) => {
               const u = new URL(url.toString());
               u.pathname = join(u.pathname, path);
               return u.toString();

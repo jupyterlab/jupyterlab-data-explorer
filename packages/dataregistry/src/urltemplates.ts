@@ -43,11 +43,11 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    * Identity isomorphism for strings.
    */
   static get string(): Dual<string, string> {
-    return [s => s, s => s];
+    return [(s) => s, (s) => s];
   }
 
   static get uuid(): Dual<string, string> {
-    return [s => (UUID_TEST.test(s) ? s : null), s => s];
+    return [(s) => (UUID_TEST.test(s) ? s : null), (s) => s];
   }
 
   /**
@@ -55,11 +55,11 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    */
   static get number(): Dual<string, number> {
     return [
-      s => {
+      (s) => {
         const n = Number(s);
         return isNaN(n) ? null : n;
       },
-      s => s.toString()
+      (s) => s.toString(),
     ];
   }
 
@@ -67,7 +67,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
    * Verifying that a string, commonly a path, ends in a certain extension.
    */
   static extension(extension: string): Dual<string, string> {
-    return [s => (s.endsWith(extension) ? s : null), s => s];
+    return [(s) => (s.endsWith(extension) ? s : null), (s) => s];
   }
 
   /**
@@ -112,7 +112,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
   ): URLTemplate<T & U> {
     return new URLTemplate(this.template + template, {
       ...this.map,
-      ...map
+      ...map,
     } as any);
   }
 
@@ -125,7 +125,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
 function nonNullableValues<T extends { [k: string]: any }>(
   t: T
 ): t is { [K in keyof T]: NonNullable<T[K]> } {
-  return !Object.values(t).some(v => v === null || v === undefined);
+  return !Object.values(t).some((v) => v === null || v === undefined);
 }
 
 /**

@@ -49,5 +49,5 @@ export default [
   foldersPlugin,
   notebooksPlugin,
   // debuggerPlugin,
-  rendermimePlugin
+  rendermimePlugin,
 ] as JupyterFrontEndPlugin<any>[];

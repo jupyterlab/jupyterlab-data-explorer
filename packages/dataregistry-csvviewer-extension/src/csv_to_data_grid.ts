@@ -32,7 +32,7 @@ interface Data {
 function convert(obj: Data) {
   return {
     type: 'Grid',
-    data: getData
+    data: getData,
   };
 
   /**
@@ -55,7 +55,7 @@ function convert(obj: Data) {
 function csv2datagrid() {
   const conversion = {
     from: datatypes.csv,
-    to: datatypes.widget
+    to: datatypes.widget,
   };
 
   return createConverter(conversion, convert);

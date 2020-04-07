@@ -9,7 +9,7 @@ import { Datasets, Dataset, URL_ } from './datasets';
 import {
   Converter,
   combineManyConverters,
-  applyConverterDataset
+  applyConverterDataset,
 } from './converters';
 import { resolveDataType } from './resolvers';
 import { BehaviorSubject, Observable, of } from 'rxjs';
@@ -61,7 +61,7 @@ export class Registry {
    * Adds a new converter.
    */
   addConverter(...converters: Array<Converter<any, any>>): void {
-    converters.forEach(converter => this._converters.add(converter));
+    converters.forEach((converter) => this._converters.add(converter));
   }
 
   addDatasets(datasets: Datasets<any>): void {
@@ -70,7 +70,7 @@ export class Registry {
         ? [...datasets.get(url)!.entries()].map(([mimeType, [cost, data]]) => ({
             mimeType,
             cost,
-            data
+            data,
           }))
         : []
     );

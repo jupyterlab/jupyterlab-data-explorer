@@ -54,8 +54,8 @@ export const URLStringConverter = createConverter<
   type,
   data: data.pipe(
     distinct(),
-    switchMap(url => fromFetch(url)),
-    switchMap(r => {
+    switchMap((url) => fromFetch(url)),
+    switchMap((r) => {
       if (r.ok) {
         return from(r.text());
       } else {
@@ -63,5 +63,5 @@ export const URLStringConverter = createConverter<
         return throwError(new Error(`Bad response ${r}`));
       }
     })
-  )
+  ),
 }));

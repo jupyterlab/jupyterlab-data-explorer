@@ -85,7 +85,7 @@ const datatypes = {
   widget: new DataTypeStringArg<() => Widget>(
     'application/x.jupyter.widget',
     'label'
-  )
+  ),
 };
 
 /**

@@ -8,14 +8,14 @@
 import {
   ILabShell,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   createConverter,
   nestedDataType,
   Registry,
   resolveDataType,
-  URL_
+  URL_,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { IDocumentManager } from '@jupyterlab/docmanager';
@@ -39,7 +39,7 @@ export default {
   id: '@jupyterlab/dataregistry-extension:active-dataset',
   requires: [ILabShell, IRegistry, IDocumentManager],
   provides: IActiveDataset,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<IActiveDataset>;
 
 function activate(
@@ -60,7 +60,7 @@ function activate(
         }
         return {
           type: nestedDataType.createMimeType(),
-          data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
+          data: active.pipe(map((url) => (url ? new Set([url]) : new Set()))),
         };
       }
     )

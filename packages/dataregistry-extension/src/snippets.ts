@@ -7,7 +7,7 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import { relative, dirname } from 'path';
 import { INotebookTracker } from '@jupyterlab/notebook';
@@ -20,7 +20,7 @@ import {
   URLDataType,
   TypedConverter,
   createConverter,
-  Registry
+  Registry,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { viewerDataType } from './viewers';
@@ -42,7 +42,7 @@ export interface IFileSnippetConverterOptions {
 export function fileSnippetConverter({
   mimeType,
   createSnippet,
-  label
+  label,
 }: IFileSnippetConverterOptions): TypedConverter<
   typeof fileDataType,
   typeof snippedDataType
@@ -56,7 +56,7 @@ export function fileSnippetConverter({
       return {
         type: label,
         data: async (context: SnippetContext) =>
-          createSnippet(relative(dirname(context.path), data))
+          createSnippet(relative(dirname(context.path), data)),
       };
     }
   );
@@ -71,7 +71,7 @@ export interface IURLSnippetConverter {
 export function URLSnippetConverter({
   mimeType,
   createSnippet,
-  label
+  label,
 }: IURLSnippetConverter): TypedConverter<
   typeof URLDataType,
   typeof snippedDataType
@@ -84,7 +84,7 @@ export function URLSnippetConverter({
       }
       return {
         type: label,
-        data: async () => createSnippet(await data.pipe(first()).toPromise())
+        data: async () => createSnippet(await data.pipe(first()).toPromise()),
       };
     }
   );
@@ -107,25 +107,27 @@ export default {
             notebookTracker.activeCell.model.value.insert(
               0,
               await data({
-                path: notebookTracker.currentWidget!.context.path
+                path: notebookTracker.currentWidget!.context.path,
               })
-            )
+            ),
         })
       ),
       fileSnippetConverter({
         mimeType: 'text/csv',
         label: 'Snippet',
-        createSnippet: path =>
-          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(path)})\ndf`
+        createSnippet: (path) =>
+          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(
+            path
+          )})\ndf`,
       }),
       URLSnippetConverter({
         mimeType: 'text/csv',
         label: 'Snippet',
         createSnippet: (url: URL_) =>
-          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(url)})\ndf`
+          `import pandas as pd\n\ndf = pd.read_csv(${JSON.stringify(url)})\ndf`,
       })
     );
   },
 
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

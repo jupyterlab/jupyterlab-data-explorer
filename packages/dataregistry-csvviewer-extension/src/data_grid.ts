@@ -53,7 +53,7 @@ class CSVDataGrid extends DataGrid {
       }
       self.model = new DSVModel({
         data: data,
-        delimiter: ','
+        delimiter: ',',
       });
     }
   }

@@ -52,6 +52,8 @@ export const relativeNestedURLConverter = createConverter(
   { from: relativeNestedDataType, to: nestedDataType },
   ({ data, url }) =>
     data.pipe(
-      map(relURLs => new Set(relURLs.map(relURL => new URL(relURL, url).href)))
+      map(
+        (relURLs) => new Set(relURLs.map((relURL) => new URL(relURL, url).href))
+      )
     )
 );

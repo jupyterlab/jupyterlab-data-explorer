@@ -18,7 +18,7 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   DataTypeNoArgs,
@@ -27,7 +27,7 @@ import {
   resolveExtensionConverter,
   relativeNestedDataType,
   resolveDataType,
-  textDataType
+  textDataType,
 } from '@jupyterlab/dataregistry';
 import { Observable, of } from 'rxjs';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
@@ -67,7 +67,7 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
       ({ data, type }) =>
         type === datasetsFileMimeType
           ? data.pipe(
-              map(text => {
+              map((text) => {
                 const res = yaml.safeLoad(text);
                 if (!validate(res)) {
                   throw validate.errors![0]!;
@@ -80,11 +80,11 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
     createConverter(
       {
         from: datasetsFileDataType,
-        to: relativeNestedDataType
+        to: relativeNestedDataType,
       },
       ({ data }) =>
         data.pipe(
-          map(file => {
+          map((file) => {
             // Add other converters that fill in the data
             // TODO: Figure out how to update this if URLs in file change
             // TODO: Have this use createCoverter if we can return multiple
@@ -109,8 +109,8 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
                       {
                         mimeType: relativeNestedDataType.createMimeType(),
                         data: of(dataset.children),
-                        cost: 1
-                      }
+                        cost: 1,
+                      },
                     ]
                   : []),
                 // label data
@@ -119,8 +119,8 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
                       {
                         mimeType: labelDataType.createMimeType(),
                         data: of(dataset.label),
-                        cost: 1
-                      }
+                        cost: 1,
+                      },
                     ]
                   : []),
                 // snippet data
@@ -128,9 +128,9 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
                   ([label, text]) => ({
                     mimeType: snippedDataType.createMimeType(label),
                     data: async () => text,
-                    cost: 1
+                    cost: 1,
                   })
-                )
+                ),
               ];
             });
 
@@ -145,5 +145,5 @@ export default {
   id: '@jupyterlab/dataregistry-extension:file',
   requires: [IRegistry],
   activate,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

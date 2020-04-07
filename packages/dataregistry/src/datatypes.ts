@@ -52,9 +52,7 @@ export class DataTypeNoArgs<T> extends DataType<void, T> {
     if (filtered.size == 0) {
       return;
     }
-    return this.filterDataset(d)
-      .values()
-      .next().value;
+    return this.filterDataset(d).values().next().value;
   }
 }
 

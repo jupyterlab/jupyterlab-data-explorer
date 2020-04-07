@@ -30,7 +30,7 @@ const extension: JupyterFrontEndPlugin<Registry> = {
   activate: activate,
   autoStart: true,
   requires: [],
-  provides: IRegistry
+  provides: IRegistry,
 };
 
 /**

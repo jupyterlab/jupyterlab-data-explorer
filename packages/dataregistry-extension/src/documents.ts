@@ -9,7 +9,7 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   Registry,
@@ -18,7 +18,7 @@ import {
   createConverter,
   DataTypeNoArgs,
   resolveExtensionConverter,
-  textDataType
+  textDataType,
 } from '@jupyterlab/dataregistry';
 import { Observable, defer } from 'rxjs';
 import { DocumentRegistry, Context } from '@jupyterlab/docregistry';
@@ -68,7 +68,7 @@ function activate(
       { from: fileDataType, to: textContextDataType },
       ({ data, type }) => ({
         type,
-        data: defer(() => getContext(docmanager, data, 'text'))
+        data: defer(() => getContext(docmanager, data, 'text')),
       })
     ),
     createConverter(
@@ -90,10 +90,10 @@ function activate(
       ({ data, type }) => ({
         type,
         data: data.pipe(
-          switchMap(context =>
+          switchMap((context) =>
             observableStringToObservable(context.model.value)
           )
-        )
+        ),
       })
     )
   );
@@ -103,5 +103,5 @@ export default {
   id: '@jupyterlab/dataregistry-extension:documents',
   requires: [IRegistry, IDocumentManager],
   activate,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

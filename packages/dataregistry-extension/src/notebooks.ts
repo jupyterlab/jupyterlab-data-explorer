@@ -8,7 +8,7 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
-  ILabShell
+  ILabShell,
 } from '@jupyterlab/application';
 import { ICellModel, isCodeCellModel } from '@jupyterlab/cells';
 import {
@@ -21,7 +21,7 @@ import {
   nestedDataType,
   Registry,
   resolveDataType,
-  URLTemplate
+  URLTemplate,
 } from '@jupyterlab/dataregistry';
 import { IOutputModel } from '@jupyterlab/rendermime';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
@@ -32,7 +32,7 @@ import { map, switchMap, filter } from 'rxjs/operators';
 import { notebookContextDataType } from './documents';
 import {
   observableListToObservable,
-  outputAreaModelToObservable
+  outputAreaModelToObservable,
 } from './observables';
 import { IActiveDataset } from './active';
 import { signalToObservable } from './utils';
@@ -42,36 +42,36 @@ import { signalToObservable } from './utils';
  */
 
 const notebookURL = new URLTemplate('file://{+path}', {
-  path: URLTemplate.extension('.ipynb')
+  path: URLTemplate.extension('.ipynb'),
 });
 
 const notebookCellURL = notebookURL.extend('#/cell-model/{cellID}', {
-  cellID: URLTemplate.uuid
+  cellID: URLTemplate.uuid,
 });
 
 const notebookCellExternalURL = notebookURL.extend('#/cells/{cellIndex}', {
-  cellIndex: URLTemplate.number
+  cellIndex: URLTemplate.number,
 });
 
 const notebookOutputURL = notebookCellURL.extend('/outputs/{outputID}', {
-  outputID: URLTemplate.number
+  outputID: URLTemplate.number,
 });
 
 const notebookOutputExternalURL = notebookCellExternalURL.extend(
   '/outputs/{outputID}',
   {
-    outputID: URLTemplate.number
+    outputID: URLTemplate.number,
   }
 );
 
 const notebookMimeDataURL = notebookOutputURL.extend('/data/{mimeType}', {
-  mimeType: URLTemplate.string
+  mimeType: URLTemplate.string,
 });
 
 const notebookMimeDataExternalURL = notebookOutputExternalURL.extend(
   '/data/{mimeType}',
   {
-    mimeType: URLTemplate.string
+    mimeType: URLTemplate.string,
   }
 );
 
@@ -124,7 +124,9 @@ export function createConverters(
       { from: notebookContextDataType, to: notebookCellsDataType },
       ({ data }) =>
         data.pipe(
-          switchMap(context => observableListToObservable(context.model.cells))
+          switchMap((context) =>
+            observableListToObservable(context.model.cells)
+          )
         )
     ),
     createConverter(
@@ -132,9 +134,9 @@ export function createConverters(
       ({ url: { path }, data }) =>
         data.pipe(
           map(
-            cells =>
+            (cells) =>
               new Set(
-                cells.map(arg =>
+                cells.map((arg) =>
                   notebookCellURL.create({ path, cellID: arg.id })
                 )
               )
@@ -149,20 +151,20 @@ export function createConverters(
       {
         from: resolveDataType,
         to: cellIndexDataType,
-        url: notebookCellURL
+        url: notebookCellURL,
       },
       ({ url: { cellID, ...rest } }) =>
         defer(() =>
           notebookCellsDataType
             .getDataset(registry.getURL(notebookURL.create(rest)))!
-            .pipe(map(cells => cells.findIndex(cell => cell.id === cellID)))
+            .pipe(map((cells) => cells.findIndex((cell) => cell.id === cellID)))
         )
     ),
     createConverter(
       {
         from: cellIndexDataType,
         to: cellModelDataType,
-        url: notebookCellURL
+        url: notebookCellURL,
       },
       ({ data, url: { cellID, ...rest } }) =>
         defer(() =>
@@ -178,7 +180,7 @@ export function createConverters(
       { from: cellModelDataType, to: outputsDataType },
       ({ data }) =>
         data.pipe(
-          switchMap(cellModel => {
+          switchMap((cellModel) => {
             if (isCodeCellModel(cellModel)) {
               return outputAreaModelToObservable(cellModel.outputs);
             }
@@ -191,7 +193,7 @@ export function createConverters(
       ({ url, data }) =>
         data.pipe(
           map(
-            outputs =>
+            (outputs) =>
               new Set(
                 outputs.map((_, outputID) =>
                   notebookOutputURL.create({ outputID, ...url })
@@ -204,14 +206,14 @@ export function createConverters(
       {
         from: cellIndexDataType,
         to: externalURLDataType,
-        url: notebookCellURL
+        url: notebookCellURL,
       },
       ({ data, url: { cellID, ...rest } }) =>
         data.pipe(
-          map(cellIndex =>
+          map((cellIndex) =>
             notebookCellExternalURL.create({
               ...rest,
-              cellIndex
+              cellIndex,
             })
           )
         )
@@ -220,27 +222,27 @@ export function createConverters(
       {
         from: resolveDataType,
         to: cellIDDataType,
-        url: notebookCellExternalURL
+        url: notebookCellExternalURL,
       },
       ({ url: { cellIndex, ...rest } }) =>
         defer(() =>
           notebookCellsDataType
             .getDataset(registry.getURL(notebookURL.create(rest)))!
-            .pipe(map(cells => cells[cellIndex].id))
+            .pipe(map((cells) => cells[cellIndex].id))
         )
     ),
     createConverter(
       {
         from: cellIDDataType,
         to: internalURLDataType,
-        url: notebookCellExternalURL
+        url: notebookCellExternalURL,
       },
       ({ url: { path }, data }) =>
         data.pipe(
-          map(cellID =>
+          map((cellID) =>
             notebookCellURL.create({
               path,
-              cellID
+              cellID,
             })
           )
         )
@@ -255,7 +257,7 @@ export function createConverters(
         defer(() =>
           outputsDataType
             .getDataset(registry.getURL(notebookCellURL.create(rest)))!
-            .pipe(map(outputs => outputs[outputID].data))
+            .pipe(map((outputs) => outputs[outputID].data))
         )
     ),
     createConverter(
@@ -263,9 +265,9 @@ export function createConverters(
       ({ url, data }) =>
         data.pipe(
           map(
-            mimeData =>
+            (mimeData) =>
               new Set(
-                Object.keys(mimeData).map(mimeType =>
+                Object.keys(mimeData).map((mimeType) =>
                   notebookMimeDataURL.create({ ...url, mimeType })
                 )
               )
@@ -276,7 +278,7 @@ export function createConverters(
       {
         from: resolveDataType,
         to: externalURLDataType,
-        url: notebookOutputURL
+        url: notebookOutputURL,
       },
       ({ url: { outputID, cellID, path } }) =>
         defer(() =>
@@ -285,11 +287,11 @@ export function createConverters(
               registry.getURL(notebookCellURL.create({ path, cellID }))
             )!
             .pipe(
-              map(cellIndex =>
+              map((cellIndex) =>
                 notebookOutputExternalURL.create({
                   path,
                   cellIndex,
-                  outputID
+                  outputID,
                 })
               )
             )
@@ -299,7 +301,7 @@ export function createConverters(
       {
         from: resolveDataType,
         to: internalURLDataType,
-        url: notebookOutputExternalURL
+        url: notebookOutputExternalURL,
       },
       ({ url: { outputID, cellIndex, path } }) =>
         defer(() =>
@@ -310,11 +312,11 @@ export function createConverters(
               )
             )!
             .pipe(
-              map(cellID =>
+              map((cellID) =>
                 notebookOutputURL.create({
                   path,
                   cellID,
-                  outputID
+                  outputID,
                 })
               )
             )
@@ -331,15 +333,15 @@ export function createConverters(
         data: defer(() =>
           mimeBundleDataType
             .getDataset(registry.getURL(notebookOutputURL.create(rest)))!
-            .pipe(map(mimeBundle => mimeBundle[mimeType]))
-        )
+            .pipe(map((mimeBundle) => mimeBundle[mimeType]))
+        ),
       })
     ),
     createConverter(
       {
         from: resolveDataType,
         to: externalURLDataType,
-        url: notebookMimeDataURL
+        url: notebookMimeDataURL,
       },
       ({ url: { path, cellID, outputID, mimeType } }) =>
         defer(() =>
@@ -348,12 +350,12 @@ export function createConverters(
               registry.getURL(notebookCellURL.create({ path, cellID }))
             )!
             .pipe(
-              map(cellIndex =>
+              map((cellIndex) =>
                 notebookMimeDataExternalURL.create({
                   path,
                   cellIndex,
                   outputID,
-                  mimeType
+                  mimeType,
                 })
               )
             )
@@ -363,7 +365,7 @@ export function createConverters(
       {
         from: resolveDataType,
         to: internalURLDataType,
-        url: notebookMimeDataExternalURL
+        url: notebookMimeDataExternalURL,
       },
       ({ url: { outputID, cellIndex, path, mimeType } }) =>
         defer(() =>
@@ -374,12 +376,12 @@ export function createConverters(
               )
             )!
             .pipe(
-              map(cellID =>
+              map((cellID) =>
                 notebookMimeDataURL.create({
                   path,
                   cellID,
                   mimeType,
-                  outputID
+                  outputID,
                 })
               )
             )
@@ -390,7 +392,7 @@ export function createConverters(
       Observable<ReadonlyJSONValue>,
       string,
       string
-    >({ from: mimeDataDataType }, ({ type, data }) => ({ type, data }))
+    >({ from: mimeDataDataType }, ({ type, data }) => ({ type, data })),
   ];
 }
 
@@ -411,7 +413,7 @@ function activate(
             map(([notebook, cell]) =>
               notebookCellURL.create({
                 path: `/${newValue.context.path}`,
-                cellID: cell.model.id
+                cellID: cell.model.id,
               })
             )
           );
@@ -420,9 +422,9 @@ function activate(
       })
     )
     .subscribe({
-      next: url => {
+      next: (url) => {
         active.next(url);
-      }
+      },
     });
   registry.addConverter(...createConverters(registry));
 }
@@ -431,5 +433,5 @@ export default {
   id: '@jupyterlab/dataregistry-extension:notebooks',
   requires: [ILabShell, IRegistry, IActiveDataset],
   activate,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

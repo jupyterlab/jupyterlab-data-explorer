@@ -11,7 +11,7 @@ import {
   URL_,
   createDataset,
   createDatasets,
-  Dataset
+  Dataset,
 } from './datasets';
 import { Converter } from './converters';
 import { CachedObservable } from './cachedObservable';
@@ -89,7 +89,7 @@ export function createConverter<
   {
     from = new MimeTypeDataType<fromD>() as any,
     to = new MimeTypeDataType<toD>() as any,
-    url: urlT = new DefaultTypedURL() as any
+    url: urlT = new DefaultTypedURL() as any,
   }: {
     from?: DataType<fromT, fromD>;
     to?: DataType<toT, toD>;
@@ -130,7 +130,7 @@ export function createConverter<
           ? ((CachedObservable.from(newData) as any) as toD)
           : newData,
       mimeType: to.createMimeType(newType),
-      cost: cost + 1
+      cost: cost + 1,
     }));
   };
 }

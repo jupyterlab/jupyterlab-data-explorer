@@ -165,6 +165,7 @@ To setup dev environment and run JupyterLab:
 
 ```bash
 $ jlpm run build
+$ jupyter lab build
 $ jupyter lab
 ```
 

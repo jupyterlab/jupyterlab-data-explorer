@@ -14,7 +14,7 @@
     "clean:jupyter": "jlpm run uninstall:extensions && jupyter lab clean",
     "clean:node": "lerna clean --yes && rimraf node_modules yarn.lock",
     "clean:packages": "lerna run clean",
-    "link:packages": "jupyter labextension link ./packages/*",
+    "link:packages": "jupyter labextension link ./packages/* --no-build",
     "lint": "jlpm run lint:css && jlpm run lint:typescript && jlpm run prettier:write",
     "lint:check": "jlpm run lint:css:check && jlpm run lint:typescript:check && jlpm run lint:prettier",
     "lint:css": "jlpm run lint:css:check --fix",
@@ -24,8 +24,10 @@
     "prettier": "prettier . --config ./etc/prettier/.prettierrc --ignore-path .gitignore --check",
     "prettier:write": "jlpm run prettier --write",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
-    "test": "env JEST_PUPPETEER_CONFIG=./etc/jest/jest-puppeteer.config.js jest --runInBand --config ./etc/jest/jest.config.js",
-    "test:debug": "env HEADLESS=false SLOWMO=true jlpm test",
+    "test": "jlpm run test:packages && jlpm run test:integration",
+    "test:packages": "lerna run test",
+    "test:integration": "env JEST_PUPPETEER_CONFIG=./etc/jest/jest-puppeteer.config.js jest --runInBand --config ./etc/jest/jest.config.js",
+    "test:integration:debug": "env HEADLESS=false SLOWMO=true jlpm test",
     "uninstall:extensions": "jupyter labextension uninstall --all"
   },
   "husky": {

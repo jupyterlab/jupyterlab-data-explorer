@@ -31,9 +31,7 @@
     "build": "tsc --build && jlpm run generateSchema",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
     "generateSchema": "ts-json-schema-generator --type datasetsObjectType --no-type-check -f tsconfig.json > lib/datasets-file.schema.json",
-    "link": "jupyter labextension link ./ --no-build",
     "prepublishOnly": "npm run clean && npm run build",
-    "unlink": "jupyter labextension unlink ./ --no-build",
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {

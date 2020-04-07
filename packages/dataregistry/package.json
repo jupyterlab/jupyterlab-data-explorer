@@ -23,11 +23,9 @@
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
-    "link": "jupyter labextension link ./ --no-build",
     "prepublishOnly": "npm run clean && npm run build",
     "test": "jest lib",
     "test:watch": "npm run test --watch",
-    "unlink": "jupyter labextension unlink ./ --no-build",
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {

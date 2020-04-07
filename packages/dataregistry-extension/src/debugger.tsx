@@ -8,14 +8,14 @@
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
-  ILayoutRestorer
+  ILayoutRestorer,
 } from '@jupyterlab/application';
 import { Inspector } from 'react-inspector';
 import {
   ReactWidget,
   ICommandPalette,
   MainAreaWidget,
-  WidgetTracker
+  WidgetTracker,
 } from '@jupyterlab/apputils';
 import { Registry, CachedObservable } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
@@ -49,7 +49,7 @@ function Data({ data }: { data: unknown }) {
   if (data instanceof CachedObservable) {
     return (
       <UseBehaviorSubject subject={data.state}>
-        {data_ => <Inspector data={data_} />}
+        {(data_) => <Inspector data={data_} />}
       </UseBehaviorSubject>
     );
   }
@@ -61,8 +61,8 @@ function Debugger({ registry }: { registry: Registry }) {
     <div>
       <ol style={{ listStyle: 'none' }}>
         <UseBehaviorSubject subject={registry.URLs$}>
-          {urls =>
-            [...urls].sort().map(url => (
+          {(urls) =>
+            [...urls].sort().map((url) => (
               <li key={url}>
                 <code>{url}</code>
                 <ol style={{ listStyle: 'none' }}>
@@ -92,7 +92,7 @@ export default {
   activate,
   id,
   requires: [IRegistry, ILayoutRestorer, ICommandPalette],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(
@@ -105,7 +105,7 @@ function activate(
   let widget: MainAreaWidget<ReactWidget>;
 
   // Add an application command
-  const command: string = 'dataregistry-debugger:open';
+  const command = 'dataregistry-debugger:open';
   app.commands.addCommand(command, {
     label: 'Data Debugger',
     execute: () => {
@@ -130,7 +130,7 @@ function activate(
 
       // Activate the widget
       app.shell.activateById(widget.id);
-    }
+    },
   });
 
   // Add the command to the palette.
@@ -138,10 +138,10 @@ function activate(
 
   // Track and restore the widget state
   const tracker = new WidgetTracker<MainAreaWidget<ReactWidget>>({
-    namespace: 'dataregistry-debugger'
+    namespace: 'dataregistry-debugger',
   });
   restorer.restore(tracker, {
     command,
-    name: () => 'dataregistry-debugger'
+    name: () => 'dataregistry-debugger',
   });
 }

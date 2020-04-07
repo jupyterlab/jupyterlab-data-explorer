@@ -18,7 +18,7 @@ import { IActiveDataset } from './active';
 import { IRenderMimeRegistry, IRenderMime } from '@jupyterlab/rendermime';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
-import * as React from 'react';
+import React from 'react';
 import { OutputArea } from '@jupyterlab/outputarea';
 import { PanelLayout, Panel } from '@lumino/widgets';
 import { CodeCell } from '@jupyterlab/cells';

@@ -15,7 +15,7 @@ import {
   URLDataType
 } from '@jupyterlab/dataregistry';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
-import * as React from 'react';
+import React from 'react';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { UseObservable } from './utils';
 import { reactDataType } from './widgets';

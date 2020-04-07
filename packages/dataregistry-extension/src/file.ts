@@ -16,6 +16,8 @@
  * Instead have structured URL converters?
  */
 
+import Ajv from 'ajv';
+import yaml from 'js-yaml';
 import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
@@ -29,15 +31,13 @@ import {
   resolveDataType,
   textDataType,
 } from '@jupyterlab/dataregistry';
-import { Observable, of } from 'rxjs';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import * as yaml from 'js-yaml';
-import { snippedDataType } from './snippets';
-import * as Ajv from 'ajv';
-import { labelDataType } from './explorer';
 
 const datasetSchema = require('./datasets-file.schema.json');
+import { labelDataType } from './explorer';
+import { snippedDataType } from './snippets';
 
 const ajv = new Ajv();
 const validate = ajv.compile(datasetSchema);

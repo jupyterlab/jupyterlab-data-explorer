@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from 'react';
+import React from 'react';
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 

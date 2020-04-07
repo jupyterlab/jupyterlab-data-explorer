@@ -11,6 +11,10 @@
   "bugs": {
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
+  },
   "license": "BSD-3-Clause",
   "author": "Project Jupyter",
   "files": [
@@ -21,10 +25,6 @@
   "directories": {
     "lib": "./lib"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
-  },
   "scripts": {
     "build": "tsc --build",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
@@ -34,13 +34,13 @@
   "dependencies": {
     "@jupyterlab/application": "^2.1.0",
     "@jupyterlab/csvviewer": "^2.1.0",
-    "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry": "^4.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
     "@lumino/datagrid": "^0.6.0",
     "@lumino/messaging": "^1.2.3",
+    "@lumino/widgets": "^1.9.0",
     "rxjs": "^6.5.2"
   },
-  "devDependencies": {},
   "publishConfig": {
     "access": "public"
   },

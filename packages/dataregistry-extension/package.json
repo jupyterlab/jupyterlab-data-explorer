@@ -1,6 +1,6 @@
 {
   "name": "@jupyterlab/dataregistry-extension",
-  "version": "3.0.0",
+  "version": "4.0.0",
   "description": "Datasets as first class entities in Juptyerlab.",
   "keywords": [
     "jupyter",
@@ -10,6 +10,10 @@
   "homepage": "https://github.com/jupyterlab/jupyterlab-data-explorer",
   "bugs": {
     "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "license": "BSD-3-Clause",
   "author": "Project Jupyter",
@@ -23,10 +27,6 @@
   "directories": {
     "lib": "./lib"
   },
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
-  },
   "scripts": {
     "build": "tsc --build && jlpm run generateSchema",
     "clean": "rimraf lib tsconfig.tsbuildinfo",
@@ -39,7 +39,7 @@
     "@jupyterlab/apputils": "^2.1.0",
     "@jupyterlab/coreutils": "^4.1.0",
     "@jupyterlab/csvviewer": "^2.1.0",
-    "@jupyterlab/dataregistry": "^3.0.0",
+    "@jupyterlab/dataregistry": "^4.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
     "@jupyterlab/docmanager": "^2.1.0",
     "@jupyterlab/docregistry": "^2.1.0",

@@ -10,7 +10,6 @@ import {
   JupyterFrontEndPlugin,
   ILayoutRestorer
 } from '@jupyterlab/application';
-
 import { Inspector } from 'react-inspector';
 import {
   ReactWidget,
@@ -18,10 +17,10 @@ import {
   MainAreaWidget,
   WidgetTracker
 } from '@jupyterlab/apputils';
-
-import * as React from 'react';
-import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { Registry, CachedObservable } from '@jupyterlab/dataregistry';
+import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
+import React from 'react';
+
 import { UseBehaviorSubject } from './utils';
 
 const id = '@jupyterlab/dataregistry-extension:data-debugger';

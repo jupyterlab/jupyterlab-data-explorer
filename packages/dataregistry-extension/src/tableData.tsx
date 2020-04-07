@@ -13,8 +13,7 @@ import {
 } from '@jupyterlab/dataregistry';
 
 import NteractDataExplorer, { Props } from '@nteract/data-explorer';
-import * as React from 'react';
-import 'react-table/react-table.css';
+import React from 'react';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { reactDataType } from './widgets';
 import { Observable } from 'rxjs';

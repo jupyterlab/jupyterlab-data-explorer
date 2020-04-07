@@ -13,7 +13,7 @@ import activate from './activate';
 /**
  * Registry converter interface.
  */
-export interface IRegistry extends Registry {}
+export type IRegistry = Registry;
 
 /**
  * Registry token.

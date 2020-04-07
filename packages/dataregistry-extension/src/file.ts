@@ -35,7 +35,7 @@ import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-const datasetSchema = require('./datasets-file.schema.json');
+const datasetSchema = require('./datasets-file.schema.json'); // eslint-disable-line
 import { labelDataType } from './explorer';
 import { snippedDataType } from './snippets';
 
@@ -58,7 +58,7 @@ export const datasetsFileDataType = new DataTypeNoArgs<
   Observable<datasetsObjectType>
 >(datasetsFileMimeType);
 
-function activate(app: JupyterFrontEnd, registry: Registry) {
+function activate(app: JupyterFrontEnd, registry: Registry): void {
   registry.addConverter(
     resolveExtensionConverter('datasets.yml', datasetsFileMimeType),
     resolveExtensionConverter('datasets.yaml', datasetsFileMimeType),
@@ -70,7 +70,7 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
               map((text) => {
                 const res = yaml.safeLoad(text);
                 if (!validate(res)) {
-                  throw validate.errors![0]!;
+                  throw validate.errors?.[0];
                 }
                 return res;
               })
@@ -127,7 +127,7 @@ function activate(app: JupyterFrontEnd, registry: Registry) {
                 ...Object.entries(dataset.snippets || {}).map(
                   ([label, text]) => ({
                     mimeType: snippedDataType.createMimeType(label),
-                    data: async () => text,
+                    data: async (): Promise<string> => text,
                     cost: 1,
                   })
                 ),

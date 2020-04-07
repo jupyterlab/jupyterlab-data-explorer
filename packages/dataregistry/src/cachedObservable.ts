@@ -92,7 +92,7 @@ export class CachedObservable<T> extends Observable<T> {
       const state = this.state.value;
       switch (state.state) {
         case State.error:
-        case State.initial:
+        case State.initial: {
           const subscribers = new Set([subscriber]);
           this.state.next({
             state: State.waitingFirst,
@@ -126,6 +126,7 @@ export class CachedObservable<T> extends Observable<T> {
               );
           }
           break;
+        }
         case State.waitingFirst:
         case State.waitingFirstSubs:
           state.subscribers.add(subscriber);
@@ -137,7 +138,7 @@ export class CachedObservable<T> extends Observable<T> {
           break;
         case State.complete:
           subscriber.next(state.value);
-          return () => {};
+          return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
         default:
           return;
       }

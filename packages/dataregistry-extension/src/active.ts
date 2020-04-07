@@ -25,7 +25,7 @@ import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { hasURL_ } from './widgets';
 
-export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
+export type IActiveDataset = BehaviorSubject<URL_ | null>;
 export const IActiveDataset = new Token<IActiveDataset>(
   '@jupyterlab/dataregistry:IActiveDataset'
 );
@@ -52,7 +52,7 @@ function activate(
 
   // Show active datasets in explorer
   registry.addConverter(
-    createConverter<void, any, void, string>(
+    createConverter<void, unknown, void, string>(
       { from: resolveDataType },
       ({ url }) => {
         if (url.toString() !== ACTIVE_URL) {

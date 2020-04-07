@@ -27,7 +27,7 @@ class CustomEnvironment extends PuppeteerEnvironment {
       const jestScreenshot = new JestScreenshot({
         page: this.global.page,
         dirName: resolve(__dirname, '..', '..'),
-        testName
+        testName,
       });
 
       await jestScreenshot.setup();

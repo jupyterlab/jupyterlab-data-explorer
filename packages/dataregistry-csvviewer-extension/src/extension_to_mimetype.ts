@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import { resolveExtensionConverter } from '@jupyterlab/dataregistry';
+import { resolveExtensionConverter, Converter } from '@jupyterlab/dataregistry';
 import datatypes from './datatypes'; // FIXME
 
 /**
@@ -14,7 +14,7 @@ import datatypes from './datatypes'; // FIXME
  * @private
  * @returns data type converter
  */
-function extension2mimetype() {
+function extension2mimetype(): Converter<void, void> {
   return resolveExtensionConverter('.csv', datatypes.csv.createMimeType());
 }
 

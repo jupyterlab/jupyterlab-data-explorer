@@ -22,16 +22,16 @@ const config = {
   globalTeardown: 'jest-environment-puppeteer/teardown',
   setupFilesAfterEnv: ['expect-puppeteer'],
   transform: {
-    ...tsjPreset.transform
+    ...tsjPreset.transform,
   },
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   testMatch: ['**/test/**/test*.ts?(x)'],
   testPathIgnorePatterns: ['/build/', '/lib/', '/node_modules/'],
   globals: {
     'ts-jest': {
-      tsConfig: resolve(ROOT, 'tsconfig.test.json')
-    }
-  }
+      tsConfig: resolve(ROOT, 'tsconfig.test.json'),
+    },
+  },
 };
 
 /**

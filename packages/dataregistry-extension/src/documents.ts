@@ -35,7 +35,7 @@ export const notebookContextDataType = new DataTypeNoArgs<
 >('application/x.jupyterlab.notebook-context');
 
 async function getContext(
-  docmanager: any,
+  docmanager: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   path: string,
   factoryName: string
 ): Promise<Context<DocumentRegistry.IModel>> {
@@ -61,7 +61,7 @@ function activate(
   app: JupyterFrontEnd,
   registry: Registry,
   docmanager: IDocumentManager
-) {
+): void {
   registry.addConverter(
     resolveExtensionConverter('.ipynb', notebookMimeType),
     createConverter(
@@ -74,8 +74,6 @@ function activate(
     createConverter(
       { from: fileDataType, to: notebookContextDataType },
       ({ data, type }) =>
-        // FIXME: TypeScript complains here.
-        // @ts-ignore
         type === notebookMimeType
           ? defer(
               () =>

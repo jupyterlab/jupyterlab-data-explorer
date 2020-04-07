@@ -20,8 +20,8 @@ import csv2datagrid from './csv_to_data_grid';
  */
 function activate(app: JupyterFrontEnd, registry: Registry) {
   registry.addConverter(extension2mimetype());
-  registry.addConverter(text2csv());
-  registry.addConverter(csv2datagrid());
+  registry.addConverter(text2csv);
+  registry.addConverter(csv2datagrid);
 }
 
 /**

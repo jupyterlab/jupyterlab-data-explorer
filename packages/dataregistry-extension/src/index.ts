@@ -50,4 +50,4 @@ export default [
   notebooksPlugin,
   // debuggerPlugin,
   rendermimePlugin,
-] as JupyterFrontEndPlugin<any>[];
+] as JupyterFrontEndPlugin<unknown>[];

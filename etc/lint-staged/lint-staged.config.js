@@ -13,8 +13,8 @@ const ignore = resolve(__dirname, '..', 'prettier', '.prettierignore');
 const config = {
   '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}': [
     'prettier --config=' + rc + ' --ignore-path=' + ignore + ' --write',
-    'git add'
-  ]
+    'git add',
+  ],
 };
 
 /**

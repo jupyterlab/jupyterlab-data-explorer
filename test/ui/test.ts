@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-const { setDefaultOptions } = require('expect-puppeteer');
+const { setDefaultOptions } = require('expect-puppeteer'); // eslint-disable-line @typescript-eslint/no-var-requires
 
 // Extend the time allowed for tests to complete:
 const timeout = 15 * 1000;
@@ -20,7 +20,7 @@ setDefaultOptions({ timeout });
  * @returns promise
  */
 function sleep(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms));
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 describe('JupyterLab', () => {
@@ -37,7 +37,7 @@ describe('JupyterLab', () => {
     await expect(page).toClick('[title="Data Explorer"]');
     await expect(page).toMatchElement('.jl-explorer-heading', {
       text: 'Datasets',
-      visible: true
+      visible: true,
     } as any);
   });
 
@@ -46,7 +46,7 @@ describe('JupyterLab', () => {
     await expect(page).toClick('[title="Data Browser"]');
     await expect(page).toMatchElement('.jl-dr-browser', {
       text: 'Follow active?',
-      visible: true
+      visible: true,
     } as any);
   });
 });

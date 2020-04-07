@@ -10,31 +10,51 @@ const resolve = require('path').resolve;
 const config = {
   env: {
     browser: true,
-    es6: true
+    es6: true,
   },
   extends: [
+    'eslint:recommended',
     'plugin:@typescript-eslint/eslint-recommended',
-    'prettier',
-    'prettier/@typescript-eslint'
+    'plugin:@typescript-eslint/recommended',
+    'prettier/@typescript-eslint',
   ],
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: resolve(__dirname, '..', '..'),
-    project: './packages/**/tsconfig.json',
+    project: [
+      './tsconfig.test.json',
+      './tsconfig.config.json',
+      './packages/**/tsconfig.json',
+    ],
     ecmaFeatures: {
-      jsx: true
+      jsx: true,
     },
     ecmaVersion: 2018,
-    sourceType: 'module'
+    sourceType: 'module',
   },
   plugins: ['prettier', 'react', 'react-hooks', '@typescript-eslint'],
   rules: {
+    '@typescript-eslint/no-use-before-define': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-non-null-assertion': 'off',
+    '@typescript-eslint/no-unused-vars': 'off',
+    '@typescript-eslint/interface-name-prefix': 'off',
+    '@typescript-eslint/no-explicit-any': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'prettier/prettier': ['error', { singleQuote: true }],
     'linebreak-style': ['error', 'unix'],
-    'no-console': ['error', { allow: ['warn', 'error'] }]
-  }
+    'no-console': ['error', { allow: ['warn', 'error'] }],
+  },
+  overrides: [
+    {
+      files: ['*.js'],
+      rules: {
+        '@typescript-eslint/no-var-requires': 'off',
+        'no-undef': 'off',
+      },
+    },
+  ],
 };
 
 /**

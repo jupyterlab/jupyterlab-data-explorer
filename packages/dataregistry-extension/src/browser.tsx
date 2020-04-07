@@ -157,14 +157,14 @@ function Browser({
           setSubmittedURL(value || '');
         },
       });
-      return () => subscription.unsubscribe();
+      return (): void => subscription.unsubscribe();
     }
   }, [active, follow]);
 
   return (
     <div className="jl-dr-browser">
       <form
-        onSubmit={(event) => {
+        onSubmit={(event): void => {
           setSubmittedURL(url);
           event.preventDefault();
         }}
@@ -174,7 +174,7 @@ function Browser({
           type="text"
           value={url}
           placeholder="file:///data.csv"
-          onChange={(event) => setURL(event.target.value)}
+          onChange={(event): void => setURL(event.target.value)}
           className="jl-dr-browser-url-text"
         />
         <input type="submit" value="Submit" />
@@ -184,7 +184,7 @@ function Browser({
         <input
           type="checkbox"
           checked={follow}
-          onChange={(e) => {
+          onChange={(e): void => {
             if (e.target.checked) {
               setURL(active.value || '');
             }

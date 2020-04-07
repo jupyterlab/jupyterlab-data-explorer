@@ -20,7 +20,7 @@ const config = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: resolve(__dirname, '..', '..'),
-    project: 'tsconfig.json',
+    project: './packages/**/tsconfig.json',
     ecmaFeatures: {
       jsx: true
     },

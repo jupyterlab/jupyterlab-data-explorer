@@ -23,8 +23,8 @@ import {
   URL_,
   createConverter
 } from '@jupyterlab/dataregistry';
-import { Widget } from '@phosphor/widgets';
-import * as React from 'react';
+import { Widget } from '@lumino/widgets';
+import React from 'react';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { viewerDataType } from './viewers';
 import { Subscription } from 'rxjs';

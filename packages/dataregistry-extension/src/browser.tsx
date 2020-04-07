@@ -5,7 +5,7 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from 'react';
+import React from 'react';
 import {
   ILayoutRestorer,
   JupyterFrontEnd,
@@ -20,7 +20,7 @@ import {
   URL_
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
-import { Widget } from '@phosphor/widgets';
+import { Widget } from '@lumino/widgets';
 import { widgetDataType, reactDataType } from './widgets';
 import { IActiveDataset } from '.';
 import { PhosphorWidget } from './utils';

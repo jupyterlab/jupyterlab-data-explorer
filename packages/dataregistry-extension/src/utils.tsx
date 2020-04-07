@@ -5,12 +5,12 @@
  * Distributed under the terms of the 3-Clause BSD License.
  */
 
-import * as React from 'react';
+import React from 'react';
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 
-import { Widget } from '@phosphor/widgets';
-import { ISignal } from '@phosphor/signaling';
+import { Widget } from '@lumino/widgets';
+import { ISignal } from '@lumino/signaling';
 
 interface IUseBehaviorSubjectProps<T> {
   subject: BehaviorSubject<T>;
@@ -66,7 +66,7 @@ export function PhosphorWidget({ widget }: { widget: Widget }) {
     return () => Widget.detach(widget);
   }, [widget]);
 
-  return <div className="scrollable jl-phosphor-widget" ref={el} />;
+  return <div className="scrollable jl-lumino-widget" ref={el} />;
 }
 
 export function signalToObservable<T, V>(

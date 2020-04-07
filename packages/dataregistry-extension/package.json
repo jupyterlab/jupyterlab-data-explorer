@@ -35,32 +35,32 @@
     "watch": "tsc --build --watch --listEmittedFiles"
   },
   "dependencies": {
-    "@jupyterlab/application": "^1.0.0",
-    "@jupyterlab/apputils": "^1.0.0",
-    "@jupyterlab/coreutils": "^3.0.0",
-    "@jupyterlab/csvviewer": "^1.0.0",
+    "@jupyterlab/application": "^2.1.0",
+    "@jupyterlab/apputils": "^2.1.0",
+    "@jupyterlab/coreutils": "^4.1.0",
+    "@jupyterlab/csvviewer": "^2.1.0",
     "@jupyterlab/dataregistry": "^3.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
-    "@jupyterlab/docmanager": "^1.0.0",
-    "@jupyterlab/docregistry": "^1.0.4",
-    "@jupyterlab/filebrowser": "^1.0.0",
-    "@jupyterlab/notebook": "^1.0.0",
-    "@jupyterlab/rendermime": "^1.0.0",
-    "@nteract/data-explorer": "7.0.1",
+    "@jupyterlab/docmanager": "^2.1.0",
+    "@jupyterlab/docregistry": "^2.1.0",
+    "@jupyterlab/filebrowser": "^2.1.0",
+    "@jupyterlab/notebook": "^2.1.0",
+    "@jupyterlab/rendermime": "^2.1.0",
     "@lumino/datagrid": "^0.6.0",
     "@lumino/messaging": "^1.2.3",
     "@lumino/widgets": "^1.8.0",
+    "@nteract/data-explorer": "8.0.3",
     "ajv": "^6.10.2",
     "js-yaml": "^3.13.1",
     "path": "0.12.7",
     "react": "^16.8.4",
-    "react-inspector": "^3.0.0",
+    "react-inspector": "^5.0.1",
     "rxjs": "^6.5.2",
-    "styled-components": "^4.3.2"
+    "styled-components": "^5.1.0"
   },
   "devDependencies": {
     "@types/js-yaml": "^3.12.1",
-    "ts-json-schema-generator": "0.52.14"
+    "ts-json-schema-generator": "0.65.0"
   },
   "publishConfig": {
     "access": "public"

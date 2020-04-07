@@ -47,7 +47,7 @@
     "@jupyterlab/notebook": "^1.0.0",
     "@jupyterlab/rendermime": "^1.0.0",
     "@nteract/data-explorer": "7.0.1",
-    "@lumino/datagrid": "^0.1.10",
+    "@lumino/datagrid": "^0.6.0",
     "@lumino/messaging": "^1.2.3",
     "@lumino/widgets": "^1.8.0",
     "ajv": "^6.10.2",

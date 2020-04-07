@@ -6,20 +6,14 @@
     ]
   },
   "scripts": {
-    "all": "jlpm run clean && jlpm run build && jlpm run build:jupyter",
-    "all:watch": "jlpm run clean && jlpm run build && jlpm run build:jupyter:watch",
-    "build": "jlpm run build:dev",
-    "build:dev": "jlpm install && jlpm run clean:packages && lerna link && jlpm run build:packages && jlpm run link:packages && jupyter labextension list",
-    "build:jupyter": "(jupyter lab build || (jlpm run build:jupyter:remediate && jupyter lab build)) && jupyter lab",
-    "build:jupyter:remediate": "curr_dir=$PWD && (cd $(jupyter lab path | head -n1 | sed s/Application\\ directory:\\ *//)/staging && echo $PWD && echo '\"@jupyterlab:registry\" \"http://localhost:4873\"' >> .yarnrc && cat .yarnrc && YARN_REGISTRY=http://localhost:4873 node ./yarn.js install --non-interactive && cd $curr_dir) || cd $curr_dir",
-    "build:jupyter:watch": "(jupyter lab build || (jlpm run build:jupyter:remediate && jupyter lab build)) && jupyter lab --watch",
-    "build:packages": "lerna run build",
-    "build:watch": "tsc --build --watch --listEmittedFiles packages/*",
+    "build": "jlpm && lerna bootstrap --hoist && jlpm run build:packages && jlpm run link:packages",
+    "build:packages": "tsc --build packages/*",
+    "build:watch": "jlpm run build:packages --watch --listEmittedFiles",
     "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
-    "clean:jupyter": "jlpm run uninstall:extensions && (lerna run --no-bail unlink || echo 'At least one unlink command failed, but continuing...') && jupyter lab clean",
+    "clean:jupyter": "jlpm run uninstall:extensions && jupyter lab clean",
     "clean:node": "lerna clean --yes && rimraf node_modules",
     "clean:packages": "lerna run clean",
-    "link:packages": "jupyter labextension link ./packages/* --no-build",
+    "link:packages": "jupyter labextension link ./packages/*",
     "lint": "jlpm run lint:css && jlpm run lint:typescript",
     "lint:check": "jlpm run prettier:check && jlpm run lint:css:check && jlpm run lint:typescript:check",
     "lint:css": "stylelint packages/**/*.css --config ./etc/stylelint/.stylelintrc.json --fix",
@@ -29,14 +23,9 @@
     "prettier": "prettier --write '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}' --config ./etc/prettier/.prettierrc --ignore-path ./etc/prettier/.prettierignore",
     "prettier:check": "prettier --list-different '**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}' --config ./etc/prettier/.prettierrc --ignore-path ./etc/prettier/.prettierignore",
     "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
-    "registry": "verdaccio",
-    "registry:init": "jlpm run registry:adduser && jlpm run registry:register",
-    "registry:adduser": "node ./scripts/registry.adduser.js",
-    "registry:register": "env NPM_USER=foo NPM_PASS=bar NPM_EMAIL=foo@bar.com NPM_REGISTRY=http://localhost:4873 NPM_SCOPE=@jupyterlab npm-cli-login && lerna exec --scope @jupyterlab/dataregistry-csvviewer-extension --scope @jupyterlab/dataregistry-registry-extension -- npm publish --registry http://localhost:4873",
     "test": "env JEST_PUPPETEER_CONFIG=./etc/jest/jest-puppeteer.config.js jest --runInBand --config ./etc/jest/jest.config.js",
     "test:debug": "env HEADLESS=false SLOWMO=true jlpm test",
-    "uninstall:extensions": "jupyter labextension uninstall --all --no-build",
-    "unlink:packages": "lerna run unlink"
+    "uninstall:extensions": "jupyter labextension uninstall --all"
   },
   "husky": {
     "hooks": {
@@ -63,8 +52,6 @@
     "jest-puppeteer": "^4.3.0",
     "lerna": "^3.16.4",
     "lint-staged": "^10.1.2",
-    "npm-cli-login": "^0.1.1",
-    "npm-registry-client": "^8.6.0",
     "prettier": "^2.0.4",
     "puppeteer": "^2.0.0",
     "rimraf": "^3.0.2",
@@ -72,7 +59,6 @@
     "stylelint-config-prettier": "^8.0.1",
     "stylelint-config-standard": "^20.0.0",
     "ts-jest": "^25.3.1",
-    "typescript": "^3.5.3",
-    "verdaccio": "^4.3.2"
+    "typescript": "^3.5.3"
   }
 }

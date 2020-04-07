@@ -34,12 +34,14 @@
   "dependencies": {
     "@jupyterlab/application": "^2.1.0",
     "@jupyterlab/csvviewer": "^2.1.0",
-    "@jupyterlab/dataregistry": "^4.0.0",
-    "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
     "@lumino/datagrid": "^0.6.0",
     "@lumino/messaging": "^1.2.3",
     "@lumino/widgets": "^1.9.0",
     "rxjs": "^6.5.2"
+  },
+  "devDependencies": {
+    "@jupyterlab/dataregistry": "^4.0.0",
+    "@jupyterlab/dataregistry-registry-extension": "^1.0.0"
   },
   "publishConfig": {
     "access": "public"

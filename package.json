@@ -12,7 +12,7 @@
     "build:watch": "jlpm run build:packages --watch --listEmittedFiles",
     "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
     "clean:jupyter": "jlpm run uninstall:extensions && jupyter lab clean",
-    "clean:node": "lerna clean --yes && rimraf node_modules",
+    "clean:node": "lerna clean --yes && rimraf node_modules yarn.lock",
     "clean:packages": "lerna run clean",
     "link:packages": "jupyter labextension link ./packages/*",
     "lint": "jlpm run lint:css && jlpm run lint:typescript",

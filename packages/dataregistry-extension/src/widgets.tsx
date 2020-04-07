@@ -9,19 +9,19 @@ import {
   ILabShell,
   ILayoutRestorer,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   WidgetTracker,
   MainAreaWidget,
-  ReactWidget
+  ReactWidget,
 } from '@jupyterlab/apputils';
 import {
   DataType,
   DataTypeStringArg,
   Registry,
   URL_,
-  createConverter
+  createConverter,
 } from '@jupyterlab/dataregistry';
 import { Widget } from '@lumino/widgets';
 import * as React from 'react';
@@ -38,15 +38,15 @@ export const widgetDataType = new DataTypeStringArg<() => Widget>(
   'label'
 );
 
-export interface IHasURL_ {
+export interface IHasURL {
   url: URL_;
 }
 
-export function hasURL_(t: any): t is IHasURL_ {
+export function hasURL_(t: any): t is IHasURL {
   return 'url' in t;
 }
 
-class DataWidget extends MainAreaWidget implements IHasURL_ {
+class DataWidget extends MainAreaWidget implements IHasURL {
   constructor(
     registry: Registry,
     content: Widget,
@@ -59,14 +59,14 @@ class DataWidget extends MainAreaWidget implements IHasURL_ {
     this.title.label = `${label}: ${url}`;
 
     this.subscription = registry.externalURL(url).subscribe({
-      next: externalURL => {
+      next: (externalURL) => {
         this.title.label =
           externalURL === url
             ? `${label}: ${url}`
             : `${label}: ${url} (${externalURL})`;
         this.externalURL = externalURL;
         tracker.save(this);
-      }
+      },
     });
   }
 
@@ -96,7 +96,7 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:widgets',
   requires: [ILabShell, IRegistry, ILayoutRestorer],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(
@@ -110,7 +110,7 @@ function activate(
       { from: widgetDataType, to: wrappedWidgetDataType },
       ({ type, url, data }) => ({
         type,
-        data: () => new DataWidget(registry, data(), url.toString(), type)
+        data: () => new DataWidget(registry, data(), url.toString(), type),
       })
     ),
     createConverter(
@@ -131,36 +131,33 @@ function activate(
           }
           widget.content.update();
           app.shell.activateById(widget.id);
-        }
+        },
       })
     )
   );
 
   app.commands.addCommand(commandID, {
-    execute: async args => {
+    execute: async (args) => {
       const url = args.url as string;
       const label = args.label as string;
       viewerDataType
         .filterDataset(
           registry.getURL(
-            await registry
-              .internalURL(url)
-              .pipe(first())
-              .toPromise()
+            await registry.internalURL(url).pipe(first()).toPromise()
           )
         )
         .get(label)!();
-    }
+    },
   });
 
   restorer.restore(tracker, {
-    name: widget => JSON.stringify([widget.label, widget.externalURL]),
+    name: (widget) => JSON.stringify([widget.label, widget.externalURL]),
     command: commandID,
     args: (
       widget
     ): {
       label: string;
       url: string;
-    } => ({ label: widget.label, url: widget.externalURL! })
+    } => ({ label: widget.label, url: widget.externalURL! }),
   });
 }

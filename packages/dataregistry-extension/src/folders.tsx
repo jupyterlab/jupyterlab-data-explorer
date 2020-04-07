@@ -9,7 +9,7 @@ import { JupyterFrontEndPlugin, JupyterLab } from '@jupyterlab/application';
 import {
   Registry,
   folderDatasetsConverter,
-  createFolderConverter
+  createFolderConverter,
 } from '@jupyterlab/dataregistry';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
@@ -19,7 +19,7 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:folders',
   requires: [IRegistry, IFileBrowserFactory],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(
@@ -31,7 +31,7 @@ function activate(
     folderDatasetsConverter,
     // Inspired by filebrowser.model.FileBrowserModel._handleContents
     createFolderConverter(
-      async path =>
+      async (path) =>
         new Set(
           [
             ...(
@@ -39,7 +39,7 @@ function activate(
                 // Remove trailing slace before querying
                 path.slice(0, -1)
               )
-            ).content
+            ).content,
           ].map((model: Contents.IModel) =>
             // Add trailing slash if this is a directory so that we know that.
             model.type === 'directory' ? `${model.name}/` : model.name

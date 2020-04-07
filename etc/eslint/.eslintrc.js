@@ -21,11 +21,7 @@ const config = {
   parser: '@typescript-eslint/parser',
   parserOptions: {
     tsconfigRootDir: resolve(__dirname, '..', '..'),
-    project: [
-      './tsconfig.test.json',
-      './tsconfig.config.json',
-      './packages/**/tsconfig.json',
-    ],
+    project: ['./tsconfig.test.json', './packages/**/tsconfig.json'],
     ecmaFeatures: {
       jsx: true,
     },
@@ -46,15 +42,6 @@ const config = {
     'linebreak-style': ['error', 'unix'],
     'no-console': ['error', { allow: ['warn', 'error'] }],
   },
-  overrides: [
-    {
-      files: ['*.js'],
-      rules: {
-        '@typescript-eslint/no-var-requires': 'off',
-        'no-undef': 'off',
-      },
-    },
-  ],
 };
 
 /**

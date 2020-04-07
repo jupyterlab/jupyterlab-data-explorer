@@ -11,7 +11,7 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import { relativeNestedDataType, Registry } from '@jupyterlab/dataregistry';
 import { IActiveDataset } from './active';
@@ -54,7 +54,9 @@ class Renderer extends ReactWidget implements IRenderMime.IRenderer {
     super();
   }
 
-  async renderModel(model: IRenderMime.IMimeModel): Promise<void> {}
+  async renderModel(model: IRenderMime.IMimeModel): Promise<void> {
+    return;
+  }
 
   render() {
     return (
@@ -80,7 +82,7 @@ function activate(
   rendermime.addFactory({
     safe: true,
     mimeTypes: [mimeType],
-    createRenderer: () => new Renderer(active, registry)
+    createRenderer: () => new Renderer(active, registry),
   });
 }
 
@@ -88,5 +90,5 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:rendermime',
   requires: [IRenderMimeRegistry, IActiveDataset, IRegistry],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

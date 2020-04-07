@@ -9,10 +9,11 @@ import { JupyterFrontEndPlugin } from '@jupyterlab/application';
 import {
   DataTypeNoArgs,
   Registry,
-  createConverter
+  createConverter,
 } from '@jupyterlab/dataregistry';
 
-import NteractDataExplorer, { Props } from '@nteract/data-explorer';
+import NteractDataExplorer from '@nteract/data-explorer';
+import { DataProps } from '@nteract/data-explorer/lib/utilities/types';
 import React from 'react';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { reactDataType } from './widgets';
@@ -23,7 +24,7 @@ import { UseObservable } from './utils';
  * Provides a table data type
  * https://frictionlessdata.io/specs/tabular-data-resource/
  */
-export const TableDataType = new DataTypeNoArgs<Observable<Props['data']>>(
+export const TableDataType = new DataTypeNoArgs<Observable<DataProps>>(
   'application/vnd.dataresource+json'
 );
 
@@ -38,7 +39,7 @@ const nteractDataExplorerConverter = createConverter(
     type: 'nteract Data Explorer',
     data: (
       <UseObservable observable={data} initial={undefined}>
-        {data =>
+        {(data) =>
           data ? (
             <NteractDataExplorer
               data={data}
@@ -51,7 +52,7 @@ const nteractDataExplorerConverter = createConverter(
           )
         }
       </UseObservable>
-    )
+    ),
   })
 );
 
@@ -61,5 +62,5 @@ export default {
   },
   id: '@jupyterlab/dataregistry-extension:table-data',
   requires: [IRegistry],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

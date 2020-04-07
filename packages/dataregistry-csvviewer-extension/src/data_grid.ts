@@ -10,7 +10,7 @@ import {
   BasicKeyHandler,
   BasicMouseHandler,
   BasicSelectionModel,
-  DataGrid
+  DataGrid,
 } from '@lumino/datagrid';
 import { Message } from '@lumino/messaging';
 import { DSVModel } from '@jupyterlab/csvviewer';
@@ -63,7 +63,7 @@ class CSVDataGrid extends DataGrid {
       self.keyHandler = new BasicKeyHandler();
       self.mouseHandler = new BasicMouseHandler();
       self.selectionModel = new BasicSelectionModel({
-        dataModel: self.dataModel
+        dataModel: self.dataModel,
       });
     }
   }

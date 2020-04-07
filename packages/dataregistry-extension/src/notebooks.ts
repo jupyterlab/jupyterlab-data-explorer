@@ -26,7 +26,7 @@ import {
 import { IOutputModel } from '@jupyterlab/rendermime';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { NotebookPanel } from '@jupyterlab/notebook';
-import { ReadonlyJSONObject, ReadonlyJSONValue } from '@lumino/coreutils';
+import { ReadonlyPartialJSONObject } from '@lumino/coreutils';
 import { combineLatest, defer, Observable, of, from } from 'rxjs';
 import { map, switchMap, filter } from 'rxjs/operators';
 import { notebookContextDataType } from './documents';
@@ -99,15 +99,14 @@ const outputsDataType = new DataTypeNoArgs<Observable<Array<IOutputModel>>>(
 );
 
 // The data in the mimebundle of an output cell
-const mimeBundleDataType = new DataTypeNoArgs<Observable<ReadonlyJSONObject>>(
-  'application/x.jupyterlab.mime-bundle'
-);
+const mimeBundleDataType = new DataTypeNoArgs<
+  Observable<ReadonlyPartialJSONObject>
+>('application/x.jupyterlab.mime-bundle');
 
 // The data for a certain mimetype in an output.
-const mimeDataDataType = new DataTypeStringArg<Observable<ReadonlyJSONValue>>(
-  'application/x.jupyterlab.mimedata',
-  'mimeType'
-);
+const mimeDataDataType = new DataTypeStringArg<
+  Observable<ReadonlyPartialJSONObject>
+>('application/x.jupyterlab.mimedata', 'mimeType');
 
 /**
  * Converters
@@ -388,8 +387,8 @@ export function createConverters(
         )
     ),
     createConverter<
-      Observable<ReadonlyJSONValue>,
-      Observable<ReadonlyJSONValue>,
+      Observable<ReadonlyPartialJSONObject>,
+      Observable<ReadonlyPartialJSONObject>,
       string,
       string
     >({ from: mimeDataDataType }, ({ type, data }) => ({ type, data })),

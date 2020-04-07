@@ -104,7 +104,7 @@ export default {
         ({ type, data }) => ({
           type,
           data: async () =>
-            notebookTracker.activeCell.model.value.insert(
+            notebookTracker.activeCell?.model.value.insert(
               0,
               await data({
                 path: notebookTracker.currentWidget!.context.path,

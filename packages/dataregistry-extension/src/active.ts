@@ -82,7 +82,7 @@ function getURL_(
   }
   const context = docManager.contextForWidget(widget);
   if (context) {
-    return new URL(context.session.path, 'file:').toString();
+    return new URL(context.path, 'file:').toString();
   }
   if (hasURL_(widget)) {
     return widget.url;

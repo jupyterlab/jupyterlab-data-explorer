@@ -23,7 +23,7 @@ import {
   URL_,
   createConverter
 } from '@jupyterlab/dataregistry';
-import { Widget } from '@phosphor/widgets';
+import { Widget } from '@lumino/widgets';
 import * as React from 'react';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { viewerDataType } from './viewers';

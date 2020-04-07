@@ -20,7 +20,7 @@ import { ReactWidget } from '@jupyterlab/apputils';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import * as React from 'react';
 import { OutputArea } from '@jupyterlab/outputarea';
-import { PanelLayout, Panel } from '@phosphor/widgets';
+import { PanelLayout, Panel } from '@lumino/widgets';
 import { CodeCell } from '@jupyterlab/cells';
 import { Notebook, NotebookPanel } from '@jupyterlab/notebook';
 import { DatasetCompononent } from './explorer';

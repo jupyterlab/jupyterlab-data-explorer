@@ -6,8 +6,8 @@
  */
 
 import { Observable, Subscription } from 'rxjs';
-import { DataGrid } from '@phosphor/datagrid';
-import { Message } from '@phosphor/messaging';
+import { DataGrid } from '@lumino/datagrid';
+import { Message } from '@lumino/messaging';
 import { DSVModel } from '@jupyterlab/csvviewer';
 
 /**

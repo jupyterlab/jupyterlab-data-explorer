@@ -36,8 +36,8 @@
     "@jupyterlab/csvviewer": "^1.0.0",
     "@jupyterlab/dataregistry": "^3.0.0",
     "@jupyterlab/dataregistry-registry-extension": "^1.0.0",
-    "@phosphor/datagrid": "^0.1.10",
-    "@phosphor/messaging": "^1.2.3",
+    "@lumino/datagrid": "^0.1.10",
+    "@lumino/messaging": "^1.2.3",
     "rxjs": "^6.5.2"
   },
   "devDependencies": {},

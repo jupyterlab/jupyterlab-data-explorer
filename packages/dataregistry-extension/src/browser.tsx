@@ -20,10 +20,10 @@ import {
   URL_
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
-import { Widget } from '@phosphor/widgets';
+import { Widget } from '@lumino/widgets';
 import { widgetDataType, reactDataType } from './widgets';
 import { IActiveDataset } from '.';
-import { PhosphorWidget } from './utils';
+import { luminoWidget } from './utils';
 import { Observable } from 'rxjs';
 
 function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
@@ -104,7 +104,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     const widgetCreator = widgets.get(name);
     return (
       components.get(name) ||
-      (widgetCreator && <PhosphorWidget widget={widgetCreator()} />)
+      (widgetCreator && <luminoWidget widget={widgetCreator()} />)
     );
   }, [options, label, components, widgets]);
   // Use the widget creator to set the current widget

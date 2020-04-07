@@ -9,8 +9,8 @@ import * as React from 'react';
 
 import { Observable, Subscription, BehaviorSubject } from 'rxjs';
 
-import { Widget } from '@phosphor/widgets';
-import { ISignal } from '@phosphor/signaling';
+import { Widget } from '@lumino/widgets';
+import { ISignal } from '@lumino/signaling';
 
 interface IUseBehaviorSubjectProps<T> {
   subject: BehaviorSubject<T>;
@@ -58,7 +58,7 @@ export class UseObservable<T, U> extends React.Component<
   }
 }
 
-export function PhosphorWidget({ widget }: { widget: Widget }) {
+export function luminoWidget({ widget }: { widget: Widget }) {
   const el = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -66,7 +66,7 @@ export function PhosphorWidget({ widget }: { widget: Widget }) {
     return () => Widget.detach(widget);
   }, [widget]);
 
-  return <div className="scrollable jl-phosphor-widget" ref={el} />;
+  return <div className="scrollable jl-lumino-widget" ref={el} />;
 }
 
 export function signalToObservable<T, V>(

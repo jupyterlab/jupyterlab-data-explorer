@@ -6,7 +6,7 @@
  */
 
 import { JupyterFrontEndPlugin } from '@jupyterlab/application';
-import { Token } from '@phosphor/coreutils';
+import { Token } from '@lumino/coreutils';
 import { Registry } from '@jupyterlab/dataregistry';
 import activate from './activate';
 

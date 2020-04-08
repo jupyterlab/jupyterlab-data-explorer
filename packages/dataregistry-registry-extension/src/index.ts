@@ -13,7 +13,7 @@ import activate from './activate';
 /**
  * Registry converter interface.
  */
-export interface IRegistry extends Registry {}
+export type IRegistry = Registry;
 
 /**
  * Registry token.
@@ -30,7 +30,7 @@ const extension: JupyterFrontEndPlugin<Registry> = {
   activate: activate,
   autoStart: true,
   requires: [],
-  provides: IRegistry
+  provides: IRegistry,
 };
 
 /**

@@ -12,7 +12,7 @@ import {
   Registry,
   resolveExtensionConverter,
   resolveFileConverter,
-  URLDataType
+  URLDataType,
 } from '@jupyterlab/dataregistry';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
 import React from 'react';
@@ -27,7 +27,7 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:files',
   requires: [IRegistry, IFileBrowserFactory],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(
@@ -49,13 +49,13 @@ function activate(
           type: 'Image',
           data: (
             <UseObservable observable={data} initial={undefined}>
-              {url => (url ? <img src={url} /> : <></>)}
+              {(url) => (url ? <img src={url} /> : <></>)}
             </UseObservable>
-          )
+          ),
         };
       }
     ),
-    fileURLConverter(path =>
+    fileURLConverter((path) =>
       fileBrowserFactory.defaultBrowser.model.manager.services.contents.getDownloadUrl(
         path
       )

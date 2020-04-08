@@ -10,7 +10,7 @@ import {
   BehaviorSubject,
   Subscriber,
   Subscription,
-  Observer
+  Observer,
 } from 'rxjs';
 
 /**
@@ -23,7 +23,7 @@ const enum State {
   waitingFirstSubs = 'waiting first and subscribed',
   waitingNextSubs = 'waiting next and subscribed',
   complete = 'complete',
-  error = 'error'
+  error = 'error',
 }
 /**
  * We want to capture the last emitted value and whether the observable is finalized yet.
@@ -88,15 +88,15 @@ export class CachedObservable<T> extends Observable<T> {
     return new CachedObservable(from);
   }
   private constructor(from: Observable<T>) {
-    super(subscriber => {
+    super((subscriber) => {
       const state = this.state.value;
       switch (state.state) {
         case State.error:
-        case State.initial:
+        case State.initial: {
           const subscribers = new Set([subscriber]);
           this.state.next({
             state: State.waitingFirst,
-            subscribers
+            subscribers,
           });
           const subscription = from.subscribe(this.observer);
           const newState = this.state.value;
@@ -105,14 +105,14 @@ export class CachedObservable<T> extends Observable<T> {
               this.state.next({
                 ...newState,
                 state: State.waitingFirstSubs,
-                subscription
+                subscription,
               });
               break;
             case State.waitingNext:
               this.state.next({
                 ...newState,
                 state: State.waitingNextSubs,
-                subscription
+                subscription,
               });
               break;
             // If we run the subscription and it complete or errors
@@ -126,6 +126,7 @@ export class CachedObservable<T> extends Observable<T> {
               );
           }
           break;
+        }
         case State.waitingFirst:
         case State.waitingFirstSubs:
           state.subscribers.add(subscriber);
@@ -137,7 +138,7 @@ export class CachedObservable<T> extends Observable<T> {
           break;
         case State.complete:
           subscriber.next(state.value);
-          return () => {};
+          return () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
         default:
           return;
       }
@@ -176,7 +177,7 @@ export class CachedObservable<T> extends Observable<T> {
 
   private get observer(): Observer<T> {
     return {
-      next: value => {
+      next: (value) => {
         const state = this.state.value;
         switch (state.state) {
           case State.initial:
@@ -186,18 +187,18 @@ export class CachedObservable<T> extends Observable<T> {
             this.state.next({
               ...state,
               state: State.waitingNext,
-              value
+              value,
             });
-            state.subscribers.forEach(s => s.next(value));
+            state.subscribers.forEach((s) => s.next(value));
             return;
           case State.waitingNextSubs:
           case State.waitingFirstSubs:
             this.state.next({
               ...state,
               state: State.waitingNextSubs,
-              value
+              value,
             });
-            state.subscribers.forEach(s => s.next(value));
+            state.subscribers.forEach((s) => s.next(value));
             return;
           case State.complete:
             throw new Error("Shouldn't be in complete state on next");
@@ -207,7 +208,7 @@ export class CachedObservable<T> extends Observable<T> {
             return;
         }
       },
-      error: error => {
+      error: (error) => {
         const state = this.state.value;
         switch (state.state) {
           case State.initial:
@@ -245,10 +246,10 @@ export class CachedObservable<T> extends Observable<T> {
           default:
             return;
         }
-      }
+      },
     };
   }
   public state = new BehaviorSubject<ObservableState<T>>({
-    state: State.initial
+    state: State.initial,
   });
 }

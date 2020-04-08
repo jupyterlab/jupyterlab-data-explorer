@@ -34,7 +34,7 @@ export function createFileURL_(path: string): URL_ {
 export const resolveFileConverter = createConverter(
   {
     from: resolveMimetypeDataType,
-    to: fileDataType
+    to: fileDataType,
   },
   ({ type, url }) => {
     if (url.protocol !== 'file:') {
@@ -54,7 +54,7 @@ export function fileURLConverter(
     { from: fileDataType, to: URLDataType },
     ({ type, data }) => ({
       type,
-      data: defer(() => getDownloadURL(data))
+      data: defer(() => getDownloadURL(data)),
     })
   );
 }

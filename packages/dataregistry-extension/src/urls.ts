@@ -7,12 +7,12 @@
 
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   URLStringConverter,
   resolverURLConverter,
-  Registry
+  Registry,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 
@@ -20,7 +20,7 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:urls',
   requires: [IRegistry],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(_app: JupyterFrontEnd, registry: Registry) {

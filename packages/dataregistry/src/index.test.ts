@@ -62,7 +62,7 @@ test('Adding a converter gives the new mimetype', () => {
     mimeType,
     url,
     data,
-    cost
+    cost,
   }) =>
     mimeType === initialMimeType
       ? [{ mimeType: convertedMimeType, data: dataConverter(url, data), cost }]
@@ -77,7 +77,7 @@ test('Adding a converter gives the new mimetype', () => {
     new Set([
       resolveDataType.createMimeType(),
       initialMimeType,
-      convertedMimeType
+      convertedMimeType,
     ])
   );
 

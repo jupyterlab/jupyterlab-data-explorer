@@ -1,13 +1,13 @@
 children:
-  - "test:///hi"
+  - 'test:///hi'
 datasets:
-  - url: "test:///hi"
-    label: "Custom label!"
+  - url: 'test:///hi'
+    label: 'Custom label!'
     snippets:
       some code: "It's code!"
       other code: "It's code!"
     children:
-      - "test:///other"
-  - url: "test:///other"
+      - 'test:///other'
+  - url: 'test:///other'
     snippets:
-      more code: "another code"
+      more code: 'another code'

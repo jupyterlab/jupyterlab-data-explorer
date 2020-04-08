@@ -8,7 +8,7 @@
 import {
   Registry,
   relativeNestedURLConverter,
-  internalURLNested
+  internalURLNested,
 } from '@jupyterlab/dataregistry';
 
 /**

@@ -19,7 +19,7 @@ interface IUseBehaviorSubjectProps<T> {
 
 export function UseBehaviorSubject<T>({
   subject,
-  children
+  children,
 }: IUseBehaviorSubjectProps<T>) {
   return (
     <UseObservable observable={subject} initial={subject.value}>
@@ -45,7 +45,7 @@ export class UseObservable<T, U> extends React.Component<
 
   componentDidMount() {
     this.subscription = this.props.observable.subscribe({
-      next: value => this.setState({ value })
+      next: (value) => this.setState({ value }),
     });
   }
 
@@ -58,7 +58,7 @@ export class UseObservable<T, U> extends React.Component<
   }
 }
 
-export function PhosphorWidget({ widget }: { widget: Widget }) {
+export function LuminoWidget({ widget }: { widget: Widget }) {
   const el = React.useRef<HTMLDivElement>(null);
 
   React.useEffect(() => {
@@ -72,7 +72,7 @@ export function PhosphorWidget({ widget }: { widget: Widget }) {
 export function signalToObservable<T, V>(
   signal: ISignal<T, V>
 ): Observable<[T, V]> {
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     function slot(sender: T, value: V) {
       subscriber.next([sender, value]);
     }

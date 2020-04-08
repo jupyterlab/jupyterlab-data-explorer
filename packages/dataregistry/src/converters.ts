@@ -34,7 +34,7 @@ export function applyConverterDataset<T>(
 ): Dataset<T> {
   // mimeTypes that we still need to convert
   let toProcess: Array<{ mimeType: MimeType_; cost: Cost; data: T }> = [
-    ...dataset
+    ...dataset,
   ].map(([mimeType, [cost, data]]) => ({ mimeType, cost, data }));
   // processed mimetypes
   const processed: Dataset<T> = new Map();
@@ -59,6 +59,6 @@ export function applyConverterDataset<T>(
 export function combineManyConverters<T, U>(
   ...converters: Array<Converter<T, U>>
 ): Converter<T, U> {
-  return dataset =>
-    converters.map(c => c(dataset)).reduce((l, r) => l.concat(r), []);
+  return (dataset) =>
+    converters.map((c) => c(dataset)).reduce((l, r) => l.concat(r), []);
 }

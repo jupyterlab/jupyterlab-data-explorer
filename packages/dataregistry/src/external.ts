@@ -38,5 +38,5 @@ export const internalURLDataType = new DataTypeNoArgs<Observable<URL_>>(
 
 export const internalURLNested = createConverter(
   { from: internalURLDataType, to: nestedDataType },
-  ({ data }) => data.pipe(map(url => new Set([url])))
+  ({ data }) => data.pipe(map((url) => new Set([url])))
 );

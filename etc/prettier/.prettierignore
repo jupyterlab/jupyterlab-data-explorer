@@ -1,9 +1,0 @@
-node_modules
-**/node_modules
-**/lib
-**/build
-**/static
-tests/**/coverage
-**/package.json
-.eggs
-.ipynb_checkpoints

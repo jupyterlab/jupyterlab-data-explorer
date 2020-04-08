@@ -161,6 +161,21 @@ Tests should accompany **all** bug fixes and features. For guidance on how to wr
 
 Any [pull requests][github-pull-request] which include failing tests and/or lint errors will **not** be accepted.
 
+To setup dev environment and run JupyterLab:
+
+```bash
+$ jlpm run build
+$ jupyter lab build
+$ jupyter lab
+```
+
+To make changes and have JupyterLab rebuild withour restarting:
+
+```bash
+$ jlpm run build:watch
+$ jupyter lab --watch
+```
+
 To run tests:
 
 ```bash

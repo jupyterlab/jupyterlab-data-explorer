@@ -9,7 +9,7 @@ import { IDocumentManager } from '@jupyterlab/docmanager';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import {
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   Registry,
@@ -18,7 +18,7 @@ import {
   createConverter,
   DataTypeNoArgs,
   resolveExtensionConverter,
-  textDataType
+  textDataType,
 } from '@jupyterlab/dataregistry';
 import { Observable, defer } from 'rxjs';
 import { DocumentRegistry, Context } from '@jupyterlab/docregistry';
@@ -35,7 +35,7 @@ export const notebookContextDataType = new DataTypeNoArgs<
 >('application/x.jupyterlab.notebook-context');
 
 async function getContext(
-  docmanager: any,
+  docmanager: any, // eslint-disable-line @typescript-eslint/no-explicit-any
   path: string,
   factoryName: string
 ): Promise<Context<DocumentRegistry.IModel>> {
@@ -61,21 +61,19 @@ function activate(
   app: JupyterFrontEnd,
   registry: Registry,
   docmanager: IDocumentManager
-) {
+): void {
   registry.addConverter(
     resolveExtensionConverter('.ipynb', notebookMimeType),
     createConverter(
       { from: fileDataType, to: textContextDataType },
       ({ data, type }) => ({
         type,
-        data: defer(() => getContext(docmanager, data, 'text'))
+        data: defer(() => getContext(docmanager, data, 'text')),
       })
     ),
     createConverter(
       { from: fileDataType, to: notebookContextDataType },
       ({ data, type }) =>
-        // FIXME: TypeScript complains here.
-        // @ts-ignore
         type === notebookMimeType
           ? defer(
               () =>
@@ -90,10 +88,10 @@ function activate(
       ({ data, type }) => ({
         type,
         data: data.pipe(
-          switchMap(context =>
+          switchMap((context) =>
             observableStringToObservable(context.model.value)
           )
-        )
+        ),
       })
     )
   );
@@ -103,5 +101,5 @@ export default {
   id: '@jupyterlab/dataregistry-extension:documents',
   requires: [IRegistry, IDocumentManager],
   activate,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;

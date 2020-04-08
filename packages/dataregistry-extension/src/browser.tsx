@@ -10,20 +10,20 @@ import {
   ILayoutRestorer,
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
-  ILabShell
+  ILabShell,
 } from '@jupyterlab/application';
 import { ReactWidget } from '@jupyterlab/apputils';
 import {
   Registry,
   relativeNestedDataType,
   nestedDataType,
-  URL_
+  URL_,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { Widget } from '@lumino/widgets';
 import { widgetDataType, reactDataType } from './widgets';
 import { IActiveDataset } from '.';
-import { PhosphorWidget } from './utils';
+import { LuminoWidget } from './utils';
 import { Observable } from 'rxjs';
 
 function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
@@ -56,9 +56,9 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
   React.useEffect(() => {
     if (children$) {
       const subscription = children$.subscribe({
-        next: value => {
+        next: (value) => {
           setChildren([...value]);
-        }
+        },
       });
       return () => subscription.unsubscribe();
     }
@@ -81,7 +81,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
   for (const child of children) {
     options.set(`child-${child}`, {
       value: child,
-      type: 'child'
+      type: 'child',
     });
   }
 
@@ -93,7 +93,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     if (!options.has(label) && options.size) {
       setLabel(options.keys().next().value);
     }
-  }, [label, widgets, children]);
+  }, [label, widgets, children, options]);
 
   const Component: React.ReactElement<any> | undefined = React.useMemo(() => {
     const selected = options.get(label);
@@ -104,14 +104,14 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
     const widgetCreator = widgets.get(name);
     return (
       components.get(name) ||
-      (widgetCreator && <PhosphorWidget widget={widgetCreator()} />)
+      (widgetCreator && <LuminoWidget widget={widgetCreator()} />)
     );
   }, [options, label, components, widgets]);
   // Use the widget creator to set the current widget
 
   return (
     <>
-      <select value={label} onChange={event => setLabel(event.target.value)}>
+      <select value={label} onChange={(event) => setLabel(event.target.value)}>
         {[...options.entries()].map(([idx, { value, type }]) => (
           <option key={idx} value={idx}>
             {type === 'child' && value.startsWith(url)
@@ -136,7 +136,7 @@ function InnerBrowser({ registry, url }: { registry: Registry; url: URL_ }) {
 
 function Browser({
   registry,
-  active
+  active,
 }: {
   registry: Registry;
   active: IActiveDataset;
@@ -152,19 +152,19 @@ function Browser({
   React.useEffect(() => {
     if (follow) {
       const subscription = active.subscribe({
-        next: value => {
+        next: (value) => {
           setURL(value || '');
           setSubmittedURL(value || '');
-        }
+        },
       });
-      return () => subscription.unsubscribe();
+      return (): void => subscription.unsubscribe();
     }
   }, [active, follow]);
 
   return (
     <div className="jl-dr-browser">
       <form
-        onSubmit={event => {
+        onSubmit={(event): void => {
           setSubmittedURL(url);
           event.preventDefault();
         }}
@@ -174,7 +174,7 @@ function Browser({
           type="text"
           value={url}
           placeholder="file:///data.csv"
-          onChange={event => setURL(event.target.value)}
+          onChange={(event): void => setURL(event.target.value)}
           className="jl-dr-browser-url-text"
         />
         <input type="submit" value="Submit" />
@@ -184,7 +184,7 @@ function Browser({
         <input
           type="checkbox"
           checked={follow}
-          onChange={e => {
+          onChange={(e): void => {
             if (e.target.checked) {
               setURL(active.value || '');
             }
@@ -201,7 +201,7 @@ export default {
   activate,
   id: '@jupyterlab/dataregistry-extension:browser',
   requires: [ILabShell, IRegistry, ILayoutRestorer, IActiveDataset],
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<void>;
 
 function activate(

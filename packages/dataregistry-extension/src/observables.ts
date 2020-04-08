@@ -14,7 +14,7 @@ import { IOutputModel } from '@jupyterlab/rendermime';
 export function observableStringToObservable(
   l: IObservableString
 ): Observable<string> {
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     subscriber.next(l.text);
 
     function slot() {
@@ -28,7 +28,7 @@ export function observableStringToObservable(
 export function observableListToObservable<T>(
   l: IObservableList<T>
 ): Observable<Array<T>> {
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     subscriber.next(toArray(l.iter()));
 
     function slot() {
@@ -50,7 +50,7 @@ export function outputAreaModelToObservable(
     }
     return a;
   }
-  return new Observable(subscriber => {
+  return new Observable((subscriber) => {
     subscriber.next(toArray());
 
     function slot() {

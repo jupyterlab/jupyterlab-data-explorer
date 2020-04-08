@@ -12,7 +12,7 @@ To experiment with the extension in a live notebook environment,
 -   Bring any data type you can imagine! **Extensible** and **type safe** data registry system.
 -   Register **conversions** between the different data types.
 -   Data changing on you? Use [`RxJS` **observables**][rxjs] to represent data over time.
--   Have a new way to look at your data? Create **React** or **Phosphor** components to view a certain type.
+-   Have a new way to look at your data? Create **React** or **lumino** components to view a certain type.
 -   Built-in data **explorer UI** to find and use available datasets.
 -   Dataset in your dataset? Use the **nested** datatype.
 -   Building another data centric application? Use the [`@jupyterlab/dataregistry`][npm-package-dataregistry] package which can be used independently of [JupyterLab][jupyterlab].

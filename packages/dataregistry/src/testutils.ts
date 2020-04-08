@@ -19,10 +19,10 @@ export class ToPromises<T> {
     if (value !== undefined) {
       return Promise.resolve(value);
     }
-    return new Promise(resolve => this._promises.push(resolve));
+    return new Promise((resolve) => this._promises.push(resolve));
   }
   constructor(observable: Observable<T>) {
-    observable.pipe(tag('ToPromise')).subscribe(next => {
+    observable.pipe(tag('ToPromise')).subscribe((next) => {
       const promise = this._promises.pop();
       if (promise === undefined) {
         this._values.push(next);

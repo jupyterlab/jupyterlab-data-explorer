@@ -8,14 +8,14 @@
 import {
   ILabShell,
   JupyterFrontEnd,
-  JupyterFrontEndPlugin
+  JupyterFrontEndPlugin,
 } from '@jupyterlab/application';
 import {
   createConverter,
   nestedDataType,
   Registry,
   resolveDataType,
-  URL_
+  URL_,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { IDocumentManager } from '@jupyterlab/docmanager';
@@ -25,7 +25,7 @@ import { BehaviorSubject } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { hasURL_ } from './widgets';
 
-export interface IActiveDataset extends BehaviorSubject<URL_ | null> {}
+export type IActiveDataset = BehaviorSubject<URL_ | null>;
 export const IActiveDataset = new Token<IActiveDataset>(
   '@jupyterlab/dataregistry:IActiveDataset'
 );
@@ -39,7 +39,7 @@ export default {
   id: '@jupyterlab/dataregistry-extension:active-dataset',
   requires: [ILabShell, IRegistry, IDocumentManager],
   provides: IActiveDataset,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<IActiveDataset>;
 
 function activate(
@@ -52,7 +52,7 @@ function activate(
 
   // Show active datasets in explorer
   registry.addConverter(
-    createConverter<void, any, void, string>(
+    createConverter<void, unknown, void, string>(
       { from: resolveDataType },
       ({ url }) => {
         if (url.toString() !== ACTIVE_URL) {
@@ -60,7 +60,7 @@ function activate(
         }
         return {
           type: nestedDataType.createMimeType(),
-          data: active.pipe(map(url => (url ? new Set([url]) : new Set())))
+          data: active.pipe(map((url) => (url ? new Set([url]) : new Set()))),
         };
       }
     )
@@ -82,7 +82,7 @@ function getURL_(
   }
   const context = docManager.contextForWidget(widget);
   if (context) {
-    return new URL(context.session.path, 'file:').toString();
+    return new URL(context.path, 'file:').toString();
   }
   if (hasURL_(widget)) {
     return widget.url;

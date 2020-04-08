@@ -16,7 +16,7 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlab/dataregistry-extension:csv-viewer',
   activate: activate,
   autoStart: true,
-  requires: [IRegistry]
+  requires: [IRegistry],
 };
 
 /**

@@ -10,7 +10,7 @@ import {
   BasicKeyHandler,
   BasicMouseHandler,
   BasicSelectionModel,
-  DataGrid
+  DataGrid,
 } from '@lumino/datagrid';
 import { Message } from '@lumino/messaging';
 import { DSVModel } from '@jupyterlab/csvviewer';
@@ -41,9 +41,7 @@ class CSVDataGrid extends DataGrid {
    *
    * @param msg - message
    */
-  protected onBeforeAttach(msg: Message) {
-    const self = this;
-    this._subscription = this._data.subscribe(onData);
+  protected onBeforeAttach(msg: Message): void {
     super.onBeforeAttach(msg);
 
     /**
@@ -52,20 +50,21 @@ class CSVDataGrid extends DataGrid {
      * @private
      * @param data - CSV data
      */
-    function onData(data: string) {
-      if (self.dataModel) {
-        (self.dataModel as DSVModel).dispose();
+    const onData = (data: string): void => {
+      if (this.dataModel) {
+        (this.dataModel as DSVModel).dispose();
       }
-      self.dataModel = new DSVModel({
+      this.dataModel = new DSVModel({
         data: data,
-        delimiter: ','
+        delimiter: ',',
       });
-      self.keyHandler = new BasicKeyHandler();
-      self.mouseHandler = new BasicMouseHandler();
-      self.selectionModel = new BasicSelectionModel({
-        dataModel: self.dataModel
+      this.keyHandler = new BasicKeyHandler();
+      this.mouseHandler = new BasicMouseHandler();
+      this.selectionModel = new BasicSelectionModel({
+        dataModel: this.dataModel,
       });
-    }
+    };
+    this._subscription = this._data.subscribe(onData);
   }
 
   /**
@@ -73,7 +72,7 @@ class CSVDataGrid extends DataGrid {
    *
    * @param msg - message
    */
-  protected onBeforeDetach(msg: Message) {
+  protected onBeforeDetach(msg: Message): void {
     this._subscription && this._subscription.unsubscribe();
     super.onBeforeDetach(msg);
   }

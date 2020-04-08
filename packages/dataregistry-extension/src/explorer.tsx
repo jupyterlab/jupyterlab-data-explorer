@@ -16,7 +16,7 @@ import {
   JupyterFrontEnd,
   JupyterFrontEndPlugin,
   ILabShell,
-  ILayoutRestorer
+  ILayoutRestorer,
 } from '@jupyterlab/application';
 import {
   Registry,
@@ -24,7 +24,7 @@ import {
   ObservableSet,
   nestedDataType,
   DataTypeNoArgs,
-  externalURLDataType
+  externalURLDataType,
 } from '@jupyterlab/dataregistry';
 import { IRegistry } from '@jupyterlab/dataregistry-registry-extension';
 import { IActiveDataset, ACTIVE_URL } from './active';
@@ -39,7 +39,7 @@ function Button({ onClick, text }: { onClick: () => void; text: string }) {
   return (
     <button
       className="jl-explorer-button"
-      onClick={e => {
+      onClick={(e) => {
         e.stopPropagation();
         onClick();
       }}
@@ -57,7 +57,7 @@ class Collapsable extends React.Component<
   { collapsed: boolean }
 > {
   state: { collapsed: boolean } = {
-    collapsed: true
+    collapsed: true,
   };
 
   render() {
@@ -85,7 +85,7 @@ export function DatasetCompononent({
   url,
   parentURL,
   active$,
-  registry
+  registry,
 }: {
   url: URL_;
   parentURL: Observable<URL_>;
@@ -103,7 +103,7 @@ export function DatasetCompononent({
   }
   return (
     <UseObservable observable={active$} initial={null}>
-      {active => {
+      {(active) => {
         const classNames = ['jl-explorer-dataset'];
         if (active === url) {
           classNames.push('jl-explorer-active-dataset');
@@ -124,14 +124,14 @@ export function DatasetCompononent({
         return (
           <div
             className={classes(...classNames)}
-            onClick={e => {
+            onClick={(e) => {
               e.stopPropagation();
               active$.next(url);
             }}
           >
             <h3 className="jl-explorer-dataset-name">
               <UseObservable observable={label} initial="">
-                {label_ => label_}
+                {(label_) => label_}
               </UseObservable>
             </h3>
             <span>
@@ -148,9 +148,7 @@ export function DatasetCompononent({
                   urls$={nestedURLs}
                 />
               </Collapsable>
-            ) : (
-              undefined
-            )}
+            ) : undefined}
           </div>
         );
       }}
@@ -162,7 +160,7 @@ function DatasetsComponent({
   active,
   registry,
   urls$,
-  url
+  url,
 }: {
   active: IActiveDataset;
   registry: Registry;
@@ -171,11 +169,11 @@ function DatasetsComponent({
 }) {
   return (
     <UseObservable observable={urls$} initial={undefined}>
-      {urls =>
+      {(urls) =>
         urls ? (
           [...urls]
             .sort()
-            .map(innerURL => (
+            .map((innerURL) => (
               <DatasetCompononent
                 key={innerURL}
                 url={innerURL}
@@ -194,7 +192,7 @@ function DatasetsComponent({
 
 function Heading({
   search,
-  onSearch
+  onSearch,
 }: {
   search: string;
   onSearch: (search: string) => void;
@@ -223,7 +221,7 @@ class DataExplorer extends React.Component<
   { search: string }
 > {
   state: { search: string } = {
-    search: ''
+    search: '',
   };
 
   render() {
@@ -274,7 +272,7 @@ export default {
   id,
   requires: [ILabShell, IRegistry, ILayoutRestorer, IActiveDataset],
   provides: IDataExplorer,
-  autoStart: true
+  autoStart: true,
 } as JupyterFrontEndPlugin<IDataExplorer>;
 
 function activate(

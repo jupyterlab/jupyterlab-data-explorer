@@ -85,7 +85,7 @@ export class URLTemplate<T extends { [arg: string]: any }> extends TypedURL<T> {
     }
     const newObject = Object.fromEntries(
       Object.entries(args).map(([key, val]) => [key, this.map[key][0](val)])
-    );
+    ) as T;
     // If none  of the value were none, return the object
     if (nonNullableValues(newObject)) {
       return newObject;

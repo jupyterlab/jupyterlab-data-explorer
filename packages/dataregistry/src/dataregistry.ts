@@ -7,7 +7,7 @@ const registry = {
   /**
    * Registers a dataset, throws an exception if dataset already exists.
    * Pass in a version to register an updated version of the dataset.
-   * @param dataset
+   * @param dataset The dataset to register
    */
   registerDataset<T extends JSONObject, U extends JSONObject>(
     dataset: Dataset<T, U>
@@ -23,6 +23,20 @@ const registry = {
       } else {
         DatasetStore[dataset.id] = [...DatasetStore[dataset.id], dataset];
       }
+    }
+  },
+
+  /**
+   * Updates a registered dataset, bumps up the version
+   * @param dataset The dataset to update
+   */
+  updateDataset<T extends JSONObject, U extends JSONObject>(
+    dataset: Dataset<T, U>
+  ) {
+    const registeredDataset = this.getDataset(dataset.id);
+    if (registeredDataset) {
+      dataset.version = registeredDataset.version! + 1;
+      this.registerDataset(dataset);
       // TODO: hook in here to emit version change callbacks
     }
   },

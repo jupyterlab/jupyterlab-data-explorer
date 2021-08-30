@@ -125,4 +125,26 @@ describe('dataregistry', () => {
       expect(registry.hasDataset('s3://bucket/object')).toBeTruthy();
     });
   });
+
+  describe('#updateDataset', () => {
+    it('should update version of existing dataset', () => {
+      registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
+        id: datasetId,
+        abstractDataType: 'tabular',
+        serializationType: 'csv',
+        storageType: 'inmemory',
+        value: {
+          value: CSV_CONTENT,
+        },
+        metadata: {
+          delimiter: ',',
+          lineDelimiter: '\n',
+        },
+        title: 'CSV In Memory Dataset',
+        description: 'Dummy in memory dataset',
+      });
+      const dataset = registry.getDataset(datasetId);
+      expect(dataset.version).toEqual(2);
+    });
+  });
 });

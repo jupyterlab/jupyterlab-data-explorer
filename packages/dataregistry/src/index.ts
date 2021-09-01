@@ -8,4 +8,3 @@
 export * from './dataset';
 export * from './dataregistry';
 export * from './utils';
-export * from './json';

@@ -1,14 +1,26 @@
-import { JSONObject } from './json';
+import { JSONValue } from '@lumino/coreutils';
 
-export interface Dataset<T extends JSONObject, U extends JSONObject> {
+export interface Dataset<T extends JSONValue, U extends JSONValue> {
   /**
    * Unique identifier for the dataset, for in-memory
    * datasets, a unique uuid might be provided.
    * This id should be unique across a jupyter server instance.
    */
   id: string;
+  /**
+   * Abstract data type for the dataset, e.g.,
+   * tabular, image, text, tabular collection
+   */
   abstractDataType: string;
+  /**
+   * Serialization type for the dataset e.g.,
+   * csv, jpg
+   */
   serializationType: string;
+  /**
+   * Storage type for the dataset e.g.,
+   * inmemory, file, s3
+   */
   storageType: string;
   /**
    * Output value for the dataset

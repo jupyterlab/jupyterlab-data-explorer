@@ -1,6 +1,7 @@
-import { JSONObject } from './json';
 import { Dataset } from './dataset';
 import registry from './dataregistry';
+import { JSONObject } from '@lumino/coreutils';
+import { Signal } from '@lumino/signaling';
 
 describe('dataregistry', () => {
   interface IInMemoryCSV extends JSONObject {
@@ -13,6 +14,14 @@ describe('dataregistry', () => {
   }
   const CSV_CONTENT = 'header1,header2\nvalue1,value2';
   const datasetId = '1234567890';
+
+  interface IS3CSV extends JSONObject {
+    value: null;
+  }
+
+  interface IS3CSVMetadata extends ICSVMetadata {
+    iamRoleArn: string;
+  }
 
   describe('#registerDataset', () => {
     it('should register a dataset with no version passed', () => {
@@ -53,8 +62,31 @@ describe('dataregistry', () => {
       }).toThrowError(/already exists/);
     });
 
-    it('should register a dataset with version passed', () => {
-      registry.registerDataset<IInMemoryCSV, ICSVMetadata>({
+    it('should throw an error with version > 0 passed', () => {
+      expect(() => {
+        registry.registerDataset<IInMemoryCSV, ICSVMetadata>({
+          id: datasetId,
+          abstractDataType: 'tabular',
+          serializationType: 'csv',
+          storageType: 'inmemory',
+          value: {
+            value: CSV_CONTENT,
+          },
+          metadata: {
+            delimiter: ',',
+            lineDelimiter: '\n',
+          },
+          title: 'CSV In Memory Dataset',
+          description: 'Dummy in memory dataset',
+          version: 1,
+        });
+      }).toThrowError(/Use the updateDataset/);
+    });
+  });
+
+  describe('#updateDataset', () => {
+    it('should update version of existing dataset', () => {
+      registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
         id: datasetId,
         abstractDataType: 'tabular',
         serializationType: 'csv',
@@ -68,8 +100,67 @@ describe('dataregistry', () => {
         },
         title: 'CSV In Memory Dataset',
         description: 'Dummy in memory dataset',
-        version: 1,
       });
+    });
+
+    it("should throw an error when abstract data type doesn't match", () => {
+      expect(() => {
+        registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
+          id: datasetId,
+          abstractDataType: 'text',
+          serializationType: 'text',
+          storageType: 'inmemory',
+          value: {
+            value: CSV_CONTENT,
+          },
+          metadata: {
+            delimiter: ',',
+            lineDelimiter: '\n',
+          },
+          title: 'CSV In Memory Dataset',
+          description: 'Dummy in memory dataset',
+        });
+      }).toThrowError(/doesn't match/);
+    });
+
+    it("should throw an error when serialization type doesn't match", () => {
+      expect(() => {
+        registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
+          id: datasetId,
+          abstractDataType: 'text',
+          serializationType: 'text',
+          storageType: 'inmemory',
+          value: {
+            value: CSV_CONTENT,
+          },
+          metadata: {
+            delimiter: ',',
+            lineDelimiter: '\n',
+          },
+          title: 'CSV In Memory Dataset',
+          description: 'Dummy in memory dataset',
+        });
+      }).toThrowError(/doesn't match/);
+    });
+
+    it("should throw an error when storage type doesn't match", () => {
+      expect(() => {
+        registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
+          id: datasetId,
+          abstractDataType: 'tabular',
+          serializationType: 'csv',
+          storageType: 's3',
+          value: {
+            value: CSV_CONTENT,
+          },
+          metadata: {
+            delimiter: ',',
+            lineDelimiter: '\n',
+          },
+          title: 'CSV In Memory Dataset',
+          description: 'Dummy in memory dataset',
+        });
+      }).toThrowError(/doesn't match/);
     });
   });
 
@@ -97,14 +188,6 @@ describe('dataregistry', () => {
     it('should return true if dataset is registered', () => {
       expect(registry.hasDataset(datasetId)).toBeTruthy();
 
-      interface IS3CSV extends JSONObject {
-        value: null;
-      }
-
-      interface IS3CSVMetadata extends ICSVMetadata {
-        iamRoleArn: string;
-      }
-
       registry.registerDataset<IS3CSV, IS3CSVMetadata>({
         id: 's3://bucket/object',
         abstractDataType: 'tabular',
@@ -126,25 +209,47 @@ describe('dataregistry', () => {
     });
   });
 
-  describe('#updateDataset', () => {
-    it('should update version of existing dataset', () => {
-      registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
-        id: datasetId,
+  describe('#getDatasetSignal', () => {
+    it('should return the signal attached to a registered dataset', () => {
+      const signal: Signal<
+        any,
+        Dataset<IS3CSV, IS3CSVMetadata>
+      > = registry.getDatasetSignal('s3://bucket/object');
+      expect(signal).toBeInstanceOf(Signal);
+    });
+
+    it('should return the same signal even when dataset is updated', () => {
+      const signalA: Signal<
+        any,
+        Dataset<IS3CSV, IS3CSVMetadata>
+      > = registry.getDatasetSignal('s3://bucket/object');
+      registry.updateDataset<IS3CSV, IS3CSVMetadata>({
+        id: 's3://bucket/object',
         abstractDataType: 'tabular',
         serializationType: 'csv',
-        storageType: 'inmemory',
+        storageType: 's3',
         value: {
-          value: CSV_CONTENT,
+          value: null,
         },
         metadata: {
           delimiter: ',',
           lineDelimiter: '\n',
+          iamRoleArn: 'arn:aws:iam::account-id:role/role-name',
         },
-        title: 'CSV In Memory Dataset',
-        description: 'Dummy in memory dataset',
+        title: 'CSV S3 Dataset',
+        description: 'CSV in S3 dataset',
       });
-      const dataset = registry.getDataset(datasetId);
-      expect(dataset.version).toEqual(2);
+      const signalB: Signal<
+        any,
+        Dataset<IS3CSV, IS3CSVMetadata>
+      > = registry.getDatasetSignal('s3://bucket/object');
+      expect(signalB).toBe(signalA);
+    });
+
+    it('should throw an error if dataset is not registered', () => {
+      expect(() => {
+        registry.getDatasetSignal('');
+      }).toThrowError();
     });
   });
 });

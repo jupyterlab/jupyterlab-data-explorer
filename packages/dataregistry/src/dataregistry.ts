@@ -14,12 +14,6 @@ const registry = {
   registerDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
   ) {
-    dataset.version = dataset.version ?? 0;
-    if (dataset.version > 0) {
-      throw new Error(
-        'Use the updateDataset function to register a new version of the dataset.'
-      );
-    }
     _registerDataset(dataset);
   },
 
@@ -47,7 +41,6 @@ const registry = {
           `Storage type "${dataset.storageType}" doesn't match "${registeredDataset.storageType}"`
         );
       }
-      dataset.version = registeredDataset.version! + 1;
       _registerDataset(dataset);
       this.getDatasetSignal(dataset.id).emit(dataset);
     }
@@ -60,15 +53,22 @@ const registry = {
    */
   getDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
-    version?: number
+    version?: string
   ): Dataset<T, U> {
     const datasets = DatasetStore[id];
     if (!datasets) {
       throw new Error(`No dataset with id: ${id} exists.`);
-    } else if (version != null && datasets.length <= version) {
-      throw new Error(`No dataset with id: ${id}, version: ${version} exists.`);
+    } else if (version) {
+      const dataset = datasets.find((dataset) => dataset.version === version);
+      if (dataset) {
+        return dataset;
+      } else {
+        throw new Error(
+          `No dataset with id: ${id}, version: ${version} exists.`
+        );
+      }
     }
-    return DatasetStore[id][version ?? datasets.length - 1];
+    return datasets[datasets.length - 1];
   },
 
   /**
@@ -92,10 +92,15 @@ const registry = {
    */
   hasDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
-    version: number = 0
+    version?: string
   ): boolean {
     const datasets = DatasetStore[id];
-    return datasets && datasets.length > version;
+    return (
+      datasets &&
+      (version
+        ? datasets.findIndex((ds) => ds.version === version) !== -1
+        : true)
+    );
   },
 
   /**
@@ -136,8 +141,32 @@ const registry = {
     );
   },
 
-  /* TODO: Placeholder to query datasets by datatype, serialization type and storage type */
-  queryDataset() {},
+  /**
+   * Returns datasets that match the passed abstract data type,
+   * serialization type, and storage type.
+   * @param abstractDataType
+   * @param serializationType
+   * @param storageType
+   */
+  queryDataset(
+    abstractDataType: string,
+    serializationType: string,
+    storageType: string
+  ) {
+    const datasets = [];
+    for (const id in DatasetStore) {
+      const versions = DatasetStore[id];
+      const dataset = versions[versions.length - 1];
+      if (
+        dataset.abstractDataType === abstractDataType &&
+        dataset.serializationType === serializationType &&
+        dataset.storageType === storageType
+      ) {
+        datasets.push(dataset);
+      }
+    }
+    return datasets;
+  },
 };
 
 function _registerDataset<T extends JSONValue, U extends JSONValue>(
@@ -148,7 +177,6 @@ function _registerDataset<T extends JSONValue, U extends JSONValue>(
       `Dataset with id: ${dataset.id}, version: ${dataset.version} already exists.`
     );
   } else {
-    dataset.version = dataset.version ?? 0;
     if (!DatasetStore[dataset.id]) {
       DatasetStore[dataset.id] = [dataset];
       SignalsStore[dataset.id] = new Signal<any, Dataset<T, U>>(registry);

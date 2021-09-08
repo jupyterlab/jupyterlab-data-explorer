@@ -24,7 +24,7 @@ describe('dataregistry', () => {
   }
 
   describe('#registerDataset', () => {
-    it('should register a dataset with no version passed', () => {
+    it('should register a dataset', () => {
       registry.registerDataset<IInMemoryCSV, ICSVMetadata>({
         id: datasetId,
         abstractDataType: 'tabular',
@@ -39,6 +39,7 @@ describe('dataregistry', () => {
         },
         title: 'CSV In Memory Dataset',
         description: 'Dummy in memory dataset',
+        version: '1.0',
       });
     });
 
@@ -61,31 +62,10 @@ describe('dataregistry', () => {
         });
       }).toThrowError(/already exists/);
     });
-
-    it('should throw an error with version > 0 passed', () => {
-      expect(() => {
-        registry.registerDataset<IInMemoryCSV, ICSVMetadata>({
-          id: datasetId,
-          abstractDataType: 'tabular',
-          serializationType: 'csv',
-          storageType: 'inmemory',
-          value: {
-            value: CSV_CONTENT,
-          },
-          metadata: {
-            delimiter: ',',
-            lineDelimiter: '\n',
-          },
-          title: 'CSV In Memory Dataset',
-          description: 'Dummy in memory dataset',
-          version: 1,
-        });
-      }).toThrowError(/Use the updateDataset/);
-    });
   });
 
   describe('#updateDataset', () => {
-    it('should update version of existing dataset', () => {
+    it('should update an existing dataset', () => {
       registry.updateDataset<IInMemoryCSV, ICSVMetadata>({
         id: datasetId,
         abstractDataType: 'tabular',
@@ -100,6 +80,7 @@ describe('dataregistry', () => {
         },
         title: 'CSV In Memory Dataset',
         description: 'Dummy in memory dataset',
+        version: '2.0',
       });
     });
 
@@ -168,15 +149,15 @@ describe('dataregistry', () => {
     it('should return the last registered version of the dataset', () => {
       const dataset: Dataset<IInMemoryCSV, ICSVMetadata> =
         registry.getDataset(datasetId);
-      expect(dataset.version).toEqual(1);
+      expect(dataset.version).toEqual('2.0');
     });
 
     it('should return the dataset corresponding to the version no passed', () => {
       const dataset: Dataset<IInMemoryCSV, ICSVMetadata> = registry.getDataset(
         datasetId,
-        0
+        '1.0'
       );
-      expect(dataset.version).toEqual(0);
+      expect(dataset.version).toEqual('1.0');
     });
   });
 
@@ -203,6 +184,7 @@ describe('dataregistry', () => {
         },
         title: 'CSV S3 Dataset',
         description: 'CSV in S3 dataset',
+        version: '1.0',
       });
 
       expect(registry.hasDataset('s3://bucket/object')).toBeTruthy();
@@ -238,6 +220,7 @@ describe('dataregistry', () => {
         },
         title: 'CSV S3 Dataset',
         description: 'CSV in S3 dataset',
+        version: '2.0',
       });
       const signalB: Signal<
         any,

@@ -34,5 +34,5 @@ export interface Dataset<T extends JSONValue, U extends JSONValue> {
   title: string;
   description: string;
   tags?: { [key: string]: string };
-  version?: number;
+  version?: string;
 }

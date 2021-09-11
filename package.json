@@ -6,7 +6,7 @@
     ]
   },
   "scripts": {
-    "build": "jlpm && lerna bootstrap --hoist && jlpm run build:packages && jlpm run build:packages:post && jlpm run link:packages",
+    "build": "jlpm && lerna bootstrap --hoist && jlpm run build:packages && jlpm run link:packages",
     "build:packages": "tsc --build packages/*",
     "build:packages:post": "lerna run postBuild",
     "build:watch": "jlpm run build:packages --watch --listEmittedFiles",

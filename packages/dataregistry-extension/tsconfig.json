@@ -11,9 +11,6 @@
   "references": [
     {
       "path": "../dataregistry"
-    },
-    {
-      "path": "../dataregistry-registry-extension"
     }
   ]
 }

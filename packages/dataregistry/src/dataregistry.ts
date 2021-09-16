@@ -149,19 +149,25 @@ const registry = {
    * @param storageType
    */
   queryDataset(
-    abstractDataType: string,
-    serializationType: string,
-    storageType: string
+    abstractDataType?: string,
+    serializationType?: string,
+    storageType?: string
   ) {
     const datasets = [];
     for (const id in DatasetStore) {
       const versions = DatasetStore[id];
       const dataset = versions[versions.length - 1];
-      if (
-        dataset.abstractDataType === abstractDataType &&
-        dataset.serializationType === serializationType &&
-        dataset.storageType === storageType
-      ) {
+      let include = true;
+      if (abstractDataType) {
+        include = dataset.abstractDataType === abstractDataType;
+      }
+      if (serializationType) {
+        include = include && dataset.serializationType === serializationType;
+      }
+      if (storageType) {
+        include = include && dataset.storageType === storageType;
+      }
+      if (include) {
         datasets.push(dataset);
       }
     }

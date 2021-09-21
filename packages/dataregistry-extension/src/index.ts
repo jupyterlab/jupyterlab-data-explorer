@@ -10,6 +10,8 @@ import { DatasetPanel } from './dataset-panel';
 import { JSONObject } from '@lumino/coreutils';
 import registry from '@jupyterlab/dataregistry/lib/dataregistry';
 import { buildIcon } from '@jupyterlab/ui-components';
+import { INotebookTracker } from '@jupyterlab/notebook';
+import { JSONValue } from '@jupyterlab/dataregistry/lib/json';
 
 /**
  * Initialization data for the @jupyterlab/dataregistry-extension extension.
@@ -17,12 +19,13 @@ import { buildIcon } from '@jupyterlab/ui-components';
 const plugin: JupyterFrontEndPlugin<void> = {
   id: '@jupyterlab/dataregistry-extension:plugin',
   autoStart: true,
-  requires: [ISettingRegistry, ITranslator, ILabShell],
+  requires: [ISettingRegistry, ITranslator, ILabShell, INotebookTracker],
   activate: (
     app: JupyterFrontEnd,
     settingRegistry: ISettingRegistry | null,
     translator: ITranslator,
-    labShell: ILabShell
+    labShell: ILabShell,
+    notebookTracker: INotebookTracker
   ) => {
     console.log(
       'JupyterLab extension @jupyterlab/dataregistry-extension is activated!'
@@ -45,7 +48,11 @@ const plugin: JupyterFrontEndPlugin<void> = {
         });
     }
     registerDatasets();
-    const panel = new DatasetPanel({ datasets: registry.queryDataset() });
+    const panel = new DatasetPanel({
+      datasets: registry.queryDataset(),
+      notebookTracker,
+      app,
+    });
     panel.title.icon = buildIcon;
     panel.title.caption = trans.__('Dataset Registry');
     panel.node.setAttribute('role', 'region');
@@ -57,10 +64,6 @@ const plugin: JupyterFrontEndPlugin<void> = {
 export default plugin;
 
 function registerDatasets() {
-  interface IInMemoryCSV extends JSONObject {
-    value: string;
-  }
-
   interface ICSVMetadata extends JSONObject {
     delimiter: string;
     lineDelimiter: string;
@@ -68,22 +71,17 @@ function registerDatasets() {
   const CSV_CONTENT = 'header1,header2\nvalue1,value2';
   const datasetId = '1234567890';
 
-  interface IS3CSV extends JSONObject {
-    value: null;
-  }
-
   interface IS3CSVMetadata extends ICSVMetadata {
-    iamRoleArn: string;
+    bucket: string;
+    filename: string;
   }
 
-  registry.registerDataset<IInMemoryCSV, ICSVMetadata>({
+  registry.registerDataset<JSONValue, ICSVMetadata>({
     id: datasetId,
     abstractDataType: 'tabular',
     serializationType: 'csv',
     storageType: 'inmemory',
-    value: {
-      value: CSV_CONTENT,
-    },
+    value: CSV_CONTENT,
     metadata: {
       delimiter: ',',
       lineDelimiter: '\n',
@@ -93,18 +91,17 @@ function registerDatasets() {
     version: '1.0',
   });
 
-  registry.registerDataset<IS3CSV, IS3CSVMetadata>({
+  registry.registerDataset<JSONValue, IS3CSVMetadata>({
     id: 's3://bucket/object',
     abstractDataType: 'tabular',
     serializationType: 'csv',
     storageType: 's3',
-    value: {
-      value: null,
-    },
+    value: null,
     metadata: {
       delimiter: ',',
       lineDelimiter: '\n',
-      iamRoleArn: 'arn:aws:iam::account-id:role/role-name',
+      bucket: 'bucket',
+      filename: 'filename',
     },
     title: 'CSV S3 Dataset',
     description: 'CSV in S3 dataset',

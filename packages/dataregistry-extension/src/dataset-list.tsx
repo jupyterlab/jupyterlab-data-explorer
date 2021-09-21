@@ -9,12 +9,17 @@ import { Dataset } from '@jupyterlab/dataregistry';
 export const DatasetListComponent = (
   options: DatasetList.IOptions
 ): JSX.Element => {
+  const onClick = (dataset: Dataset<any, any>) => {
+    if (options.onClick) {
+      options.onClick(dataset);
+    }
+  };
   return (
     <div>
       <ul>
         {options.datasets.map((dataset) => {
           return (
-            <li key={dataset.id}>
+            <li key={dataset.id} onClick={(e) => onClick(dataset)}>
               <span>{dataset.title}</span>
               <span>
                 {dataset.abstractDataType}, {dataset.serializationType},
@@ -47,5 +52,6 @@ export class DatasetList extends ReactWidget {
 namespace DatasetList {
   export interface IOptions {
     datasets: Dataset<any, any>[];
+    onClick?: Function;
   }
 }

@@ -15,6 +15,7 @@ const registry = {
     dataset: Dataset<T, U>
   ) {
     _registerDataset(dataset);
+    this.datasetAdded.emit(dataset);
   },
 
   /**
@@ -43,6 +44,7 @@ const registry = {
       }
       _registerDataset(dataset);
       this.getDatasetSignal(dataset.id).emit(dataset);
+      this.datasetUpdated.emit(dataset);
     }
   },
 
@@ -121,6 +123,7 @@ const registry = {
     const key = `${abstractDataType}:${serializationType}:${storageType}`;
     const actions = CommandsStore[key] || new Set();
     CommandsStore[key] = actions.add(commandId);
+    this.commandAdded.emit(commandId);
   },
 
   /**
@@ -173,6 +176,9 @@ const registry = {
     }
     return datasets;
   },
+  datasetAdded: new Signal<any, Dataset<any, any>>(this),
+  datasetUpdated: new Signal<any, Dataset<any, any>>(this),
+  commandAdded: new Signal<any, String>(this),
 };
 
 function _registerDataset<T extends JSONValue, U extends JSONValue>(

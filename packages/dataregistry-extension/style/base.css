@@ -3,3 +3,32 @@
 	color: var(--jp-ui-font-color1);
 	font-size: var(--jp-ui-font-size1);
 }
+
+.jp-dataset-panel li {
+	margin-bottom: 15px;
+}
+
+.jp-dataset-panel table {
+	border-collapse: collapse;
+	width: 100%;
+	text-align: left;
+}
+
+.jp-dataset-panel table thead {
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+	box-shadow: var(--jp-toolbar-box-shadow);
+}
+
+.jp-dataset-panel thead th {
+	padding: 4px 12px 2px 12px;
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-dataset-panel tbody td {
+	padding: 4px 12px 2px 12px;
+	border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-Dataset-list-item.selected {
+	background-color: var(--jp-inverse-layout-color3);
+}

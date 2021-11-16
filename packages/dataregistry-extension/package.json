@@ -55,6 +55,7 @@
     "@jupyterlab/translation": "^3.1.11",
     "@jupyterlab/ui-components": "^3.1.11",
     "@lumino/domutils": "^1.5.2",
+    "@lumino/signaling": "^1.8.0",
     "@lumino/widgets": "^1.26.2"
   },
   "devDependencies": {

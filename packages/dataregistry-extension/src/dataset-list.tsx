@@ -1,6 +1,6 @@
-import { ReactWidget } from '@jupyterlab/apputils';
 import React from 'react';
 import { Dataset } from '@jupyterlab/dataregistry';
+import { IModel } from './model';
 
 /**
  * React component for the dataset list
@@ -9,49 +9,47 @@ import { Dataset } from '@jupyterlab/dataregistry';
 export const DatasetListComponent = (
   options: DatasetList.IOptions
 ): JSX.Element => {
-  const onClick = (dataset: Dataset<any, any>) => {
-    if (options.onClick) {
-      options.onClick(dataset);
-    }
+  const onContextMenu = (dataset: Dataset<any, any>) => {
+    options.model.dataset = dataset;
   };
+
   return (
     <div>
-      <ul>
-        {options.datasets.map((dataset) => {
-          return (
-            <li key={dataset.id} onClick={(e) => onClick(dataset)}>
-              <span>{dataset.title}</span>
-              <span>
-                {dataset.abstractDataType}, {dataset.serializationType},
-                {dataset.storageType}
-              </span>
-            </li>
-          );
-        })}
-      </ul>
+      <table className={'jp-Dataset-list'}>
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Type</th>
+            <th>Storage</th>
+          </tr>
+        </thead>
+        <tbody>
+          {options.datasets.map((dataset) => {
+            return (
+              <tr
+                className={`jp-Dataset-list-item`}
+                data-dataset-id={dataset.id}
+                data-adt={dataset.abstractDataType}
+                data-sert={dataset.serializationType}
+                data-stot={dataset.storageType}
+                key={dataset.id}
+                onContextMenu={(e) => onContextMenu(dataset)}
+              >
+                <td>{dataset.title}</td>
+                <td>{dataset.abstractDataType}</td>
+                <td>{dataset.storageType}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
     </div>
   );
 };
 
-/**
- * Widget to display the datasets in list format
- */
-export class DatasetList extends ReactWidget {
-  readonly _datasets: Dataset<any, any>[];
-  constructor(options: DatasetList.IOptions) {
-    super();
-    this.addClass('jp-dataset-list');
-    this._datasets = options.datasets;
-  }
-
-  render(): JSX.Element {
-    return <DatasetListComponent datasets={this._datasets} />;
-  }
-}
-
 namespace DatasetList {
   export interface IOptions {
     datasets: Dataset<any, any>[];
-    onClick?: Function;
+    model: IModel;
   }
 }

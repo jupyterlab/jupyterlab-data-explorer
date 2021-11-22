@@ -1,6 +1,6 @@
 import React from 'react';
 import { Dataset } from '@jupyterlab/dataregistry';
-import { IModel } from './model';
+import { IDatasetListingModel } from './model';
 
 /**
  * React component for the dataset list
@@ -10,7 +10,7 @@ export const DatasetListComponent = (
   options: DatasetList.IOptions
 ): JSX.Element => {
   const onContextMenu = (dataset: Dataset<any, any>) => {
-    options.model.dataset = dataset;
+    options.model.selectedDataset = dataset;
   };
 
   return (
@@ -24,7 +24,7 @@ export const DatasetListComponent = (
           </tr>
         </thead>
         <tbody>
-          {options.datasets.map((dataset) => {
+          {options.model.datasets().map((dataset) => {
             return (
               <tr
                 className={`jp-Dataset-list-item`}
@@ -49,7 +49,6 @@ export const DatasetListComponent = (
 
 namespace DatasetList {
   export interface IOptions {
-    datasets: Dataset<any, any>[];
-    model: IModel;
+    model: IDatasetListingModel;
   }
 }

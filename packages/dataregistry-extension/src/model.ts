@@ -1,27 +1,9 @@
 import { Dataset } from '@jupyterlab/dataregistry';
-import { ISignal, Signal } from '@lumino/signaling';
+import { Signal } from '@lumino/signaling';
 import registry from '@jupyterlab/dataregistry/lib/dataregistry';
 
-export class Model implements IModel {
-  constructor() {}
-
-  get dataset(): Dataset<any, any> {
-    return this._dataset!;
-  }
-
-  get datasetChanged(): ISignal<this, Dataset<any, any>> {
-    return this._datasetChanged;
-  }
-
-  set dataset(value: Dataset<any, any>) {
-    if (this._dataset.id === value.id) {
-      return;
-    }
-    this._dataset = value;
-    this._datasetChanged.emit(this._dataset);
-  }
-
-  private _dataset: Dataset<any, any> = {
+export class DatasetListingModel implements IDatasetListingModel {
+  private _selectedDataset: Dataset<any, any> = {
     id: '',
     storageType: '',
     abstractDataType: '',
@@ -31,29 +13,21 @@ export class Model implements IModel {
     title: '',
     description: '',
   };
-
-  private _datasetChanged = new Signal<this, Dataset<any, any>>(this);
-}
-
-export interface IModel {
-  dataset: Dataset<any, any>;
-  datasetChanged: ISignal<IModel, Dataset<any, any>>;
-}
-
-export class DatasetListingModel implements IDatasetListingModel {
   private _datasets: Dataset<any, any>[];
   private _filter?: IDatasetFilter;
+  readonly datasetsChanged: Signal<any, any>;
 
   constructor(datasets: Dataset<any, any>[]) {
     this._datasets = datasets;
-    registry.datasetAdded.connect(this._addDataset);
-    registry.datasetUpdated.connect(this._updateDataset);
-    registry.commandAdded.connect(this._commandAdded);
+    registry.datasetAdded.connect(this._addDataset.bind(this));
+    registry.datasetUpdated.connect(this._updateDataset.bind(this));
+    registry.commandAdded.connect(this._commandAdded.bind(this));
+    this.datasetsChanged = new Signal(this);
   }
 
-  _addDataset(dataset: Dataset<any, any>) {
+  _addDataset(sender: any, dataset: Dataset<any, any>) {
     this._datasets.push(dataset);
-    // notify
+    this.datasetsChanged.emit(null);
   }
 
   _updateDataset(dataset: Dataset<any, any>) {
@@ -69,7 +43,7 @@ export class DatasetListingModel implements IDatasetListingModel {
   set filter(value: IDatasetFilter) {
     if (!this._filter || this._filter.value !== value.value) {
       this._filter = value;
-      // update the
+      this.datasetsChanged.emit(null);
     }
   }
 
@@ -83,11 +57,25 @@ export class DatasetListingModel implements IDatasetListingModel {
       return [...this._datasets];
     }
   }
+
+  get selectedDataset(): Dataset<any, any> {
+    return this._selectedDataset;
+  }
+
+  set selectedDataset(dataset: Dataset<any, any>) {
+    if (this._selectedDataset.id === dataset.id) {
+      return;
+    }
+    this._selectedDataset = dataset;
+    this.datasetsChanged.emit(null);
+  }
 }
 
-interface IDatasetListingModel {
+export interface IDatasetListingModel {
   selectedDataset?: Dataset<any, any>;
   filter: IDatasetFilter;
+  datasets(): Dataset<any, any>[];
+  datasetsChanged: Signal<any, any>;
 }
 
 interface IDatasetFilter {

@@ -1,12 +1,69 @@
 import { Dataset } from './dataset';
-import { JSONValue } from '@lumino/coreutils';
+import { JSONValue, Token } from '@lumino/coreutils';
 import { Signal } from '@lumino/signaling';
 
 const DatasetStore: { [key: string]: Dataset<any, any>[] } = {};
 const CommandsStore: { [key: string]: Set<string> } = {};
 const SignalsStore: { [key: string]: Signal<any, any> } = {};
 
-const registry = {
+export interface IDataRegistry {
+  registerDataset<T extends JSONValue, U extends JSONValue>(
+    dataset: Dataset<T, U>
+  ): void;
+
+  updateDataset<T extends JSONValue, U extends JSONValue>(
+    dataset: Dataset<T, U>
+  ): void;
+
+  getDataset<T extends JSONValue, U extends JSONValue>(
+    id: string,
+    version?: string
+  ): Dataset<T, U>;
+
+  getDatasetSignal<T extends JSONValue, U extends JSONValue>(
+    id: string
+  ): Signal<any, Dataset<T, U>>;
+
+  hasDataset<T extends JSONValue, U extends JSONValue>(
+    id: string,
+    version?: string
+  ): boolean;
+
+  registerCommand(
+    commandId: string,
+    abstractDataType: string,
+    serializationType: string,
+    storageType: string
+  ): void;
+
+  getCommands(
+    abstractDataType: string,
+    serializationType: string,
+    storageType: string
+  ): Set<string> | [];
+
+  queryDataset(
+    abstractDataType?: string,
+    serializationType?: string,
+    storageType?: string
+  ): Dataset<any, any>[] | [];
+
+  readonly datasetAdded: Signal<any, Dataset<any, any>>;
+  readonly datasetUpdated: Signal<any, Dataset<any, any>>;
+  readonly commandAdded: Signal<any, String>;
+}
+
+class Registry implements IDataRegistry {
+  readonly datasetAdded: Signal<any, Dataset<any, any>>;
+  readonly datasetUpdated: Signal<any, Dataset<any, any>>;
+  readonly commandAdded: Signal<any, String>;
+
+  constructor() {
+    this.datasetAdded = new Signal(this);
+    this.datasetUpdated = new Signal(this);
+    this.commandAdded = new Signal(this);
+  }
+
   /**
    * Registers a dataset, throws an exception if dataset already exists.
    * @param dataset The dataset to register
@@ -16,7 +73,7 @@ const registry = {
   ) {
     _registerDataset(dataset);
     this.datasetAdded.emit(dataset);
-  },
+  }
 
   /**
    * Updates a registered dataset, bumps up the version
@@ -46,7 +103,7 @@ const registry = {
       this.getDatasetSignal(dataset.id).emit(dataset);
       this.datasetUpdated.emit(dataset);
     }
-  },
+  }
 
   /**
    * Returns last registered version of dataset if no version is passed
@@ -71,7 +128,7 @@ const registry = {
       }
     }
     return datasets[datasets.length - 1];
-  },
+  }
 
   /**
    * Returns dataset signal for subscribing to changes in dataset
@@ -85,7 +142,7 @@ const registry = {
     } else {
       throw new Error(`No dataset registered with id: ${id}`);
     }
-  },
+  }
 
   /**
    * Returns true if dataset exists, false otherwise
@@ -103,7 +160,7 @@ const registry = {
         ? datasets.findIndex((ds) => ds.version === version) !== -1
         : true)
     );
-  },
+  }
 
   /**
    * Registers a command for an abstract data type, serialization type,
@@ -124,7 +181,7 @@ const registry = {
     const actions = CommandsStore[key] || new Set();
     CommandsStore[key] = actions.add(commandId);
     this.commandAdded.emit(commandId);
-  },
+  }
 
   /**
    * Get list of registered commands
@@ -136,13 +193,13 @@ const registry = {
     abstractDataType: string,
     serializationType: string,
     storageType: string
-  ) {
+  ): Set<string> | [] {
     return (
       CommandsStore[
         `${abstractDataType}:${serializationType}:${storageType}`
       ] || []
     );
-  },
+  }
 
   /**
    * Returns datasets that match the passed abstract data type,
@@ -155,7 +212,7 @@ const registry = {
     abstractDataType?: string,
     serializationType?: string,
     storageType?: string
-  ) {
+  ): Dataset<any, any>[] | [] {
     const datasets = [];
     for (const id in DatasetStore) {
       const versions = DatasetStore[id];
@@ -175,11 +232,12 @@ const registry = {
       }
     }
     return datasets;
-  },
-  datasetAdded: new Signal<any, Dataset<any, any>>(this),
-  datasetUpdated: new Signal<any, Dataset<any, any>>(this),
-  commandAdded: new Signal<any, String>(this),
-};
+  }
+}
+
+const registry = new Registry();
+
+console.log('Created a new registry');
 
 function _registerDataset<T extends JSONValue, U extends JSONValue>(
   dataset: Dataset<T, U>
@@ -197,5 +255,9 @@ function _registerDataset<T extends JSONValue, U extends JSONValue>(
     }
   }
 }
+
+export const IDataRegistry = new Token<IDataRegistry>(
+  '@jupyterlab/dataregistry:IDataRegistry'
+);
 
 export default registry;

@@ -14,7 +14,7 @@ export class DatasetListingModel implements IDatasetListingModel {
     description: '',
   };
   private _datasets: Dataset<any, any>[];
-  private _filter?: IDatasetFilter;
+  private _filter?: string;
   readonly datasetsChanged: Signal<any, any>;
 
   constructor(datasets: Dataset<any, any>[]) {
@@ -40,18 +40,18 @@ export class DatasetListingModel implements IDatasetListingModel {
 
   _commandAdded(commandId: string) {}
 
-  set filter(value: IDatasetFilter) {
-    if (!this._filter || this._filter.value !== value.value) {
+  set filter(value: string) {
+    if (!this._filter || this._filter !== value) {
       this._filter = value;
       this.datasetsChanged.emit(null);
     }
   }
 
   datasets(): Dataset<any, any>[] {
-    if (this._filter && this._filter.value) {
-      const value = this._filter.value;
+    if (this._filter && this._filter) {
+      const value = this._filter.toLowerCase();
       return this._datasets.filter(
-        (dataset) => dataset.title.indexOf(value) !== -1
+        (dataset) => dataset.title.toLowerCase().indexOf(value) !== -1
       );
     } else {
       return [...this._datasets];
@@ -73,12 +73,7 @@ export class DatasetListingModel implements IDatasetListingModel {
 
 export interface IDatasetListingModel {
   selectedDataset?: Dataset<any, any>;
-  filter: IDatasetFilter;
+  filter: string;
   datasets(): Dataset<any, any>[];
   datasetsChanged: Signal<any, any>;
-}
-
-interface IDatasetFilter {
-  value: string;
-  qualifier?: 'title' | 'adt' | 'sert' | 'stot';
 }

@@ -3,7 +3,9 @@ import React from 'react';
 export const DatasetAddComponent = (options: DatasetAdd.IOptions) => {
   return (
     <button
-      onClick={(e) => {
+      title="Adds code snippet to register new dataset"
+      className="jp-mod-styled jp-mod-accept"
+      onClick={(e: React.MouseEvent<HTMLElement, MouseEvent>) => {
         options.onClick(e);
       }}
     >

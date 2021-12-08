@@ -1,4 +1,4 @@
-import { getTemplate } from './templates';
+import { getCreateTemplate, getTemplate } from './templates';
 import { ElementExt } from '@lumino/domutils';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { INotebookTracker } from '@jupyterlab/notebook';
@@ -7,6 +7,7 @@ import registry from '@jupyterlab/dataregistry/lib/dataregistry';
 
 export const CommandIds = {
   view: 'dataregistry:view-dataset',
+  create: 'dataregistry:create-dataset',
 };
 
 export const addCommandsAndMenu = (
@@ -31,6 +32,41 @@ export const addCommandsAndMenu = (
             cell: {
               cell_type: 'code',
               source: getTemplate(model.selectedDataset!),
+              metadata: {},
+            },
+          });
+          nbModel.cells.insert(notebook.activeCellIndex + 1, cell);
+          notebook.activeCellIndex++;
+          notebook.deselectAll();
+          const { activeCell, node } = notebook;
+
+          if (state.wasFocused || notebook.mode === 'edit') {
+            notebook.activate();
+          }
+          ElementExt.scrollIntoViewIfNeeded(node, activeCell!.node);
+        }
+      }
+    },
+  });
+
+  app.commands.addCommand(CommandIds.create, {
+    label: 'View dataset',
+    caption: 'Adds code to view dataset in a new cell',
+    execute: (args) => {
+      if (notebookTracker) {
+        notebookTracker;
+        const widget = notebookTracker.currentWidget;
+        const notebook = widget!.content;
+        if (notebook.model) {
+          const state = {
+            wasFocused: notebook.node.contains(document.activeElement),
+            activeCell: notebook.activeCell,
+          };
+          const nbModel = notebook.model;
+          const cell = nbModel.contentFactory.createCodeCell({
+            cell: {
+              cell_type: 'code',
+              source: getCreateTemplate(),
               metadata: {},
             },
           });

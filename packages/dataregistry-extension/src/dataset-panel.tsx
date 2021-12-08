@@ -6,6 +6,7 @@ import { DatasetAddComponent } from './dataset-add';
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { IDatasetListingModel } from './model';
+import { CommandIds } from './commands';
 
 export class DatasetPanel extends ReactWidget {
   readonly _title?: string;
@@ -17,20 +18,31 @@ export class DatasetPanel extends ReactWidget {
     super();
     this.addClass('jp-dataset-panel');
     this.id = 'dataset-panel';
-    this._title = options.title ?? 'Data Panel';
+    this._title = options.title ?? 'Datasets';
     this._description =
       options.description ??
       'Add and view data associated with your notebooks.';
     this._model = options.model;
+    this._app = options.app;
+  }
+
+  handleAdd(e: any) {
+    if (this._app) {
+      this._app.commands.execute(CommandIds.create);
+    }
   }
 
   render(): JSX.Element {
     return (
       <div>
-        <h2>{this._title}</h2>
-        <p>{this._description}</p>
-        <DatasetSearchComponent />
-        <DatasetAddComponent onClick={(e: any) => console.log(e)} />
+        <div className="jp-dataset-header">
+          <h2>{this._title}</h2>
+          <p>{this._description}</p>
+        </div>
+        <div className="jp-dataset-search">
+          <DatasetSearchComponent model={this._model} />
+          <DatasetAddComponent onClick={(e: any) => this.handleAdd(e)} />
+        </div>
         <UseSignal signal={this._model.datasetsChanged}>
           {() => <DatasetListComponent model={this._model} />}
         </UseSignal>
@@ -44,5 +56,6 @@ namespace DatasetPanel {
     title?: string;
     description?: string;
     model: IDatasetListingModel;
+    app: JupyterFrontEnd;
   }
 }

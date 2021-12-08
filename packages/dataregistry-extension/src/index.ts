@@ -55,6 +55,7 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
     const model = new DatasetListingModel(registry.queryDataset());
     const panel = new DatasetPanel({
       model,
+      app,
     });
     panel.title.icon = spreadsheetIcon;
 

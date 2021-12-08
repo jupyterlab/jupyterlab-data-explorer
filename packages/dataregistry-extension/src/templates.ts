@@ -37,3 +37,23 @@ export const getTemplate = (dataset: Dataset<any, any>) => {
     );
   }
 };
+
+export const getCreateTemplate = () => {
+  const tpl = [
+    'from dataregistry import dataset',
+    'ds = dataset.Dataset(',
+    '    id="0",',
+    '    abstract_data_type="tabular",',
+    '    serialization_type="tsv",',
+    '    storage_type="immemory",',
+    '    title="In memory dataset from python",',
+    '    description="In memory dataset from python",',
+    '    value="header1\\theader2\\nvalue1\\tvalue2",',
+    '    metadata={',
+    '        "delimiter": "\\t",',
+    '        "lineDemiliter": "\\n"',
+    '    }',
+    ')',
+  ];
+  return tpl.join('\n');
+};

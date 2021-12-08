@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Dataset } from '@jupyterlab/dataregistry';
 import { IDatasetListingModel } from './model';
 
@@ -9,8 +9,16 @@ import { IDatasetListingModel } from './model';
 export const DatasetListComponent = (
   options: DatasetList.IOptions
 ): JSX.Element => {
+  const [selectedId, setSelectedId] = useState(
+    options.model!.selectedDataset ? options.model!.selectedDataset.id : ''
+  );
+
   const onContextMenu = (dataset: Dataset<any, any>) => {
     options.model.selectedDataset = dataset;
+  };
+
+  const onClick = (dataset: Dataset<any, any>) => {
+    setSelectedId(dataset.id);
   };
 
   return (
@@ -27,13 +35,18 @@ export const DatasetListComponent = (
           {options.model.datasets().map((dataset) => {
             return (
               <tr
-                className={`jp-Dataset-list-item`}
+                className={
+                  selectedId === dataset.id
+                    ? 'selected jp-Dataset-list-item'
+                    : 'jp-Dataset-list-item'
+                }
                 data-dataset-id={dataset.id}
                 data-adt={dataset.abstractDataType}
                 data-sert={dataset.serializationType}
                 data-stot={dataset.storageType}
                 key={dataset.id}
                 onContextMenu={(e) => onContextMenu(dataset)}
+                onClick={() => onClick(dataset)}
               >
                 <td>{dataset.title}</td>
                 <td>{dataset.abstractDataType}</td>

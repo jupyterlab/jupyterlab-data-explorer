@@ -29,6 +29,35 @@
 	border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
 }
 
-.jp-Dataset-list-item.selected {
-	background-color: var(--jp-inverse-layout-color3);
+.jp-Dataset-list-item.selected,
+.jp-Dataset-list-item.selected:hover {
+	background-color: var(--jp-brand-color1);
+	color: var(--jp-layout-color2);
+}
+
+.jp-Dataset-list-item:hover {
+	background-color: var(--jp-layout-color2);
+}
+
+.jp-dataset-header {
+	padding: 0px 12px;
+	margin-bottom: 15px;
+}
+
+.jp-dataset-header h2 {
+	margin-bottom: 5px;
+}
+
+.jp-dataset-search {
+	display: flex;
+	gap: 12px;
+	padding: 0px 12px 15px;
+}
+
+.jp-dataset-search .jp-InputGroup {
+	width: 100%;
+}
+
+.jp-dataset-search button {
+	width: 120px;
 }

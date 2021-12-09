@@ -78,7 +78,7 @@
   "styleModule": "style/index.js",
   "jupyterlab": {
     "extension": true,
-    "mimeExtension": "./lib/mime-extension.js",
+    "mimeExtension": "lib/mime-extension.js",
     "outputDir": "dataregistry-extension/labextension",
     "schemaDir": "schema",
     "sharedPackages": {

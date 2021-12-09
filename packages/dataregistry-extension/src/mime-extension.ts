@@ -40,7 +40,7 @@ export class DatasetWidget extends Widget implements IRenderMime.IRenderer {
     const datasets = Array.isArray(data)
       ? data
       : [typeof data === 'string' ? JSON.parse(data) : data];
-    datasets.forEach((dataset) => {
+    datasets.forEach(dataset => {
       try {
         registry.registerCommand(
           CommandIds.view,
@@ -69,7 +69,7 @@ export class DatasetWidget extends Widget implements IRenderMime.IRenderer {
 export const rendererFactory: IRenderMime.IRendererFactory = {
   safe: true,
   mimeTypes: [MIME_TYPE],
-  createRenderer: (options) => new DatasetWidget(options),
+  createRenderer: options => new DatasetWidget(options)
 };
 
 /**
@@ -84,15 +84,15 @@ const extension: IRenderMime.IExtension = {
     {
       name: 'dataset',
       mimeTypes: [MIME_TYPE],
-      extensions: ['.dataset'],
-    },
+      extensions: ['.dataset']
+    }
   ],
   documentWidgetFactoryOptions: {
     name: 'dataset-viewer',
     primaryFileType: 'dataset',
     fileTypes: ['dataset'],
-    defaultFor: ['dataset'],
-  },
+    defaultFor: ['dataset']
+  }
 };
 
 export default extension;

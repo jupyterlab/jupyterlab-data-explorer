@@ -61,3 +61,24 @@
 .jp-dataset-search button {
 	width: 120px;
 }
+
+.jp-csv-widget table{
+	border-collapse: collapse;
+	width: 100%;
+	text-align: left;
+}
+
+.jp-csv-widget table thead {
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+	box-shadow: var(--jp-toolbar-box-shadow);
+}
+
+.jp-csv-widget thead th {
+	padding: 4px 12px 2px 12px;
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-csv-widget tbody td {
+	padding: 4px 12px 2px 12px;
+	border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}

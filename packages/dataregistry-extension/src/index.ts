@@ -87,6 +87,7 @@ function registerDatasets() {
   }
 
   registry.registerCommand(CommandIds.view, 'tabular', 'csv', 'inmemory');
+  registry.registerCommand(CommandIds.opencsv, 'tabular', 'csv', 'inmemory');
 
   registry.registerDataset<JSONValue, ICSVMetadata>({
     id: datasetId,

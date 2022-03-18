@@ -33,6 +33,6 @@ export interface Dataset<T extends JSONValue, U extends JSONValue> {
   metadata: U;
   title: string;
   description: string;
-  tags?: { [key: string]: string };
+  tags?: Set<string>;
   version?: string;
 }

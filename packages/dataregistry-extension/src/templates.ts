@@ -25,12 +25,22 @@ const S3CsvTemplate = (dataset: Dataset<any, any>): String[] => {
   ];
 };
 
+const HuggingFaceTemplate = (dataset: Dataset<any, any>): String[] => {
+  return [
+    'from datasets import load_dataset',
+    '',
+    `ds = load_dataset(\'${dataset.metadata.name}\', \'${dataset.metadata.config}\', split=\'${dataset.metadata.split}\')`,
+  ];
+};
+
 export const getTemplate = (dataset: Dataset<any, any>) => {
   const { storageType, serializationType } = dataset;
   if (storageType === 'inmemory' && serializationType === 'csv') {
     return InMemoryCsvTemplate(dataset).join('\n');
   } else if (storageType === 's3' && serializationType === 'csv') {
     return S3CsvTemplate(dataset).join('\n');
+  } else if (storageType === 'huggingface') {
+    return HuggingFaceTemplate(dataset).join('\n');
   } else {
     throw new Error(
       `Template not found for ${storageType}, ${serializationType}`

@@ -54,8 +54,22 @@ export interface IDataRegistry {
 }
 
 class Registry implements IDataRegistry {
+  /**
+   * This signal provides subscriptions to
+   * any datasets added to registry.
+   */
   readonly datasetAdded: Signal<any, Dataset<any, any>>;
+
+  /**
+   * This signal provides subscriptions to
+   * any updates to datasets.
+   */
   readonly datasetUpdated: Signal<any, Dataset<any, any>>;
+
+  /**
+   * This signal provides subscriptions to
+   * event when any command is registered.
+   */
   readonly commandAdded: Signal<any, String>;
 
   constructor() {
@@ -65,8 +79,12 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Registers a dataset, throws an exception if dataset already exists.
+   * Registers a dataset. Use {@link Registry#updateDataset}
+   * to update a registered dataset.
+   *
    * @param dataset The dataset to register
+   * @throws Throws an error if dataset with
+   * same id and version already exists.
    */
   registerDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
@@ -76,8 +94,12 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Updates a registered dataset, bumps up the version
+   * Updates a registered dataset, bumps up the version.
+   *
    * @param dataset The dataset to update
+   * @throws Throws an exception if any of abstractDataType,
+   * serializationType or storageType are different from
+   * registered values.
    */
   updateDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
@@ -106,9 +128,12 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Returns last registered version of dataset if no version is passed
+   * Returns last registered version of dataset if no version is passed.
+   *
    * @param id unique id dataset was registered with
    * @param version optional, specific dataset version
+   * @returns Dataset dataset
+   * @throws  Will throw an error if no matching dataset found
    */
   getDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
@@ -132,7 +157,12 @@ class Registry implements IDataRegistry {
 
   /**
    * Returns dataset signal for subscribing to changes in dataset
+   * See {@link https://jupyterlab.github.io/lumino/signaling/classes/signal.html|Signal}
+   * to learn more about use of signals to subscribe to changes in dataset.
+   *
    * @param id unique id used to register the dataset
+   * @returns {@link https://jupyterlab.github.io/lumino/signaling/classes/signal.html|Signal} signal instance associated with dataset
+   * @throws {Error} Will throw an error if
    */
   getDatasetSignal<T extends JSONValue, U extends JSONValue>(
     id: string
@@ -146,8 +176,10 @@ class Registry implements IDataRegistry {
 
   /**
    * Returns true if dataset exists, false otherwise
+   *
    * @param id unique id that was used to register the dataset
-   * @param version version that dataset was registered with (optional, defaults to 0)
+   * @param version version that dataset was registered with
+   * @returns {boolean} true if matching dataset exists
    */
   hasDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
@@ -163,13 +195,15 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Registers a command for an abstract data type, serialization type,
-   * and storage type. This can be used to get a list of commands that
-   * that a dataset can support.
+   * Registers a command for datasets with a set of abstract data type,
+   * serialization type, and storage type. This is useful for extension
+   * writers to associate specific dataset types with commands/actions
+   * that their extensions support.
+   *
    * @param commandId unique id of the command registered with the command registry
-   * @param abstractDataType
-   * @param serializationType
-   * @param storageType
+   * @param abstractDataType abstract data type
+   * @param serializationType serialization type
+   * @param storageType storage type
    */
   registerCommand(
     commandId: string,
@@ -184,10 +218,15 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Get list of registered commands
-   * @param abstractDataType
-   * @param serializationType
-   * @param storageType
+   * Get list of commands registered with a specific set of
+   * abstract data type, serialization type, and storage type.
+   * This is useful for extension writers to obtain only those commands
+   * that have been previously registered with the dataset type.
+   *
+   * @param abstractDataType abstract data type
+   * @param serializationType serialization type
+   * @param storageType storage type
+   * @returns {Set[string]|[]} set of registered commands
    */
   getCommands(
     abstractDataType: string,
@@ -202,11 +241,13 @@ class Registry implements IDataRegistry {
   }
 
   /**
-   * Returns datasets that match the passed abstract data type,
+   * Returns list of datasets that match the passed abstract data type,
    * serialization type, and storage type.
-   * @param abstractDataType
-   * @param serializationType
-   * @param storageType
+   *
+   * @param abstractDataType abstract data type to match
+   * @param serializationType serialization type to match
+   * @param storageType storage type to match
+   * @returns {Dataset[]|[]} list of matching datasets
    */
   queryDataset(
     abstractDataType?: string,
@@ -236,8 +277,6 @@ class Registry implements IDataRegistry {
 }
 
 const registry = new Registry();
-
-console.log('Created a new registry');
 
 function _registerDataset<T extends JSONValue, U extends JSONValue>(
   dataset: Dataset<T, U>

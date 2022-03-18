@@ -122,4 +122,49 @@ function registerDatasets() {
     description: 'CSV in S3 dataset',
     version: '1.0',
   });
+
+  registry.registerCommand(
+    CommandIds.openhuggingface,
+    'tabular',
+    'csv',
+    'huggingface'
+  );
 }
+
+/*const plugin1: JupyterFrontEndPlugin<void> = {
+  id: '@jupyterlab/dataregistry-extension:plugin',
+  autoStart: true,
+  requires: [IDataRegistry],
+  activate: (
+    app: JupyterFrontEnd,
+    registry: IDataRegistry
+  ) => {
+
+    interface ICSVMetadata extends JSONObject {
+      delimiter: string;
+      lineDelimiter: string;
+    }
+
+    interface IS3CSVMetadata extends ICSVMetadata {
+      bucket: string;
+      filename: string;
+    }
+
+    registry.registerDataset<JSONValue, IS3CSVMetadata>({
+      id: 's3://bucket/filename',
+      abstractDataType: 'tabular',
+      serializationType: 'csv',
+      storageType: 's3',
+      value: null,
+      metadata: {
+        delimiter: ',',
+        lineDelimiter: '\n',
+        bucket: 'bucket',
+        filename: 'filename',
+      },
+      title: 'CSV S3 Dataset',
+      description: 'CSV in S3 dataset',
+      version: '1.0',
+    });
+  }
+};*/

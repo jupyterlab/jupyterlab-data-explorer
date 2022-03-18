@@ -18,10 +18,9 @@ export class DatasetPanel extends ReactWidget {
     super();
     this.addClass('jp-dataset-panel');
     this.id = 'dataset-panel';
-    this._title = options.title ?? 'Datasets';
+    this._title = options.title ?? 'My Datasets';
     this._description =
-      options.description ??
-      'Add and view data associated with your notebooks.';
+      options.description ?? 'Datasets that you are actively working with.';
     this._model = options.model;
     this._app = options.app;
   }

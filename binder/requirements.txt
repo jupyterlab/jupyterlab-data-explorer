@@ -1,3 +1,0 @@
-pandas
-jupyterlab>=2.0
-vega_datasets

@@ -1,7 +1,0 @@
-{
-  "version": "independent",
-  "packages": ["packages/*"],
-  "npmClient": "jlpm",
-  "npmClientArgs": ["--no-lockfile"],
-  "useWorkspaces": true
-}

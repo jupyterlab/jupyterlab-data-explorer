@@ -1,0 +1,90 @@
+/*
+    See the JupyterLab Developer Guide for useful CSS Patterns:
+
+    https://jupyterlab.readthedocs.io/en/stable/developer/css.html
+*/
+
+.jp-dataset-panel {
+	background: var(--jp-layout-color1);
+	color: var(--jp-ui-font-color1);
+	font-size: var(--jp-ui-font-size1);
+}
+
+.jp-dataset-panel li {
+	margin-bottom: 15px;
+}
+
+.jp-dataset-panel table {
+	border-collapse: collapse;
+	width: 100%;
+	text-align: left;
+}
+
+.jp-dataset-panel table thead {
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+	box-shadow: var(--jp-toolbar-box-shadow);
+}
+
+.jp-dataset-panel thead th {
+	padding: 4px 12px 2px 12px;
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-dataset-panel tbody td {
+	padding: 4px 12px 2px 12px;
+	border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-Dataset-list-item.selected,
+.jp-Dataset-list-item.selected:hover {
+	background-color: var(--jp-brand-color1);
+	color: var(--jp-layout-color2);
+}
+
+.jp-Dataset-list-item:hover {
+	background-color: var(--jp-layout-color2);
+}
+
+.jp-dataset-header {
+	padding: 0px 12px;
+	margin-bottom: 15px;
+}
+
+.jp-dataset-header h2 {
+	margin-bottom: 5px;
+}
+
+.jp-dataset-search {
+	display: flex;
+	gap: 12px;
+	padding: 0px 12px 15px;
+}
+
+.jp-dataset-search .jp-InputGroup {
+	width: 100%;
+}
+
+.jp-dataset-search button {
+	width: 120px;
+}
+
+.jp-csv-widget table{
+	border-collapse: collapse;
+	width: 100%;
+	text-align: left;
+}
+
+.jp-csv-widget table thead {
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+	box-shadow: var(--jp-toolbar-box-shadow);
+}
+
+.jp-csv-widget thead th {
+	padding: 4px 12px 2px 12px;
+	border: var(--jp-border-width) solid var(--jp-border-color1);
+}
+
+.jp-csv-widget tbody td {
+	padding: 4px 12px 2px 12px;
+	border-bottom: var(--jp-border-width) solid var(--jp-border-color1);
+}

@@ -1,67 +1,127 @@
 {
-  "private": true,
-  "workspaces": {
-    "packages": [
-      "packages/*"
-    ]
+  "name": "jupyterlab-dataregistry",
+  "version": "4.0.0",
+  "description": "Datasets as first class entities in Juptyerlab",
+  "keywords": [
+    "jupyter",
+    "jupyterlab",
+    "jupyterlab-extension"
+  ],
+  "homepage": "https://github.com/jupyterlab/jupyterlab-data-explorer",
+  "bugs": {
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer/issues"
+  },
+  "license": "BSD-3-Clause",
+  "author": {
+    "name": "Project Jupyter",
+    "email": "jupyter@googlegroups.com"
+  },
+  "files": [
+    "lib/**/*.{d.ts,eot,gif,html,jpg,js,js.map,json,png,svg,woff2,ttf}",
+    "style/**/*.{css,js,eot,gif,html,jpg,json,png,svg,woff2,ttf}"
+  ],
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "style": "style/index.css",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jupyterlab/jupyterlab-data-explorer.git"
   },
   "scripts": {
-    "build": "jlpm && lerna bootstrap --hoist && lerna run build",
-    "build:packages": "tsc --build packages/*",
-    "build:packages:post": "lerna run postBuild",
-    "build:watch": "jlpm run build:packages --watch --listEmittedFiles",
-    "clean": "jlpm run clean:jupyter && jlpm clean:packages && jlpm clean:node",
-    "clean:jupyter": "jlpm run uninstall:extensions && jupyter lab clean",
-    "clean:node": "lerna clean --yes && rimraf node_modules yarn.lock",
-    "clean:packages": "lerna run clean",
-    "link:packages": "jupyter labextension link ./packages/* --no-build",
-    "lint": "jlpm run lint:css && jlpm run lint:typescript && jlpm run prettier:write",
-    "lint:check": "jlpm run lint:css:check && jlpm run lint:typescript:check && jlpm run prettier",
-    "lint:css": "jlpm run lint:css:check --fix",
-    "lint:css:check": "stylelint packages/**/*.css --config ./etc/stylelint/.stylelintrc.json",
-    "lint:typescript": "jlpm run lint:typescript:check --fix",
-    "lint:typescript:check": "eslint . --ext 'ts,tsx' --ignore-path .gitignore --config ./etc/eslint/.eslintrc.js",
-    "prettier": "prettier . --config ./etc/prettier/.prettierrc --ignore-path .gitignore --check",
-    "prettier:write": "jlpm run prettier --write",
-    "rebuild:packages": "jlpm run clean:packages && jlpm run build:packages",
-    "test": "jlpm run test:packages && jlpm run test:integration",
-    "test:packages": "lerna run test",
-    "test:integration": "env JEST_PUPPETEER_CONFIG=./etc/jest/jest-puppeteer.config.js jest --runInBand --config ./etc/jest/jest.config.js",
-    "test:integration:debug": "env HEADLESS=false SLOWMO=true jlpm test",
-    "uninstall:extensions": "jupyter labextension uninstall --all"
+    "build": "jlpm build:lib && jlpm build:labextension:dev",
+    "build:prod": "jlpm clean && jlpm build:lib && jlpm build:labextension",
+    "build:labextension": "jupyter labextension build .",
+    "build:labextension:dev": "jupyter labextension build --development True .",
+    "build:lib": "tsc",
+    "clean": "jlpm clean:lib",
+    "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
+    "clean:lintcache": "rimraf .eslintcache .stylelintcache",
+    "clean:labextension": "rimraf jupyterlab_dataregistry/labextension",
+    "clean:all": "jlpm clean:lib && jlpm clean:labextension && jlpm clean:lintcache",
+    "eslint": "jlpm eslint:check --fix",
+    "eslint:check": "eslint . --cache --ext .ts,.tsx",
+    "install:extension": "jlpm build",
+    "lint": "jlpm stylelint && jlpm prettier && jlpm eslint",
+    "lint:check": "jlpm stylelint:check && jlpm prettier:check && jlpm eslint:check",
+    "prettier": "jlpm prettier:base --write --list-different",
+    "prettier:base": "prettier \"**/*{.ts,.tsx,.js,.jsx,.css,.json,.md}\"",
+    "prettier:check": "jlpm prettier:base --check",
+    "stylelint": "jlpm stylelint:check --fix",
+    "stylelint:check": "stylelint --cache \"style/**/*.css\"",
+    "test": "jest --coverage",
+    "watch": "run-p watch:src watch:labextension",
+    "watch:src": "tsc -w",
+    "watch:labextension": "jupyter labextension watch ."
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged --config ./etc/lint-staged/lint-staged.config.js"
-    }
+  "dependencies": {
+    "@jupyterlab/application": "^3.1.0",
+    "@jupyterlab/coreutils": "^5.1.0",
+    "@jupyterlab/services": "^6.1.0",
+    "@jupyterlab/notebook": "^3.1.11",
+    "@jupyterlab/notebook-extension": "^3.1.11",
+    "@jupyterlab/settingregistry": "^3.1.0",
+    "@jupyterlab/translation": "^3.1.11",
+    "@jupyterlab/ui-components": "^3.1.11",
+    "@lumino/domutils": "^1.8.1",
+    "@lumino/signaling": "^1.8.1",
+    "@lumino/widgets": "^1.26.2"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@rws-air/jestscreenshot": "^4.0.4",
-    "@types/expect-puppeteer": "^4.4.1",
-    "@types/jest": "^25.2.1",
-    "@types/jest-environment-puppeteer": "^4.3.1",
-    "@types/puppeteer": "^2.0.1",
-    "@typescript-eslint/eslint-plugin": "^2.27.0",
-    "@typescript-eslint/parser": "^2.27.0",
-    "eslint": "^6.1.0",
-    "eslint-config-prettier": "^6.0.0",
-    "eslint-plugin-prettier": "^3.1.1",
-    "eslint-plugin-react": "^7.14.3",
-    "eslint-plugin-react-hooks": "^3.0.0",
-    "husky": "^4.2.3",
-    "jest": "^25.2.7",
-    "jest-circus": "^25.2.7",
-    "jest-puppeteer": "^4.3.0",
-    "lerna": "^3.16.4",
-    "lint-staged": "^10.1.2",
-    "prettier": "^2.0.4",
-    "puppeteer": "^2.0.0",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@jupyterlab/builder": "^3.1.0",
+    "@jupyterlab/testutils": "^3.0.0",
+    "@types/jest": "^26.0.0",
+    "@typescript-eslint/eslint-plugin": "^4.8.1",
+    "@typescript-eslint/parser": "^4.8.1",
+    "eslint": "^7.14.0",
+    "eslint-config-prettier": "^6.15.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "jest": "^26.0.0",
+    "mkdirp": "^1.0.3",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.1",
     "rimraf": "^3.0.2",
-    "stylelint": "^13.3.0",
-    "stylelint-config-prettier": "^8.0.1",
-    "stylelint-config-standard": "^20.0.0",
-    "ts-jest": "^25.3.1",
-    "typescript": "^3.5.3"
+    "stylelint": "^14.3.0",
+    "stylelint-config-prettier": "^9.0.3",
+    "stylelint-config-recommended": "^6.0.0",
+    "stylelint-config-standard": "~24.0.0",
+    "stylelint-prettier": "^2.0.0",
+    "typescript": "~4.1.3",
+    "ts-jest": "^26.0.0"
+  },
+  "sideEffects": [
+    "style/*.css",
+    "style/index.js"
+  ],
+  "styleModule": "style/index.js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "jupyterlab": { 
+    "discovery": {
+        "server": {
+          "managers": [
+            "pip"
+          ],
+          "base": {
+            "name": "jupyterlab_dataregistry"
+          }
+        }
+    },
+    "extension": true,
+    "outputDir": "jupyterlab_dataregistry/labextension",
+    "mimeExtension": "lib/mime-extension.js"
+  },
+  "jupyter-releaser": {
+    "hooks": {
+      "before-build-npm": [
+        "python -m pip install jupyterlab~=3.1",
+        "jlpm"
+      ],
+      "before-build-python": [
+        "jlpm clean:all"
+      ]
+    }
   }
 }

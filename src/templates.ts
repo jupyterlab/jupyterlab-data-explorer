@@ -51,7 +51,7 @@ export const getTemplate = (dataset: Dataset<any, any>) => {
 export const getCreateTemplate = () => {
   const tpl = [
     'from jupyterlab_dataregistry import dataset',
-    'ds = dataset.Dataset(',
+    'dataset.Dataset(',
     '    id="0",',
     '    abstract_data_type="tabular",',
     '    serialization_type="tsv",',

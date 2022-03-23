@@ -1,0 +1,32 @@
+[
+    {
+        "id": "100",
+        "abstractDataType": "tabular",
+        "storageType": "inmemory",
+        "value" : {
+            "value": "header1,header2\nvalue1,value2"
+        },
+        "metadata": {
+            "delimiter": ",",
+            "lineDelimiter": "\n"
+        },
+        "title": "CSV in memory dataset 1",
+        "description": "CSV in memory dataset 1",
+        "version": "1.0"
+    },
+    {
+        "id": "200",
+        "abstractDataType": "tabular",
+        "storageType": "inmemory",
+        "value" : {
+            "value": "header1,header2\nvalue3,value4"
+        },
+        "metadata": {
+            "delimiter": ",",
+            "lineDelimiter": "\n"
+        },
+        "title": "CSV in memory dataset 2",
+        "description": "CSV in memory dataset 2",
+        "version": "1.0"
+    }
+]

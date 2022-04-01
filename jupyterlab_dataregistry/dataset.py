@@ -1,55 +1,38 @@
+from dataclasses import asdict, dataclass
 import json
 from typing import Union, Optional, Dict
 
+from jupyterlab_dataregistry.utils import dict_to_camel
 
+@dataclass
 class Dataset:
     """Simple object for registering datasets.
     Creating a new dataset in notebook registers the dataset.
     """
+    id: str
+    abstract_data_type: str
+    serialization_type: str
+    storage_type: str
+    metadata: Dict
+    title: str
+    description: str
+    value: Union[str, Dict] = None
+    tags: Optional[Dict[str, str]] = None
+    version: Optional[str] = None
 
-    def __init__(
-        self,
-        id: str,
-        abstract_data_type: str,
-        serialization_type: str,
-        storage_type: str,
-        value: Union[str, Dict],
-        metadata: Dict,
-        title: str,
-        description: str,
-        tags: Optional[Dict[str, str]] = None,
-        version: Optional[str] = None
-    ):
-        self.id = id
-        self.abstract_data_type = abstract_data_type
-        self.serialization_type = serialization_type
-        self.storage_type = storage_type
-        self.value = value
-        self.metadata = metadata
-        self.title = title
-        self.description = description
-        self.tags = tags
-        self.version = version
+
+    def to_dict(self, camel_case: bool = False):
+        dataset = asdict(self, dict_factory=lambda x: {k: v for (k, v) in x if v is not None or k == 'value'})
+        return dict_to_camel(dataset) if camel_case else dataset
+
 
     def _repr_mimebundle_(self, include=None, exclude=None):
-        dataset = dict(
-            id=self.id,
-            abstractDataType=self.abstract_data_type,
-            serializationType=self.serialization_type,
-            storageType=self.storage_type,
-            value=self.value,
-            metadata=self.metadata,
-            title=self.title,
-            description=self.description
-        )
-        if self.tags:
-            dataset['tags'] = self.tags
-
-        if self.version:
-            dataset['version'] = self.version
+        dataset = self.to_dict(True)
 
         return {
             'application/vnd.jupyter.dataset': json.dumps(dataset)
         }
+    
 
+    
 

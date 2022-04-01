@@ -15,3 +15,6 @@ npm = ["jlpm"]
 
 [tool.check-manifest]
 ignore = ["jupyterlab_dataregistry/labextension/**", "yarn.lock", ".*", "package-lock.json"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "strict"

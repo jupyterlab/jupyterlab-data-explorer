@@ -46,7 +46,7 @@ def test_add_command(mock_exists, data, adt, sert, stot, command, filename):
             serialization_type=sert,
             storage_type=stot,
         )
-        handle = m()
-        m.assert_called_with(filename, "w")
-        expected_write = data + command + "\n"
-        handle.write.assert_called_once_with(expected_write)
+    handle = m()
+    m.assert_any_call(filename, "w")
+    expected_write = data + command + "\n"
+    handle.write.assert_called_once_with(expected_write)

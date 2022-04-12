@@ -81,10 +81,11 @@ async def dummy(*args, **kwargs):
 @pytest.mark.usefixtures("clear_dataregistry")
 async def test_register_dataset(jp_fetch, dataset, expected_status, error, before):
     await before(jp_fetch, dataset)
-    with error:
+    with error as e:
         r = await save_dataset(jp_fetch, dataset)
         assert r.code == expected_status
         payload = json.loads(r.body)
+        assert json.loads(dataset) == payload
 
 
 @pytest.mark.parametrize(

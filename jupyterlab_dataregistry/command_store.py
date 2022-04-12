@@ -2,8 +2,6 @@ import hashlib
 import os
 from typing import List
 
-from .dataset import Dataset
-
 
 class CommandStore:
     """A file based storage to persist dataset commands"""
@@ -50,9 +48,12 @@ class CommandStore:
             abstract_data_type, serialization_type, storage_type
         )
         commands = []
-        with open(os.path.join(self.path, filename), "r") as f:
-            data = f.read()
-            if data:
-                commands = data.split("\n")
+        try:
+            with open(os.path.join(self.path, filename), "r") as f:
+                data = f.read()
+                if data:
+                    commands = data.split("\n")
+        except FileNotFoundError:
+            pass
                 
         return [x for x in commands if x] 

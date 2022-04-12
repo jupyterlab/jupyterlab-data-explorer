@@ -1,10 +1,39 @@
 
 from argparse import ArgumentError
 import os
+from typing import Optional
 from .command_store import CommandStore
 from .dataset import Dataset
 
 from .dataset_store import DatasetStore
+
+
+class AlreadyExistsError(Exception):
+    def __init__(self, id: str, version: Optional[str] = None):
+        self.id = id
+        self.version = version
+
+    def __str__(self):
+        return f"Dataset with id: {self.id} and version: {self.version} already exists."
+
+
+class NotFoundError(Exception):
+    def __init__(self, id: str, version: Optional[str] = None):
+        self.id = id
+        self.version = version
+
+    def __str__(self):
+        return f"Dataset with id: {self.id} and version: {self.version} not found."
+
+
+class TypeMismatchError(Exception):
+    def __init__(self, type_name: str, actual: str, expected: str):
+        self.type_name = type_name
+        self.actual = actual
+        self.expected = expected
+
+    def __str__(self):
+        return f"{self.actual} passed for {self.type_name}, but {self.expected} expected."
 
 
 class DataRegistry():
@@ -21,10 +50,7 @@ class DataRegistry():
         id = dataset.id
         version = dataset.version
         if dataset_store.has_dataset(id, version):
-            raise ArgumentError(
-                None,
-                message=f"Dataset with id {dataset.id} already exists"
-            )
+            raise AlreadyExistsError(id, version)
         else:
             dataset_store.save_dataset(dataset)
 
@@ -36,28 +62,28 @@ class DataRegistry():
         
         registered_dataset = dataset_store.load_dataset(id)
         if registered_dataset.abstract_data_type != dataset.abstract_data_type:
-            raise ArgumentError(
-                None,
-                f"Abstract data type {dataset.abstract_data_type} doesn't match {registered_dataset.abstract_data_type}"
+            raise TypeMismatchError(
+                "abstractDataType",
+                dataset.abstract_data_type,
+                registered_dataset.abstract_data_type
             )
         
         if registered_dataset.serialization_type != dataset.serialization_type:
-            raise ArgumentError(
-                None,
-                f"Serialization type {dataset.serialization_type} doesn't match {registered_dataset.serialization_type}"
+            raise TypeMismatchError(
+                "serializationType",
+                dataset.serialization_type,
+                registered_dataset.serialization_type
             )
         
         if registered_dataset.storage_type != dataset.storage_type:
-            raise ArgumentError(
-                None,
-                f"Storage type {dataset.storage_type} doesn't match {registered_dataset.storage_type}"
+            raise TypeMismatchError(
+                "storageType",
+                dataset.storage_type,
+                registered_dataset.storage_type
             )
         
         if dataset_store.dataset_exists(id, version):
-            raise ArgumentError(
-                None,
-                f"Dataset with id: {id} and version: {version} already exists"
-            )
+            raise AlreadyExistsError(id, version)
         else:
             dataset_store.save_dataset(dataset)
         
@@ -67,7 +93,7 @@ class DataRegistry():
         if dataset_store.has_dataset(id, version):
             dataset = dataset_store.load_dataset(id, version)
         else:
-            raise ArgumentError(None, f"Dataset with id: {id} and version: {version} does not exist.")
+            raise NotFoundError(id, version)
 
         return dataset
 

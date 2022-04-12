@@ -2,7 +2,7 @@ from dataclasses import asdict, dataclass
 import json
 from typing import Union, Optional, Dict
 
-from jupyterlab_dataregistry.utils import dict_to_camel
+from .utils import dict_to_camel
 
 @dataclass
 class Dataset:

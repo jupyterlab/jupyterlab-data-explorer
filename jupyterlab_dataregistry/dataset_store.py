@@ -55,7 +55,7 @@ class DatasetStore:
             if version:
                 with open(os.path.join(self.path, filename), "r") as f:
                     datasets = json.load(f)
-                    dataset = next((d for d in datasets if d.version == version), None)
+                    dataset = next((d for d in datasets if d.get('version') == version), None)
                     return True if dataset else False
             else:
                 return True

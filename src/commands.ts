@@ -3,7 +3,7 @@ import { ElementExt } from '@lumino/domutils';
 import { JupyterFrontEnd } from '@jupyterlab/application';
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { IDatasetListingModel } from './model';
-import registry from './dataregistry';
+import registry, { IDataRegistry } from './dataregistry';
 import { CsvViewer, CsvWidget } from './csv-widget';
 import { Dataset } from './dataset';
 import { JSONValue } from '@lumino/coreutils';
@@ -15,7 +15,7 @@ export const CommandIds = {
   openhuggingface: 'dataregistry:open-huggingface',
 };
 
-export const addCommandsAndMenu = (
+export const addCommandsAndMenu = async (
   app: JupyterFrontEnd,
   notebookTracker: INotebookTracker,
   model: IDatasetListingModel
@@ -104,19 +104,34 @@ export const addCommandsAndMenu = (
     },
   });
 
-  // Add menus for datasets
-  registry.datasetAdded.connect((registry, dataset) => {
+  const addCommands = async (registry: IDataRegistry, dataset: Dataset<any, any>) => {
     const { abstractDataType, serializationType, storageType } = dataset;
-    const commands = registry.getCommands(
+    const commands = await registry.getCommands(
       abstractDataType,
       serializationType,
       storageType
     );
     for (const command of commands) {
       app.contextMenu.addItem({
-        selector: `.jp-Dataset-list-item[data-adt=${abstractDataType}][data-sert=${serializationType}][data-stot=${storageType}]`,
+        selector: [
+          `.jp-Dataset-list-item`,
+          `[data-adt=${abstractDataType}]`,
+          `[data-sert=${serializationType}]`,
+          `[data-stot=${storageType}]`
+        ].join(""),
         command: command,
       });
     }
+  }
+
+  // Add menus for datasets that are already registered
+  const datasets = await registry.queryDataset();
+  datasets.forEach(async (dataset) => {
+    addCommands(registry, dataset);
+  });
+
+  // Add menus for datasets that are registered later in the UI
+  registry.datasetAdded.connect(async (registry, dataset) => {
+    addCommands(registry, dataset);
   });
 };

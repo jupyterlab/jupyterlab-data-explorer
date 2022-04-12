@@ -1,52 +1,51 @@
 import { Dataset } from './dataset';
 import { JSONValue, Token } from '@lumino/coreutils';
 import { Signal } from '@lumino/signaling';
+import { DataRegistryHandler } from './handler';
 
-const DatasetStore: { [key: string]: Dataset<any, any>[] } = {};
-const CommandsStore: { [key: string]: Set<string> } = {};
 const SignalsStore: { [key: string]: Signal<any, any> } = {};
 
 export interface IDataRegistry {
   registerDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
-  ): void;
+  ): Promise<void>;
 
   updateDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
-  ): void;
+  ): Promise<void>;
 
   getDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
     version?: string
-  ): Dataset<T, U>;
+  ): Promise<Dataset<T, U>>;
 
   getDatasetSignal<T extends JSONValue, U extends JSONValue>(
     id: string
   ): Signal<any, Dataset<T, U>>;
 
-  hasDataset<T extends JSONValue, U extends JSONValue>(
+  hasDataset(
     id: string,
     version?: string
-  ): boolean;
+  ): Promise<boolean>;
 
   registerCommand(
     commandId: string,
     abstractDataType: string,
     serializationType: string,
     storageType: string
-  ): void;
+  ): Promise<void>;
 
   getCommands(
     abstractDataType: string,
     serializationType: string,
     storageType: string
-  ): Set<string> | [];
+  ): Promise<Set<string> | []>;
 
   queryDataset(
     abstractDataType?: string,
     serializationType?: string,
     storageType?: string
-  ): Dataset<any, any>[] | [];
+  ): Promise<Dataset<any, any>[]> | Promise<[]>;
 
   readonly datasetAdded: Signal<any, Dataset<any, any>>;
   readonly datasetUpdated: Signal<any, Dataset<any, any>>;
@@ -72,10 +71,13 @@ class Registry implements IDataRegistry {
    */
   readonly commandAdded: Signal<any, String>;
 
+  private readonly _registryService: DataRegistryHandler;
+
   constructor() {
     this.datasetAdded = new Signal(this);
     this.datasetUpdated = new Signal(this);
     this.commandAdded = new Signal(this);
+    this._registryService = new DataRegistryHandler({});
   }
 
   /**
@@ -86,11 +88,14 @@ class Registry implements IDataRegistry {
    * @throws Throws an error if dataset with
    * same id and version already exists.
    */
-  registerDataset<T extends JSONValue, U extends JSONValue>(
+  async registerDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
   ) {
-    _registerDataset(dataset);
-    this.datasetAdded.emit(dataset);
+    const registeredDataset = await this._registryService.registerDataset(dataset);
+    if(registeredDataset != null) {
+      SignalsStore[dataset.id] = new Signal<any, Dataset<T, U>>(registry);
+      this.datasetAdded.emit(dataset);
+    }
   }
 
   /**
@@ -101,27 +106,11 @@ class Registry implements IDataRegistry {
    * serializationType or storageType are different from
    * registered values.
    */
-  updateDataset<T extends JSONValue, U extends JSONValue>(
+  async updateDataset<T extends JSONValue, U extends JSONValue>(
     dataset: Dataset<T, U>
   ) {
-    const registeredDataset = this.getDataset(dataset.id);
-    if (registeredDataset) {
-      if (registeredDataset.abstractDataType !== dataset.abstractDataType) {
-        throw new Error(
-          `Abstract data type "${dataset.abstractDataType}" doesn't match "${registeredDataset.abstractDataType}"`
-        );
-      }
-      if (registeredDataset.serializationType !== dataset.serializationType) {
-        throw new Error(
-          `Serialization type "${dataset.serializationType}" doesn't match "${registeredDataset.serializationType}"`
-        );
-      }
-      if (registeredDataset.storageType !== dataset.storageType) {
-        throw new Error(
-          `Storage type "${dataset.storageType}" doesn't match "${registeredDataset.storageType}"`
-        );
-      }
-      _registerDataset(dataset);
+    const registeredDataset = await this._registryService.updateDataset(dataset);
+    if(registeredDataset != null) {
       this.getDatasetSignal(dataset.id).emit(dataset);
       this.datasetUpdated.emit(dataset);
     }
@@ -135,24 +124,13 @@ class Registry implements IDataRegistry {
    * @returns Dataset dataset
    * @throws  Will throw an error if no matching dataset found
    */
-  getDataset<T extends JSONValue, U extends JSONValue>(
+  async getDataset<T extends JSONValue, U extends JSONValue>(
     id: string,
     version?: string
-  ): Dataset<T, U> {
-    const datasets = DatasetStore[id];
-    if (!datasets) {
-      throw new Error(`No dataset with id: ${id} exists.`);
-    } else if (version) {
-      const dataset = datasets.find((dataset) => dataset.version === version);
-      if (dataset) {
-        return dataset;
-      } else {
-        throw new Error(
-          `No dataset with id: ${id}, version: ${version} exists.`
-        );
-      }
-    }
-    return datasets[datasets.length - 1];
+  ): Promise<Dataset<T, U>> {
+    const dataset = await this._registryService.getDataset<T, U>(id, version);
+    return dataset;
+    
   }
 
   /**
@@ -167,7 +145,7 @@ class Registry implements IDataRegistry {
   getDatasetSignal<T extends JSONValue, U extends JSONValue>(
     id: string
   ): Signal<any, Dataset<T, U>> {
-    if (this.hasDataset(id)) {
+    if (SignalsStore[id]) {
       return SignalsStore[id];
     } else {
       throw new Error(`No dataset registered with id: ${id}`);
@@ -181,17 +159,11 @@ class Registry implements IDataRegistry {
    * @param version version that dataset was registered with
    * @returns {boolean} true if matching dataset exists
    */
-  hasDataset<T extends JSONValue, U extends JSONValue>(
+  async hasDataset(
     id: string,
     version?: string
-  ): boolean {
-    const datasets = DatasetStore[id];
-    return (
-      datasets &&
-      (version
-        ? datasets.findIndex((ds) => ds.version === version) !== -1
-        : true)
-    );
+  ): Promise<boolean> {
+    return await this._registryService.hasDataset(id, version)
   }
 
   /**
@@ -205,16 +177,16 @@ class Registry implements IDataRegistry {
    * @param serializationType serialization type
    * @param storageType storage type
    */
-  registerCommand(
+  async registerCommand(
     commandId: string,
     abstractDataType: string,
     serializationType: string,
     storageType: string
-  ): void {
-    const key = `${abstractDataType}:${serializationType}:${storageType}`;
-    const actions = CommandsStore[key] || new Set();
-    CommandsStore[key] = actions.add(commandId);
-    this.commandAdded.emit(commandId);
+  ): Promise<void> {
+    const data = await this._registryService.registerCommand(commandId, abstractDataType, serializationType, storageType);
+    if(data != null){
+      this.commandAdded.emit(commandId);
+    }
   }
 
   /**
@@ -228,15 +200,13 @@ class Registry implements IDataRegistry {
    * @param storageType storage type
    * @returns {Set[string]|[]} set of registered commands
    */
-  getCommands(
+  async getCommands(
     abstractDataType: string,
     serializationType: string,
     storageType: string
-  ): Set<string> | [] {
+  ): Promise<Set<string> | []> {
     return (
-      CommandsStore[
-        `${abstractDataType}:${serializationType}:${storageType}`
-      ] || []
+      await this._registryService.getCommands(abstractDataType, serializationType, storageType)
     );
   }
 
@@ -249,51 +219,22 @@ class Registry implements IDataRegistry {
    * @param storageType storage type to match
    * @returns {Dataset[]|[]} list of matching datasets
    */
-  queryDataset(
+  async queryDataset(
     abstractDataType?: string,
     serializationType?: string,
     storageType?: string
-  ): Dataset<any, any>[] | [] {
-    const datasets = [];
-    for (const id in DatasetStore) {
-      const versions = DatasetStore[id];
-      const dataset = versions[versions.length - 1];
-      let include = true;
-      if (abstractDataType) {
-        include = dataset.abstractDataType === abstractDataType;
-      }
-      if (serializationType) {
-        include = include && dataset.serializationType === serializationType;
-      }
-      if (storageType) {
-        include = include && dataset.storageType === storageType;
-      }
-      if (include) {
-        datasets.push(dataset);
-      }
-    }
-    return datasets;
+  ): Promise<Dataset<any, any>[] | []> {
+    return (
+      await this._registryService.queryDataset(
+        abstractDataType,
+        serializationType,
+        storageType
+      )
+    )
   }
 }
 
 const registry = new Registry();
-
-function _registerDataset<T extends JSONValue, U extends JSONValue>(
-  dataset: Dataset<T, U>
-) {
-  if (registry.hasDataset<T, U>(dataset.id, dataset.version)) {
-    throw new Error(
-      `Dataset with id: ${dataset.id}, version: ${dataset.version} already exists.`
-    );
-  } else {
-    if (!DatasetStore[dataset.id]) {
-      DatasetStore[dataset.id] = [dataset];
-      SignalsStore[dataset.id] = new Signal<any, Dataset<T, U>>(registry);
-    } else {
-      DatasetStore[dataset.id] = [...DatasetStore[dataset.id], dataset];
-    }
-  }
-}
 
 export const IDataRegistry = new Token<IDataRegistry>(
   '@jupyterlab/dataregistry:IDataRegistry'

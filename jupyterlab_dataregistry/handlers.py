@@ -1,107 +1,130 @@
-from argparse import ArgumentError
 import json
-from sys import exc_info
-from typing import DefaultDict
+import traceback
 
 from jupyter_core.paths import jupyter_data_dir
 from jupyter_server.base.handlers import APIHandler
 from jupyter_server.utils import url_path_join
-import tornado
+from tornado import web
 
 from .utils import dict_to_snake
-from .dataregistry import DataRegistry
+from .dataregistry import AlreadyExistsError, DataRegistry, NotFoundError
 from .dataset import Dataset
 
 
 class RegisterHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def post(self):
         body = self.get_json_body()
         body = dict_to_snake(body)
-        dataset = Dataset(**body)
         try:
+            dataset = Dataset(**body)
             __DATA_REGISTRY__.register_dataset(dataset)
             self.finish(json.dumps(dataset.to_dict(True)))
-        except:
-            self.send_error(exc_info=exc_info)
+        except AlreadyExistsError as e:
+            raise web.HTTPError(500, str(e)) from e
+        except TypeError as e:
+            raise web.HTTPError(
+                500, "Missing fields in JSON data: " + str(e).split(":")[-1]
+            ) from e
+        except Exception as e:
+            print(traceback.format_exc())
+            raise web.HTTPError(500, str(e)) from e
 
 
 class UpdateHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def put(self):
         body = self.get_json_body()
         body = dict_to_snake(body)
-        dataset = Dataset(**body)
-        __DATA_REGISTRY__.update_dataset(dataset)
-        self.finish(json.dumps(dataset.to_dict(True)))
+        try:
+            dataset = Dataset(**body)
+            __DATA_REGISTRY__.update_dataset(dataset)
+            self.finish(json.dumps(dataset.to_dict(True)))
+        except AlreadyExistsError as e:
+            raise web.HTTPError(500, str(e)) from e
+        except TypeError as e:
+            raise web.HTTPError(
+                500, "Missing fields in JSON data: " + str(e).split(":")[-1]
+            ) from e
+        except Exception as e:
+            raise web.HTTPError(500, str(e)) from e
 
 
 class QueryHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def get(self):
         abstract_data_type = self.get_query_argument("abstractDataType", None)
         serialization_type = self.get_query_argument("serializationType", None)
         storage_type = self.get_query_argument("storageType", None)
-        
+
         datasets = __DATA_REGISTRY__.query_dataset(
             abstract_data_type=abstract_data_type,
             serialization_type=serialization_type,
-            storage_type=storage_type
+            storage_type=storage_type,
         )
         response = [d.to_dict(True) for d in datasets]
         self.finish(json.dumps(response))
 
 
 class GetDatasetHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def get(self):
         id = self.get_query_argument("id")
         version = self.get_query_argument("version", None)
-
-        dataset = __DATA_REGISTRY__.get_dataset(id, version)
-        self.finish(json.dumps(dataset.to_dict(True)))
+        try:
+            dataset = __DATA_REGISTRY__.get_dataset(id, version)
+            self.finish(json.dumps(dataset.to_dict(True)))
+        except NotFoundError as e:
+            raise web.HTTPError(
+                404, f"Dataset with id: {id} and version: {version} not found."
+            )
+        except Exception as e:
+            raise web.HTTPError(500, str(e))
 
 
 class HasDatasetHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def head(self):
         id = self.get_query_argument("id")
         version = self.get_query_argument("version", None)
-        
+
         has_dataset = __DATA_REGISTRY__.has_dataset(id, version)
         self.finish()
 
 
 class RegisterCommandHandler(APIHandler):
-    
-    @tornado.web.authenticated
-    def put(self):
-        command_id = self.get_body_argument("command_id")
-        abstract_data_type = self.get_body_argument("abstractDataType")
-        serialization_type = self.get_body_argument("serializationType")
-        storage_type = self.get_body_argument("storageType")
-        
-        __DATA_REGISTRY__.register_command(
-            command_id=command_id,
-            abstract_data_type=abstract_data_type,
-            serialization_type=serialization_type,
-            storage_type=storage_type
-        )
+    @web.authenticated
+    def post(self):
+        params = self.get_json_body()
+        try: 
+            command_id = params["commandId"]
+            abstract_data_type = params["abstractDataType"]
+            serialization_type = params["serializationType"]
+            storage_type = params["storageType"]
 
-        self.finish(json.dumps({
-            "message": "Command with id: {command_id} registered successfully."
-        }))
-        
+            __DATA_REGISTRY__.register_command(
+                command_id=command_id,
+                abstract_data_type=abstract_data_type,
+                serialization_type=serialization_type,
+                storage_type=storage_type,
+            )
+
+            self.finish(
+                json.dumps(
+                    {"message": f"Command with id: {command_id} registered successfully."}
+                )
+            )
+
+        except KeyError as e:
+            raise web.HTTPError(
+                500, "Missing fields in JSON data: " + str(e).split(":")[-1]
+            ) from e
+        except Exception as e:
+            raise web.HTTPError(500, str(e)) from e
 
 
 class GetCommandsHandler(APIHandler):
-    
-    @tornado.web.authenticated
+    @web.authenticated
     def get(self):
         abstract_data_type = self.get_query_argument("abstractDataType")
         serialization_type = self.get_query_argument("serializationType")
@@ -110,7 +133,7 @@ class GetCommandsHandler(APIHandler):
         commands = __DATA_REGISTRY__.get_commands(
             abstract_data_type=abstract_data_type,
             serialization_type=serialization_type,
-            storage_type=storage_type
+            storage_type=storage_type,
         )
 
         self.finish(json.dumps(commands))
@@ -125,7 +148,7 @@ def setup_handlers(web_app):
         ("updateDataset", UpdateHandler),
         ("queryDataset", QueryHandler),
         ("getDataset", GetDatasetHandler),
-        ("hasDataset", HasDatasetHandler), 
+        ("hasDataset", HasDatasetHandler),
         ("registerCommand", RegisterCommandHandler),
         ("getCommands", GetCommandsHandler),
     ]
@@ -136,8 +159,8 @@ def setup_handlers(web_app):
         for endpoint, handler in handlers_with_path
     ]
     web_app.add_handlers(host_pattern, handlers)
-    
+
     data_dir = jupyter_data_dir()
-    
+
     global __DATA_REGISTRY__
     __DATA_REGISTRY__ = DataRegistry(data_dir)

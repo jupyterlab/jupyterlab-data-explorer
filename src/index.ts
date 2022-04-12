@@ -7,13 +7,12 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { ITranslator } from '@jupyterlab/translation';
 import { DatasetPanel } from './dataset-panel';
-import { JSONObject } from '@lumino/coreutils';
+//import { JSONObject } from '@lumino/coreutils';
 import registry, {
   IDataRegistry,
 } from './dataregistry';
 import { spreadsheetIcon } from '@jupyterlab/ui-components';
 import { INotebookTracker } from '@jupyterlab/notebook';
-import { JSONValue } from '@lumino/coreutils';
 import { DatasetListingModel } from './model';
 import { addCommandsAndMenu, CommandIds } from './commands';
 
@@ -24,7 +23,7 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
   id: '@jupyterlab/dataregistry-extension:plugin',
   autoStart: true,
   requires: [ISettingRegistry, ITranslator, ILabShell, INotebookTracker],
-  activate: (
+  activate: async (
     app: JupyterFrontEnd,
     settingRegistry: ISettingRegistry | null,
     translator: ITranslator,
@@ -52,7 +51,7 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
         });
     }
 
-    const model = new DatasetListingModel(registry.queryDataset());
+    const model = new DatasetListingModel(await registry.queryDataset());
     const panel = new DatasetPanel({
       model,
       app,
@@ -64,10 +63,11 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
     panel.node.setAttribute('aria-label', trans.__('Dataset Registry'));
     labShell.add(panel, 'left');
 
-    addCommandsAndMenu(app, notebookTracker, model);
+    await addCommandsAndMenu(app, notebookTracker, model);
     
     // This should exist in a demo extension
-    registerDemoDatasets();
+    await registerDemoDatasets();
+    await registerDemoCommands();
 
     return registry;
   },
@@ -76,9 +76,23 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
 export default plugin;
 
 
+// Move this to a demo extension
+async function registerDemoCommands() {
+  await registry.registerCommand(CommandIds.view, 'tabular', 'csv', 'inmemory');
+  await registry.registerCommand(CommandIds.opencsv, 'tabular', 'csv', 'inmemory');
+  await registry.registerCommand(CommandIds.view, 'tabular', 'csv', 's3');
+  await registry.registerCommand(
+    CommandIds.openhuggingface,
+    'tabular',
+    'csv',
+    'huggingface'
+  );
+}
+
+
 // This should exist in a demo extension
-function registerDemoDatasets() {
-  interface ICSVMetadata extends JSONObject {
+async function registerDemoDatasets() {
+  /*interface ICSVMetadata extends JSONObject {
     delimiter: string;
     lineDelimiter: string;
   }
@@ -90,10 +104,7 @@ function registerDemoDatasets() {
     filename: string;
   }
 
-  registry.registerCommand(CommandIds.view, 'tabular', 'csv', 'inmemory');
-  registry.registerCommand(CommandIds.opencsv, 'tabular', 'csv', 'inmemory');
-
-  registry.registerDataset<JSONValue, ICSVMetadata>({
+  await registry.registerDataset<JSONValue, ICSVMetadata>({
     id: datasetId,
     abstractDataType: 'tabular',
     serializationType: 'csv',
@@ -108,9 +119,7 @@ function registerDemoDatasets() {
     version: '1.0',
   });
 
-  registry.registerCommand(CommandIds.view, 'tabular', 'csv', 's3');
-
-  registry.registerDataset<JSONValue, IS3CSVMetadata>({
+  await registry.registerDataset<JSONValue, IS3CSVMetadata>({
     id: 's3://bucket/filename',
     abstractDataType: 'tabular',
     serializationType: 'csv',
@@ -125,12 +134,5 @@ function registerDemoDatasets() {
     title: 'CSV S3 Dataset',
     description: 'CSV in S3 dataset',
     version: '1.0',
-  });
-
-  registry.registerCommand(
-    CommandIds.openhuggingface,
-    'tabular',
-    'csv',
-    'huggingface'
-  );
+  });*/
 }

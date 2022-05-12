@@ -119,3 +119,6 @@ dmypy.json
 
 # vscode
 .vscode
+
+# intellij
+.idea

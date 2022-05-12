@@ -1,6 +1,6 @@
 import hashlib
 import os
-from typing import List
+from typing import Dict, List
 
 
 class CommandStore:
@@ -18,6 +18,11 @@ class CommandStore:
             f"{abstract_data_type}_{serialization_type}_{storage_type}".encode("utf-8")
         ).hexdigest()
 
+    def __create_filename_key(
+        self, abstract_data_type: str, serialization_type: str, storage_type: str
+    ) -> str:
+        return f"{abstract_data_type}_{serialization_type}_{storage_type}"
+
     def add_command(
         self,
         command_id: str,
@@ -30,12 +35,16 @@ class CommandStore:
         filename = self.__create_filename(
             abstract_data_type, serialization_type, storage_type
         )
+        key = self.__create_filename_key(
+            abstract_data_type, serialization_type, storage_type
+        )
         commands = self.get_commands(
             abstract_data_type, storage_type, serialization_type
         )
 
         if command_id not in commands:
             commands.append(command_id)
+            commands.insert(0, key)
             with open(os.path.join(self.path, filename), "w") as f:
                 f.write("\n".join(commands) + "\n")
 
@@ -53,7 +62,28 @@ class CommandStore:
                 data = f.read()
                 if data:
                     commands = data.split("\n")
+                    commands = commands[1:]
         except FileNotFoundError:
             pass
                 
         return [x for x in commands if x] 
+
+
+    def load_all_commands(self) -> Dict[str, str]:
+        """Returns all commands keyed with data type"""
+
+        c = {}
+        for file in os.listdir(self.path):
+            filepath = os.path.join(self.path, file)
+            if os.path.isfile(filepath):
+                with open(filepath, "r") as f:
+                    data = f.read()
+
+                if data:
+                    commands = data.split("\n")
+                    key = commands[0]
+                    commands = commands[1:]
+                    commands = [x for x in commands if x] 
+                    c[key] = commands
+
+        return c

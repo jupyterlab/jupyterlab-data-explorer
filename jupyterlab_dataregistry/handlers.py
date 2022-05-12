@@ -1,13 +1,13 @@
 import json
 import traceback
 
-from jupyter_core.paths import jupyter_data_dir
-from jupyter_server.base.handlers import APIHandler
+from jupyter_server.base.handlers import APIHandler, JupyterHandler
 from jupyter_server.utils import url_path_join
 from tornado import web
+from tornado.websocket import WebSocketHandler
 
 from .utils import dict_to_snake
-from .dataregistry import AlreadyExistsError, DataRegistry, NotFoundError
+from .dataregistry import AlreadyExistsError, DATA_REGISTRY, NotFoundError
 from .dataset import Dataset
 
 
@@ -18,7 +18,7 @@ class RegisterHandler(APIHandler):
         body = dict_to_snake(body)
         try:
             dataset = Dataset(**body)
-            __DATA_REGISTRY__.register_dataset(dataset)
+            DATA_REGISTRY.register_dataset(dataset)
             self.finish(json.dumps(dataset.to_dict(True)))
         except AlreadyExistsError as e:
             raise web.HTTPError(500, str(e)) from e
@@ -38,7 +38,7 @@ class UpdateHandler(APIHandler):
         body = dict_to_snake(body)
         try:
             dataset = Dataset(**body)
-            __DATA_REGISTRY__.update_dataset(dataset)
+            DATA_REGISTRY.update_dataset(dataset)
             self.finish(json.dumps(dataset.to_dict(True)))
         except AlreadyExistsError as e:
             raise web.HTTPError(500, str(e)) from e
@@ -57,7 +57,7 @@ class QueryHandler(APIHandler):
         serialization_type = self.get_query_argument("serializationType", None)
         storage_type = self.get_query_argument("storageType", None)
 
-        datasets = __DATA_REGISTRY__.query_dataset(
+        datasets = DATA_REGISTRY.query_dataset(
             abstract_data_type=abstract_data_type,
             serialization_type=serialization_type,
             storage_type=storage_type,
@@ -72,7 +72,7 @@ class GetDatasetHandler(APIHandler):
         id = self.get_query_argument("id")
         version = self.get_query_argument("version", None)
         try:
-            dataset = __DATA_REGISTRY__.get_dataset(id, version)
+            dataset = DATA_REGISTRY.get_dataset(id, version)
             self.finish(json.dumps(dataset.to_dict(True)))
         except NotFoundError as e:
             raise web.HTTPError(
@@ -88,7 +88,7 @@ class HasDatasetHandler(APIHandler):
         id = self.get_query_argument("id")
         version = self.get_query_argument("version", None)
 
-        has_dataset = __DATA_REGISTRY__.has_dataset(id, version)
+        DATA_REGISTRY.has_dataset(id, version)
         self.finish()
 
 
@@ -96,13 +96,13 @@ class RegisterCommandHandler(APIHandler):
     @web.authenticated
     def post(self):
         params = self.get_json_body()
-        try: 
+        try:
             command_id = params["commandId"]
             abstract_data_type = params["abstractDataType"]
             serialization_type = params["serializationType"]
             storage_type = params["storageType"]
 
-            __DATA_REGISTRY__.register_command(
+            DATA_REGISTRY.register_command(
                 command_id=command_id,
                 abstract_data_type=abstract_data_type,
                 serialization_type=serialization_type,
@@ -111,7 +111,9 @@ class RegisterCommandHandler(APIHandler):
 
             self.finish(
                 json.dumps(
-                    {"message": f"Command with id: {command_id} registered successfully."}
+                    {
+                        "message": f"Command with id: {command_id} registered successfully."
+                    }
                 )
             )
 
@@ -126,17 +128,48 @@ class RegisterCommandHandler(APIHandler):
 class GetCommandsHandler(APIHandler):
     @web.authenticated
     def get(self):
-        abstract_data_type = self.get_query_argument("abstractDataType")
-        serialization_type = self.get_query_argument("serializationType")
-        storage_type = self.get_query_argument("storageType")
+        abstract_data_type = self.get_query_argument("abstractDataType", None)
+        serialization_type = self.get_query_argument("serializationType", None)
+        storage_type = self.get_query_argument("storageType", None)
 
-        commands = __DATA_REGISTRY__.get_commands(
-            abstract_data_type=abstract_data_type,
-            serialization_type=serialization_type,
-            storage_type=storage_type,
-        )
+        if (
+            abstract_data_type is None
+            or serialization_type is None
+            or storage_type is None
+        ):
+            commands = DATA_REGISTRY.load_all_commands()
+        else:
+            commands = DATA_REGISTRY.get_commands(
+                abstract_data_type=abstract_data_type,
+                serialization_type=serialization_type,
+                storage_type=storage_type,
+            )
 
         self.finish(json.dumps(commands))
+
+
+class DataRegistryEventsHandler(JupyterHandler, WebSocketHandler):
+    def set_default_headers(self):
+        """Undo the set_default_headers in JupyterHandler
+
+        which doesn't make sense for websockets
+        """
+        pass
+
+    def pre_get(self):
+        if self.get_current_user() is None:
+            self.log.warning("Couldn't authenticate WebSocket connection")
+            raise web.HTTPError(403)
+
+    async def get(self, *args, **kwargs):
+        # pre_get can be a coroutine in subclasses
+        # assign and yield in two step to avoid tornado 3 issues
+        self.pre_get()
+        res = super().get(*args, **kwargs)
+        await res
+
+    def get_compression_options(self):
+        return self.settings.get("websocket_compression_options", None)
 
 
 def setup_handlers(web_app):
@@ -151,6 +184,7 @@ def setup_handlers(web_app):
         ("hasDataset", HasDatasetHandler),
         ("registerCommand", RegisterCommandHandler),
         ("getCommands", GetCommandsHandler),
+        ("events", DataRegistryEventsHandler),
     ]
 
     base_url = web_app.settings["base_url"]
@@ -159,8 +193,3 @@ def setup_handlers(web_app):
         for endpoint, handler in handlers_with_path
     ]
     web_app.add_handlers(host_pattern, handlers)
-
-    data_dir = jupyter_data_dir()
-
-    global __DATA_REGISTRY__
-    __DATA_REGISTRY__ = DataRegistry(data_dir)

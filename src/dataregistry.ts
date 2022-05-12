@@ -2,8 +2,12 @@ import { Dataset } from './dataset';
 import { JSONValue, Token } from '@lumino/coreutils';
 import { Signal } from '@lumino/signaling';
 import { DataRegistryHandler } from './handler';
+import { Poll } from '@lumino/polling';
 
 const SignalsStore: { [key: string]: Signal<any, any> } = {};
+const DatasetsStore: { [key: string]: Dataset<any, any>[] } = {};
+const CommandsStore: { [key: string]: string[] } = {};
+
 
 export interface IDataRegistry {
   registerDataset<T extends JSONValue, U extends JSONValue>(
@@ -47,9 +51,13 @@ export interface IDataRegistry {
     storageType?: string
   ): Promise<Dataset<any, any>[]> | Promise<[]>;
 
+  loadDatasets(): void
+  loadCommands(): void
+  dispose(): void
+
   readonly datasetAdded: Signal<any, Dataset<any, any>>;
   readonly datasetUpdated: Signal<any, Dataset<any, any>>;
-  readonly commandAdded: Signal<any, String>;
+  readonly commandAdded: Signal<any, string>;
 }
 
 class Registry implements IDataRegistry {
@@ -69,15 +77,24 @@ class Registry implements IDataRegistry {
    * This signal provides subscriptions to
    * event when any command is registered.
    */
-  readonly commandAdded: Signal<any, String>;
+  readonly commandAdded: Signal<any, string>;
 
   private readonly _registryService: DataRegistryHandler;
+  private readonly _poll: Poll
 
   constructor() {
     this.datasetAdded = new Signal(this);
     this.datasetUpdated = new Signal(this);
     this.commandAdded = new Signal(this);
     this._registryService = new DataRegistryHandler({});
+    this._poll = new Poll({
+      factory: async () => {
+        await this.loadDatasets();
+        await this.loadCommands();
+      },
+      frequency: { interval: 10000, backoff: false }
+    });
+    this._poll.start();
   }
 
   /**
@@ -92,6 +109,7 @@ class Registry implements IDataRegistry {
     dataset: Dataset<T, U>
   ) {
     const registeredDataset = await this._registryService.registerDataset(dataset);
+    DatasetsStore[dataset.id] = [dataset];
     if(registeredDataset != null) {
       SignalsStore[dataset.id] = new Signal<any, Dataset<T, U>>(registry);
       this.datasetAdded.emit(dataset);
@@ -110,6 +128,7 @@ class Registry implements IDataRegistry {
     dataset: Dataset<T, U>
   ) {
     const registeredDataset = await this._registryService.updateDataset(dataset);
+    DatasetsStore[dataset.id].push(dataset);
     if(registeredDataset != null) {
       this.getDatasetSignal(dataset.id).emit(dataset);
       this.datasetUpdated.emit(dataset);
@@ -128,8 +147,15 @@ class Registry implements IDataRegistry {
     id: string,
     version?: string
   ): Promise<Dataset<T, U>> {
-    const dataset = await this._registryService.getDataset<T, U>(id, version);
-    return dataset;
+    const datasets = DatasetsStore[id];
+    if(!datasets) {
+      throw new Error(`Dataset with id ${id} is not registered.`);
+    }
+    const dataset = datasets.find((ds) => ds.version != null && ds.version === version)
+    if(version && !dataset) {
+      throw new Error(`Dataset with id:${id} and version: ${version} is not registered.`);
+    }
+    return dataset!!;
     
   }
 
@@ -163,7 +189,15 @@ class Registry implements IDataRegistry {
     id: string,
     version?: string
   ): Promise<boolean> {
-    return await this._registryService.hasDataset(id, version)
+    const datasets = DatasetsStore[id];
+    if(!datasets) {
+      return false;
+    }
+    const dataset = datasets.find((ds) => ds.version != null && ds.version === version)
+    if(version && !dataset) {
+      return false;
+    }
+    return true;
   }
 
   /**
@@ -184,6 +218,12 @@ class Registry implements IDataRegistry {
     storageType: string
   ): Promise<void> {
     const data = await this._registryService.registerCommand(commandId, abstractDataType, serializationType, storageType);
+    const key = `${abstractDataType}_${serializationType}_${storageType}`;
+    if(CommandsStore[key]) {
+      CommandsStore[key].push(commandId);
+    } else {
+      CommandsStore[key] = [commandId];
+    }
     if(data != null){
       this.commandAdded.emit(commandId);
     }
@@ -205,9 +245,8 @@ class Registry implements IDataRegistry {
     serializationType: string,
     storageType: string
   ): Promise<Set<string> | []> {
-    return (
-      await this._registryService.getCommands(abstractDataType, serializationType, storageType)
-    );
+    const key = `${abstractDataType}_${serializationType}_${storageType}`;
+    return new Set(CommandsStore[key]) || [];
   }
 
   /**
@@ -224,14 +263,80 @@ class Registry implements IDataRegistry {
     serializationType?: string,
     storageType?: string
   ): Promise<Dataset<any, any>[] | []> {
-    return (
-      await this._registryService.queryDataset(
-        abstractDataType,
-        serializationType,
-        storageType
-      )
-    )
+    const all_datasets = [];
+    for (const id in DatasetsStore) {
+      const datasets = DatasetsStore[id]; 
+      const dataset = datasets[datasets.length - 1];
+      let include = true;
+      if(abstractDataType) {
+        include = dataset.abstractDataType === abstractDataType;
+      }
+      if(serializationType) {
+        include = include && dataset.serializationType === serializationType;
+      }
+      if(storageType) {
+        include = include && dataset.storageType === storageType;
+      }
+      if(include) {
+        all_datasets.push(dataset);
+      }
+    }
+    
+    return all_datasets;
   }
+
+  /**
+   * Loads all the datasets from the server
+   */
+  async loadDatasets() {
+    const all_datasets = await this._registryService.queryDataset();
+    for(const dataset of all_datasets) {
+      const id = dataset.id;
+      if (DatasetsStore[id]) {
+        const datasets = DatasetsStore[id];
+        const localDataset = datasets[datasets.length - 1];
+        if(dataset.version != null && dataset.version != localDataset.version) {
+          DatasetsStore[id].push(dataset);
+          this.getDatasetSignal(dataset.id).emit(dataset);
+          this.datasetUpdated.emit(dataset);
+        }
+      } else {
+        DatasetsStore[id] = [dataset];
+        SignalsStore[dataset.id] = new Signal<any, Dataset<any, any>>(registry);
+        this.datasetAdded.emit(dataset);
+      } 
+    }
+  }
+
+  /**
+   * Loads all commands from server
+   */
+  async loadCommands() {
+    const allCommands = await this._registryService.loadCommands();
+    for(const key in allCommands) {
+      const localCommands = CommandsStore[key];
+      const commands = allCommands[key];
+      if(localCommands) {
+        const missing = commands.filter(c => !localCommands.includes(c))
+        if(missing.length > 0) {
+          CommandsStore[key] = [...localCommands, ...missing]
+          for(const command of missing) {
+            this.commandAdded.emit(command);
+          }
+        }
+      } else {
+        CommandsStore[key] = commands;
+        for(const command of commands) {
+          this.commandAdded.emit(command);
+        }
+      }
+    }
+  }
+
+  dispose() {
+    this._poll.dispose();
+  }
+
 }
 
 const registry = new Registry();

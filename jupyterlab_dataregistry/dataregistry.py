@@ -1,9 +1,9 @@
-
-from argparse import ArgumentError
 import os
 from typing import Optional
 from .command_store import CommandStore
 from .dataset import Dataset
+
+from jupyter_core.paths import jupyter_data_dir
 
 from .dataset_store import DatasetStore
 
@@ -36,7 +36,7 @@ class TypeMismatchError(Exception):
         return f"{self.actual} passed for {self.type_name}, but {self.expected} expected."
 
 
-class DataRegistry():
+class DataRegistry:
 
     def __init__(self, store_path: str):
         base_path = os.path.join(store_path, ".dataregistry")
@@ -44,7 +44,6 @@ class DataRegistry():
         self.__dataset_store = DatasetStore(os.path.join(base_path, "datasets"))
         self.__command_store = CommandStore(os.path.join(base_path, "commands"))
 
-    
     def register_dataset(self, dataset: Dataset):
         dataset_store = self.__dataset_store
         id = dataset.id
@@ -54,41 +53,39 @@ class DataRegistry():
         else:
             dataset_store.save_dataset(dataset)
 
-
     def update_dataset(self, dataset: Dataset):
         dataset_store = self.__dataset_store
-        id = dataset.id
+        _id = dataset.id
         version = dataset.version
-        
-        registered_dataset = dataset_store.load_dataset(id)
+
+        registered_dataset = dataset_store.load_dataset(_id)
         if registered_dataset.abstract_data_type != dataset.abstract_data_type:
             raise TypeMismatchError(
                 "abstractDataType",
                 dataset.abstract_data_type,
                 registered_dataset.abstract_data_type
             )
-        
+
         if registered_dataset.serialization_type != dataset.serialization_type:
             raise TypeMismatchError(
                 "serializationType",
                 dataset.serialization_type,
                 registered_dataset.serialization_type
             )
-        
+
         if registered_dataset.storage_type != dataset.storage_type:
             raise TypeMismatchError(
                 "storageType",
                 dataset.storage_type,
                 registered_dataset.storage_type
             )
-        
-        if dataset_store.dataset_exists(id, version):
-            raise AlreadyExistsError(id, version)
+
+        if dataset_store.dataset_exists(_id, version):
+            raise AlreadyExistsError(_id, version)
         else:
             dataset_store.save_dataset(dataset)
-        
 
-    def get_dataset(self, id, version = None):
+    def get_dataset(self, id, version=None):
         dataset_store = self.__dataset_store
         if dataset_store.has_dataset(id, version):
             dataset = dataset_store.load_dataset(id, version)
@@ -97,12 +94,11 @@ class DataRegistry():
 
         return dataset
 
-
     def query_dataset(
-        self, 
-        abstract_data_type: str = None, 
-        serialization_type: str = None, 
-        storage_type: str = None
+            self,
+            abstract_data_type: str = None,
+            serialization_type: str = None,
+            storage_type: str = None
     ):
         datasets = []
         for dataset in self.__dataset_store.load_all_datasets():
@@ -121,36 +117,33 @@ class DataRegistry():
 
         return datasets
 
-
     def has_dataset(
-        self,
-        id: str,
-        version: str = None
-    ) -> Dataset:  
+            self,
+            id: str,
+            version: str = None
+    ) -> Dataset:
         dataset = self.__dataset_store.has_dataset(id, version)
         return dataset
 
-
     def register_command(
-        self,
-        command_id: str,
-        abstract_data_type: str, 
-        serialization_type: str, 
-        storage_type: str
+            self,
+            command_id: str,
+            abstract_data_type: str,
+            serialization_type: str,
+            storage_type: str
     ):
         self.__command_store.add_command(
-            command_id, 
+            command_id,
             abstract_data_type,
             serialization_type,
             storage_type
-        )       
-
+        )
 
     def get_commands(
-        self,
-        abstract_data_type: str, 
-        serialization_type: str, 
-        storage_type: str
+            self,
+            abstract_data_type: str,
+            serialization_type: str,
+            storage_type: str
     ):
         commands = self.__command_store.get_commands(
             abstract_data_type,
@@ -159,5 +152,11 @@ class DataRegistry():
         )
 
         return commands
-    
-    
+
+
+    def load_all_commands(self):
+        commands = self.__command_store.load_all_commands()
+        return commands
+
+
+DATA_REGISTRY = DataRegistry(jupyter_data_dir())

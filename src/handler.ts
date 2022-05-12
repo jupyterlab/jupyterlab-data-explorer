@@ -7,7 +7,6 @@ import { Dataset } from './dataset';
 const API_NAMEPSACE = 'dataregistry';
 
 export class DataRegistryHandler {
-
   constructor(options: DataRegistryHandler.IOptions) {
     this.serverSettings =
       options.serverSettings || ServerConnection.makeSettings();
@@ -16,14 +15,10 @@ export class DataRegistryHandler {
   async registerDataset(dataset: Dataset<any, any>) {
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        "registerDataset",
-        {
-          method: 'POST',
-          body: JSON.stringify(dataset)
-        }
-      )
+      data = await requestAPI(this.serverSettings, 'registerDataset', {
+        method: 'POST',
+        body: JSON.stringify(dataset)
+      });
     } catch (e: any) {
       console.log(e);
     }
@@ -33,43 +28,34 @@ export class DataRegistryHandler {
   async updateDataset(dataset: Dataset<any, any>) {
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        "updateDataset",
-        {
-          method: 'PUT',
-          body: JSON.stringify(dataset)
-        }
-      )
+      data = await requestAPI(this.serverSettings, 'updateDataset', {
+        method: 'PUT',
+        body: JSON.stringify(dataset)
+      });
     } catch (e: any) {
       console.log(e);
     }
     return data;
   }
 
-  
   async getDataset<T extends JSONValue, U extends JSONValue>(
-    id: string, 
+    id: string,
     version?: string
-    ):Promise<Dataset<T, U>> {    
+  ): Promise<Dataset<T, U>> {
     const params = URLExt.objectToQueryString({
       id,
       version
     });
-    
+
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        `getDataset${params}`,
-        {
-          method: 'GET'
-        }
-      )
+      data = await requestAPI(this.serverSettings, `getDataset${params}`, {
+        method: 'GET'
+      });
     } catch (e: any) {
       console.log(e);
     }
-    
+
     return data as Dataset<T, U>;
   }
 
@@ -86,98 +72,101 @@ export class DataRegistryHandler {
           method: 'HEAD'
         },
         false
-      )
+      );
     } catch (e: any) {
-      return false
+      return false;
     }
-    return true
+    return true;
   }
 
   async registerCommand(
-    commandId: string, 
-    abstractDataType: string, 
-    serializationType: string, 
+    commandId: string,
+    abstractDataType: string,
+    serializationType: string,
     storageType: string
-  ) {    
+  ) {
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        `registerCommand`,
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            commandId,
-            abstractDataType,
-            serializationType,
-            storageType
-          })
-        }
-      )
+      data = await requestAPI(this.serverSettings, 'registerCommand', {
+        method: 'POST',
+        body: JSON.stringify({
+          commandId,
+          abstractDataType,
+          serializationType,
+          storageType
+        })
+      });
     } catch (e: any) {
       console.log(e);
     }
-    
+
     return data;
   }
 
   async getCommands(
-    abstractDataType: string, 
-    serializationType: string, 
+    abstractDataType: string,
+    serializationType: string,
     storageType: string
-  ) {    
+  ) {
     const params = URLExt.objectToQueryString({
       abstractDataType,
       serializationType,
       storageType
     });
-    
+
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        `getCommands${params}`,
-        {
-          method: 'GET'
-        }
-      )
+      data = await requestAPI(this.serverSettings, `getCommands${params}`, {
+        method: 'GET'
+      });
     } catch (e: any) {
       console.log(e);
     }
-    
+
     return data as Set<string>;
   }
 
-  async queryDataset(
-    abstractDataType?: string, 
-    serializationType?: string, 
-    storageType?: string
-  ) {    
-    let params: any = {};
-    if(abstractDataType) {
-      params['abstractDataType'] = abstractDataType;
-    }
-    if(serializationType) {
-      params['serializationType'] = serializationType;
-    }
-    if(storageType){
-      params['storageType'] = storageType;
-    }
-    params = URLExt.objectToQueryString(params);
-    
+
+  async loadCommands() {
     let data;
     try {
-      data = await requestAPI(
-        this.serverSettings,
-        `queryDataset${params}`,
-        {
-          method: 'GET'
-        }
-      )
+      data = await requestAPI(this.serverSettings, 'getCommands', {
+        method: 'GET'
+      });
     } catch (e: any) {
       console.log(e);
     }
-    
+
+    return data as {[key: string]: [string]};
+  }
+
+
+  async queryDataset(
+    abstractDataType?: string,
+    serializationType?: string,
+    storageType?: string
+  ) {
+    let params: any = {};
+    if (abstractDataType) {
+      params['abstractDataType'] = abstractDataType;
+    }
+    if (serializationType) {
+      params['serializationType'] = serializationType;
+    }
+    if (storageType) {
+      params['storageType'] = storageType;
+    }
+    params = URLExt.objectToQueryString(params);
+
+    let data;
+    try {
+      data = await requestAPI(this.serverSettings, `queryDataset${params}`, {
+        method: 'GET'
+      });
+    } catch (e: any) {
+      console.log(e);
+    }
+
     return data as Promise<Dataset<any, any>[] | []>;
   }
 
@@ -199,14 +188,10 @@ async function requestAPI<T>(
   settings: ServerConnection.ISettings,
   endPoint = '',
   init: RequestInit = {},
-  expectData: boolean = true
+  expectData = true
 ): Promise<T> {
   // Make request to Jupyter API
-  const requestUrl = URLExt.join(
-    settings.baseUrl,
-    API_NAMEPSACE,
-    endPoint
-  );
+  const requestUrl = URLExt.join(settings.baseUrl, API_NAMEPSACE, endPoint);
 
   let response: Response;
   try {

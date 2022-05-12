@@ -124,14 +124,43 @@ export const addCommandsAndMenu = async (
     }
   }
 
-  // Add menus for datasets that are already registered
-  const datasets = await registry.queryDataset();
-  datasets.forEach(async (dataset) => {
-    addCommands(registry, dataset);
-  });
-
   // Add menus for datasets that are registered later in the UI
   registry.datasetAdded.connect(async (registry, dataset) => {
     addCommands(registry, dataset);
   });
+
+  const selectors = new Set();
+  registry.commandAdded.connect(async (registry, command) => {
+    const datasets = await registry.queryDataset();
+    for (const dataset of datasets) {
+      const { abstractDataType, serializationType, storageType } = dataset;
+      const commands = await registry.getCommands(
+        abstractDataType,
+        serializationType,
+        storageType
+      );
+      if(commands.has(command)) {
+        const selector = [
+          `.jp-Dataset-list-item`,
+          `[data-adt=${abstractDataType}]`,
+          `[data-sert=${serializationType}]`,
+          `[data-stot=${storageType}]`,
+          command
+        ].join("");
+        if(!selectors.has(selector)) {
+          selectors.add(selector);
+          app.contextMenu.addItem({
+            selector: [
+              `.jp-Dataset-list-item`,
+              `[data-adt=${abstractDataType}]`,
+              `[data-sert=${serializationType}]`,
+              `[data-stot=${storageType}]`
+            ].join(""),
+            command: command,
+          });
+        }
+      }
+    }
+  });
+
 };

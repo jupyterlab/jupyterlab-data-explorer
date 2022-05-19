@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab-dataregistry",
-  "version": "4.0.0",
+  "version": "0.0.1",
   "description": "Datasets as first class entities in Juptyerlab",
   "keywords": [
     "jupyter",
@@ -65,7 +65,9 @@
     "@lumino/domutils": "^1.8.1",
     "@lumino/signaling": "^1.8.1",
     "@lumino/polling": "^1.8.1",
-    "@lumino/widgets": "^1.26.2"
+    "@lumino/widgets": "^1.26.2",
+    "@jupyterlab/apputils": "^3.1.11",
+    "@jupyterlab/docregistry": "^3.1.11"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",

@@ -7,7 +7,7 @@ import {
 import { ISettingRegistry } from '@jupyterlab/settingregistry';
 import { ITranslator } from '@jupyterlab/translation';
 import { DatasetPanel } from './dataset-panel';
-//import { JSONObject } from '@lumino/coreutils';
+import { JSONObject, JSONValue } from '@lumino/coreutils';
 import registry, {
   IDataRegistry,
 } from './dataregistry';
@@ -15,6 +15,7 @@ import { spreadsheetIcon } from '@jupyterlab/ui-components';
 import { INotebookTracker } from '@jupyterlab/notebook';
 import { DatasetListingModel } from './model';
 import { addCommandsAndMenu, CommandIds } from './commands';
+import { Widget } from '@lumino/widgets';
 
 /**
  * Initialization data for the @jupyterlab/dataregistry-extension extension.
@@ -61,9 +62,9 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
     panel.title.caption = trans.__('Dataset Registry');
     panel.node.setAttribute('role', 'region');
     panel.node.setAttribute('aria-label', trans.__('Dataset Registry'));
-    labShell.add(panel, 'left');
+    labShell.add(panel as unknown as Widget, 'left');
 
-    await addCommandsAndMenu(app, notebookTracker, model);
+    await addCommandsAndMenu(app, labShell, notebookTracker, model, trans);
     
     // This should exist in a demo extension
     await registerDemoDatasets();
@@ -72,6 +73,8 @@ const plugin: JupyterFrontEndPlugin<IDataRegistry> = {
     return registry;
   },
 };
+
+export {IDataRegistry};
 
 export default plugin;
 
@@ -86,6 +89,12 @@ async function registerDemoCommands() {
     'tabular',
     'csv',
     'huggingface'
+  );
+  registry.registerCommand(
+    CommandIds.opensql,
+    'tabular',
+    'sql',
+    'sqlite'
   );
 }
 
@@ -135,4 +144,30 @@ async function registerDemoDatasets() {
     description: 'CSV in S3 dataset',
     version: '1.0',
   });*/
+
+  interface IStockAAPLSqliteMeta extends JSONObject {
+    location: string,
+    table: string,
+    cols: string[],
+    query: string
+  }
+
+  registry.registerDataset<JSONValue, IStockAAPLSqliteMeta>({
+    id: "aapl_stock_data",
+    version: "1",
+    abstractDataType: 'tabular',
+    serializationType: "sql",
+    storageType: 'sqlite',
+    value: null,
+    metadata: {
+      location: "data/demodb.sqlite",
+      table: "all_stocks",
+      cols: [
+        "data", "open", "high", "low", "close", "volume", "Name"
+      ],
+      query: "select * from all_stocks where Name = 'AAPL';"
+    },
+    title: "AAPL stock data",
+    description: "AAPL stock data"
+  }); 
 }

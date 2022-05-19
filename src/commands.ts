@@ -1,24 +1,30 @@
 import { getCreateTemplate, getTemplate } from './templates';
 import { ElementExt } from '@lumino/domutils';
-import { JupyterFrontEnd } from '@jupyterlab/application';
-import { INotebookTracker } from '@jupyterlab/notebook';
+import { JupyterFrontEnd, ILabShell } from '@jupyterlab/application';
+import { INotebookModel, INotebookTracker, Notebook, NotebookPanel } from '@jupyterlab/notebook';
 import { IDatasetListingModel } from './model';
 import registry, { IDataRegistry } from './dataregistry';
 import { CsvViewer, CsvWidget } from './csv-widget';
 import { Dataset } from './dataset';
 import { JSONValue } from '@lumino/coreutils';
+import { TranslationBundle } from '@jupyterlab/translation';
+import { showErrorMessage } from '@jupyterlab/apputils';
+import { Widget } from '@lumino/widgets';
 
 export const CommandIds = {
   view: 'dataregistry:view-dataset',
   create: 'dataregistry:create-dataset',
   opencsv: 'dataregistry:open-with-csv-viewer',
   openhuggingface: 'dataregistry:open-huggingface',
+  opensql: 'dataregistry:open-sql'
 };
 
 export const addCommandsAndMenu = async (
   app: JupyterFrontEnd,
+  labShell: ILabShell,
   notebookTracker: INotebookTracker,
-  model: IDatasetListingModel
+  model: IDatasetListingModel,
+  trans: TranslationBundle
 ) => {
   app.commands.addCommand(CommandIds.view, {
     label: 'View dataset',
@@ -59,7 +65,6 @@ export const addCommandsAndMenu = async (
     caption: 'Adds code to view dataset in a new cell',
     execute: (args) => {
       if (notebookTracker) {
-        notebookTracker;
         const widget = notebookTracker.currentWidget;
         const notebook = widget!.content;
         if (notebook.model) {
@@ -98,11 +103,49 @@ export const addCommandsAndMenu = async (
             JSONValue,
             CsvViewer.IMetadata
           >
-        ),
+        ) as unknown as Widget,
         'main'
       );
     },
   });
+
+  app.commands.addCommand(CommandIds.opensql, {
+    label: 'Open in SQL Notebook',
+    caption: 'Opens a new notebook with xeus-sql kernel',
+    execute: (args) => {
+      // does it need a check if xeus-sql kernel is available
+      app.commands.execute('notebook:create-new', {
+          kernelName: "xsql"
+      })
+      .then((widget: NotebookPanel) => {
+        if(widget instanceof NotebookPanel) {
+          const dataset = model.selectedDataset;
+          const notebook = widget!.content;
+          setTimeout(() => {
+            if (notebook.model) {
+              const nbModel = notebook.model;
+              notebook.mode = 'edit';
+              addCodeCell(
+                `%LOAD sqlite3 db="${dataset?.metadata.location}"`,
+                nbModel,
+                notebook
+              );
+              addCodeCell(
+                dataset?.metadata.query,
+                nbModel,
+                notebook
+              );
+              notebook.deselectAll();
+            }
+          }, 1000);
+        } 
+      })
+      .catch(err => {
+        void showErrorMessage(trans._p('Error', 'Launcher Error'), err);
+      });
+    }
+  });
+
 
   const addCommands = async (registry: IDataRegistry, dataset: Dataset<any, any>) => {
     const { abstractDataType, serializationType, storageType } = dataset;
@@ -164,3 +207,16 @@ export const addCommandsAndMenu = async (
   });
 
 };
+
+
+function addCodeCell(source: string, model: INotebookModel, notebook: Notebook) {
+  const cell = model.contentFactory.createCodeCell({
+    cell: {
+      cell_type: 'code',
+      source,
+      metadata: {},
+    },
+  });
+  model.cells.insert(notebook.activeCellIndex || 0, cell);
+  notebook.activeCellIndex++;
+}

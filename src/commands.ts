@@ -121,7 +121,7 @@ export const addCommandsAndMenu = async (
         if(widget instanceof NotebookPanel) {
           const dataset = model.selectedDataset;
           const notebook = widget!.content;
-          setTimeout(() => {
+          widget.context.ready.then(() => {
             if (notebook.model) {
               const nbModel = notebook.model;
               notebook.mode = 'edit';
@@ -137,7 +137,7 @@ export const addCommandsAndMenu = async (
               );
               notebook.deselectAll();
             }
-          }, 1000);
+          });
         } 
       })
       .catch(err => {

@@ -1,3 +1,5 @@
+**This repository has been archived by lack of maintainers.**
+
 # JupyterLab Data Explorer
 
 ![Stability Experimental][badge-stability] [![npm][badge-npm-version-dataregistry-extension]][npm-package-dataregistry-extension] [![npm][badge-npm-version-dataregistry]][npm-package-dataregistry]
